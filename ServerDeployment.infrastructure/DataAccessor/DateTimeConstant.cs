@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace ARAKDataSetup.infrastructure.DataAccessor;
+namespace ServerDeployment.infrastructure.DataAccessor;
 
 public abstract class DateTimeConstant
 {

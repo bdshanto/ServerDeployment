@@ -3,8 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <RootNamespace>ARAKDataSetup.Domains</RootNamespace>
+    <Nullable>enable</Nullable> 
   </PropertyGroup>
 
 </Project>

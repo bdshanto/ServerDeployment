@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace ARAKDataSetup.Domains.Utility
@@ -36,7 +37,7 @@ namespace ARAKDataSetup.Domains.Utility
                 throw null;
             }
         }
-
+        
         /*public static string JsonSerialize(object obj)
         {
             try

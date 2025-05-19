@@ -1,5 +1,5 @@
 ﻿using ARAKDataSetup.Domains.Utility;
-using ARAKDataSetup.infrastructure.Contracts.IDataAccessor;
+using ServerDeployment.infrastructure.Contracts.IDataAccessor;
 using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Transactions;
 
-namespace ARAKDataSetup.infrastructure.DataAccessor;
+namespace ServerDeployment.infrastructure.DataAccessor;
 
 public class DataAccess : IDataAccess
 {

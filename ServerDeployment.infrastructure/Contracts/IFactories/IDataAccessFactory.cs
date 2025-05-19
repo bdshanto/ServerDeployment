@@ -1,6 +1,6 @@
-using ARAKDataSetup.infrastructure.Contracts.IDataAccessor;
+using ServerDeployment.infrastructure.Contracts.IDataAccessor;
 
-namespace ARAKDataSetup.infrastructure.Contracts.IFactories
+namespace ServerDeployment.infrastructure.Contracts.IFactories
 {
     public interface IDataAccessFactory
     {

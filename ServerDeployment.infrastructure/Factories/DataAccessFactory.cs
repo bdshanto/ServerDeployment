@@ -1,9 +1,9 @@
-using ARAKDataSetup.Domains.Utility;
-using ARAKDataSetup.infrastructure.Contracts.IDataAccessor;
-using ARAKDataSetup.infrastructure.Contracts.IFactories;
-using ARAKDataSetup.infrastructure.DataAccessor;
+using ARAKDataSetup.Domains.Utility; 
+using ServerDeployment.infrastructure.Contracts.IDataAccessor;
+using ServerDeployment.infrastructure.Contracts.IFactories;
+using ServerDeployment.infrastructure.DataAccessor;
 
-namespace ARAKDataSetup.infrastructure.Factories
+namespace ServerDeployment.infrastructure.Factories
 {
     public class DataAccessFactory : IDataAccessFactory
     {

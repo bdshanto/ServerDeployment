@@ -1,6 +1,6 @@
 ﻿using System.Transactions;
 
-namespace ARAKDataSetup.infrastructure.Contracts.IDataAccessor;
+namespace ServerDeployment.infrastructure.Contracts.IDataAccessor;
 
 public interface IDataAccess
 {
