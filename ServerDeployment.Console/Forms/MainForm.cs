@@ -33,7 +33,7 @@ namespace ServerDeployment.Console.Forms
             var checkBoxCol = new DataGridViewCheckBoxColumn()
             {
                 HeaderText = "Select",
-                Width = 50,
+                Width = 80,
                 Name = "chkSelect"
             };
             dataGridView1.Columns.Add(checkBoxCol);
@@ -388,5 +388,25 @@ namespace ServerDeployment.Console.Forms
             CopyAppSettings();
         }
 
+        private void btnReloadSites_Click(object sender, EventArgs e)
+        {
+            LoadSitesFromIIS();
+        }
+        private async void btnPingSite_Click(object sender, EventArgs e)
+        {
+            var selected = GetSelectedSites();
+            if (selected.Count == 0)
+            {
+                MessageBox.Show("Select site(s) to ping.");
+                return;
+            }
+            foreach (var site in selected)
+            {
+                await PingSiteAsync(site.PhysicalPath);
+            }
+            MessageBox.Show("Ping completed.");
+        }
+
+        
     }
 }
