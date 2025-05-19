@@ -55,7 +55,8 @@
             btnReloadSites.Size = new Size(267, 111);
             btnReloadSites.TabIndex = 1;
             btnReloadSites.Text = "btnReloadSites";
-            btnReloadSites.UseVisualStyleBackColor = true; 
+            btnReloadSites.UseVisualStyleBackColor = true;
+            btnReloadSites.Click += btnReloadSites_Click;
             // 
             // btnBackup
             // 
@@ -65,6 +66,7 @@
             btnBackup.TabIndex = 2;
             btnBackup.Text = "btnBackup";
             btnBackup.UseVisualStyleBackColor = true;
+            btnBackup.Click += btnBackup_Click;
             // 
             // btnStopIIS
             // 
@@ -74,6 +76,7 @@
             btnStopIIS.TabIndex = 2;
             btnStopIIS.Text = "btnStopIIS";
             btnStopIIS.UseVisualStyleBackColor = true;
+            btnStopIIS.Click += btnStopIIS_Click;
             // 
             // btnStartIIS
             // 
@@ -83,6 +86,7 @@
             btnStartIIS.TabIndex = 2;
             btnStartIIS.Text = "btnStartIIS";
             btnStartIIS.UseVisualStyleBackColor = true;
+            btnStartIIS.Click += btnStartIIS_Click;
             // 
             // btnDeleteFiles
             // 
@@ -92,6 +96,7 @@
             btnDeleteFiles.TabIndex = 2;
             btnDeleteFiles.Text = "btnDeleteFiles";
             btnDeleteFiles.UseVisualStyleBackColor = true;
+            btnDeleteFiles.Click += btnDeleteFiles_Click;
             // 
             // btnCopyAppSettings
             // 
@@ -101,6 +106,7 @@
             btnCopyAppSettings.TabIndex = 2;
             btnCopyAppSettings.Text = "btnCopyAppSettings";
             btnCopyAppSettings.UseVisualStyleBackColor = true;
+            btnCopyAppSettings.Click += btnCopyAppSettings_Click;
             // 
             // btnPingSite
             // 
@@ -110,6 +116,7 @@
             btnPingSite.TabIndex = 2;
             btnPingSite.Text = "btnPingSite";
             btnPingSite.UseVisualStyleBackColor = true;
+            btnPingSite.Click += btnPingSite_Click;
             // 
             // MainForm
             // 

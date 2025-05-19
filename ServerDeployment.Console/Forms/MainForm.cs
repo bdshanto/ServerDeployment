@@ -148,7 +148,8 @@ namespace ServerDeployment.Console.Forms
 
         private void BackupSelectedSites()
         {
-            var selectedSites = GetSelectedSites(); // your method returning selected IISSiteInfo list 
+            var selectedSites = GetSelectedSites();
+            if (selectedSites.Count <= 0)
             {
                 MessageBox.Show("Please select at least one site to backup.");
                 return;
@@ -258,7 +259,7 @@ namespace ServerDeployment.Console.Forms
             MessageBox.Show("Files deleted.");
         }
 
-        private void DeleteAllFiles(string folder)
+        private void DeleteAllFiles(string folder, bool isRoot = true)
         {
             foreach (var file in Directory.GetFiles(folder))
             {
@@ -275,7 +276,14 @@ namespace ServerDeployment.Console.Forms
 
             foreach (var dir in Directory.GetDirectories(folder))
             {
-                DeleteAllFiles(dir);
+                // Skip deleting "Documents" folder if at root
+                if (isRoot && string.Equals(new DirectoryInfo(dir).Name, "Documents", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                DeleteAllFiles(dir, false);
+
                 try
                 {
                     Directory.Delete(dir, true);
@@ -286,6 +294,7 @@ namespace ServerDeployment.Console.Forms
                 }
             }
         }
+
 
         // Copy appsettings.json from each selected site to a backup folder
         private void CopyAppSettings()
@@ -299,7 +308,8 @@ namespace ServerDeployment.Console.Forms
 
             using var fbd = new FolderBrowserDialog()
             {
-                Description = "Select destination folder for appsettings.json backup"
+                Description = "Select destination folder for appsettings.json backup",
+                AddToRecent = true
             };
             if (fbd.ShowDialog() != DialogResult.OK) return;
 
@@ -363,7 +373,7 @@ namespace ServerDeployment.Console.Forms
             var selected = GetSelectedSites();
             foreach (var site in selected)
             {
-                StopSite(site.PhysicalPath);
+                StopSite(site.Name);
             }
             MessageBox.Show("Stop commands sent.");
         }
@@ -373,7 +383,7 @@ namespace ServerDeployment.Console.Forms
             var selected = GetSelectedSites();
             foreach (var site in selected)
             {
-                StartSite(site.PhysicalPath);
+                StartSite(site.Name);
             }
             MessageBox.Show("Start commands sent.");
         }
@@ -385,7 +395,61 @@ namespace ServerDeployment.Console.Forms
 
         private void btnCopyAppSettings_Click(object sender, EventArgs e)
         {
-            CopyAppSettings();
+            var sites = GetIISSites();
+            if (sites.Count <= 0)
+            {
+                MessageBox.Show("No sites found.");
+                return;
+            }
+
+            using var sourceDialog = new FolderBrowserDialog
+            {
+                Description = "Select Source Directory"
+            };
+            if (sourceDialog.ShowDialog() != DialogResult.OK)
+                return;
+            string sourceRoot = sourceDialog.SelectedPath;
+
+           /* // Select destination directory
+            using var destDialog = new FolderBrowserDialog
+            {
+                Description = "Select Destination Directory"
+            };
+            if (destDialog.ShowDialog() != DialogResult.OK)
+                return;*/
+            string destRoot = sites[0].PhysicalPath;
+
+            try
+            {
+                // Copy Documents folder
+                string sourceDocs = Path.Combine(sourceRoot, "Documents");
+                string destDocs = Path.Combine(destRoot, "Documents");
+                if (Directory.Exists(sourceDocs))
+                    CopyDirectory(sourceDocs, destDocs);
+
+                // Copy appsettings.json from PetMatrixBackendAPI folder
+                string sourceAppSettings = Path.Combine(sourceRoot, "PetMatrixBackendAPI", "appsettings.json");
+                if (File.Exists(sourceAppSettings))
+                {
+                    string destApiFolder = Path.Combine(destRoot, "PetMatrixBackendAPI");
+                    Directory.CreateDirectory(destApiFolder);
+                    string destAppSettings = Path.Combine(destApiFolder, "appsettings.json");
+                    File.Copy(sourceAppSettings, destAppSettings, overwrite: true);
+                }
+
+                // Copy ReportsViewer folder
+                string sourceReportsViewer = Path.Combine(sourceRoot, "ReportsViewer");
+                string destReportsViewer = Path.Combine(destRoot, "ReportsViewer");
+                if (Directory.Exists(sourceReportsViewer))
+                    CopyDirectory(sourceReportsViewer, destReportsViewer);
+
+                MessageBox.Show("Copy completed successfully.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error during copy: {ex.Message}");
+            }
+
         }
 
         private void btnReloadSites_Click(object sender, EventArgs e)
@@ -407,6 +471,6 @@ namespace ServerDeployment.Console.Forms
             MessageBox.Show("Ping completed.");
         }
 
-        
+
     }
 }
