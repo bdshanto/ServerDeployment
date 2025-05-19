@@ -181,10 +181,14 @@ namespace ServerDeployment.Console.Forms
             Directory.CreateDirectory(destDir);
 
             foreach (var file in dir.GetFiles())
+            {
                 file.CopyTo(Path.Combine(destDir, file.Name), true);
+            }
 
             foreach (var subDir in dir.GetDirectories())
+            {
                 CopyDirectory(subDir.FullName, Path.Combine(destDir, subDir.Name));
+            }
         }
         private void StopSite(string siteFolderName)
         {
@@ -475,7 +479,7 @@ namespace ServerDeployment.Console.Forms
             MessageBox.Show("Ping completed.");
         }
 
-       
+
 
         private void btnSetSiteRoot_Click_1(object sender, EventArgs e)
         {
@@ -488,8 +492,41 @@ namespace ServerDeployment.Console.Forms
             {
                 siteRootFolder = folderDialog.SelectedPath;
                 txtSiteRoot.Text = siteRootFolder;
- 
+
             }
         }
+
+        private void btnCopyContent_Click(object sender, EventArgs e)
+        {
+            // Select source directory
+            using var sourceDialog = new FolderBrowserDialog
+            {
+                Description = "Select Source Folder"
+            };
+            if (sourceDialog.ShowDialog() != DialogResult.OK)
+                return;
+            string sourceFolder = sourceDialog.SelectedPath;
+
+            // Select destination directory
+            using var destDialog = new FolderBrowserDialog
+            {
+                Description = "Select Destination Folder"
+            };
+            if (destDialog.ShowDialog() != DialogResult.OK)
+                return;
+            string destFolder = destDialog.SelectedPath;
+
+            try
+            {
+                CopyDirectory(sourceFolder, destFolder);
+                MessageBox.Show("Content copied successfully.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error copying content: " + ex.Message);
+            }
+        }
+
+
     }
 }

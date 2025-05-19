@@ -38,7 +38,7 @@
             btnPingSite = new Button();
             btnSetSiteRoot = new Button();
             txtSiteRoot = new TextBox();
-            button1 = new Button();
+            btnCopyContent = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
@@ -103,7 +103,7 @@
             // 
             // btnCopyAppSettings
             // 
-            btnCopyAppSettings.Location = new Point(1373, 670);
+            btnCopyAppSettings.Location = new Point(1646, 670);
             btnCopyAppSettings.Name = "btnCopyAppSettings";
             btnCopyAppSettings.Size = new Size(267, 111);
             btnCopyAppSettings.TabIndex = 2;
@@ -138,15 +138,15 @@
             txtSiteRoot.Size = new Size(927, 31);
             txtSiteRoot.TabIndex = 3;
             // 
-            // button1
+            // btnCopyContent
             // 
-            button1.Location = new Point(1646, 670);
-            button1.Name = "button1";
-            button1.Size = new Size(267, 111);
-            button1.TabIndex = 2;
-            button1.Text = "btnStartIIS";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += btnStartIIS_Click;
+            btnCopyContent.Location = new Point(1373, 670);
+            btnCopyContent.Name = "btnCopyContent";
+            btnCopyContent.Size = new Size(267, 111);
+            btnCopyContent.TabIndex = 2;
+            btnCopyContent.Text = "btnCopyContent";
+            btnCopyContent.UseVisualStyleBackColor = true;
+            btnCopyContent.Click += btnCopyContent_Click;
             // 
             // MainForm
             // 
@@ -157,7 +157,7 @@
             Controls.Add(btnPingSite);
             Controls.Add(btnCopyAppSettings);
             Controls.Add(btnDeleteFiles);
-            Controls.Add(button1);
+            Controls.Add(btnCopyContent);
             Controls.Add(btnStartIIS);
             Controls.Add(btnStopIIS);
             Controls.Add(btnBackup);
@@ -186,6 +186,6 @@
         private Button btnPingSite;
         private Button btnSetSiteRoot;
         private TextBox txtSiteRoot;
-        private Button button1;
+        private Button btnCopyContent;
     }
 }
