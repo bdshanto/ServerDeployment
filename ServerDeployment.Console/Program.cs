@@ -17,8 +17,8 @@ namespace ServerDeployment.Console
             AppUtility.ConnectionString = conString;
 
             ApplicationConfiguration.Initialize();
-            //Application.Run(new MainForm());
-            Application.Run(new ReasonTypeForm());
+            
+             Application.Run(new MainForm());
         }
     }
 }
