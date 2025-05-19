@@ -14,7 +14,7 @@ namespace ServerDeployment.Console.Forms
 {
     public partial class MainForm : Form
     {
-        private string sitesRoot = @"D:\Workspace\Office\ARAK\Resources\Websites";
+        private string siteRootFolder = ""; // field to hold site root path
         public MainForm()
         {
             InitializeComponent();
@@ -246,7 +246,7 @@ namespace ServerDeployment.Console.Forms
 
             foreach (var site in selected)
             {
-                var folder = Path.Combine(sitesRoot, site.PhysicalPath);
+                var folder = Path.Combine(siteRootFolder, site.PhysicalPath);
                 try
                 {
                     DeleteAllFiles(folder);
@@ -270,7 +270,7 @@ namespace ServerDeployment.Console.Forms
                 }
                 catch
                 {
-                    
+
                 }
             }
 
@@ -315,7 +315,7 @@ namespace ServerDeployment.Console.Forms
 
             foreach (var site in selected)
             {
-                var sourceFile = Path.Combine(sitesRoot, site.PhysicalPath, "appsettings.json");
+                var sourceFile = Path.Combine(siteRootFolder, site.PhysicalPath, "appsettings.json");
                 if (!File.Exists(sourceFile)) continue;
 
                 var destFile = Path.Combine(fbd.SelectedPath, $"{site}_appsettings_{DateTime.Now:yyyyMMddHHmmss}.json");
@@ -375,7 +375,8 @@ namespace ServerDeployment.Console.Forms
             {
                 StopSite(site.Name);
             }
-            MessageBox.Show("Stop commands sent.");
+            LoadSitesFromIIS();
+            // MessageBox.Show("Stop commands sent.");
         }
 
         private void btnStartIIS_Click(object sender, EventArgs e)
@@ -385,7 +386,8 @@ namespace ServerDeployment.Console.Forms
             {
                 StartSite(site.Name);
             }
-            MessageBox.Show("Start commands sent.");
+            LoadSitesFromIIS();
+            // MessageBox.Show("Start commands sent.");
         }
 
         private void btnDeleteFiles_Click(object sender, EventArgs e)
@@ -410,22 +412,24 @@ namespace ServerDeployment.Console.Forms
                 return;
             string sourceRoot = sourceDialog.SelectedPath;
 
-           /* // Select destination directory
-            using var destDialog = new FolderBrowserDialog
-            {
-                Description = "Select Destination Directory"
-            };
-            if (destDialog.ShowDialog() != DialogResult.OK)
-                return;*/
+            /* // Select destination directory
+             using var destDialog = new FolderBrowserDialog
+             {
+                 Description = "Select Destination Directory"
+             };
+             if (destDialog.ShowDialog() != DialogResult.OK)
+                 return;*/
             string destRoot = sites[0].PhysicalPath;
 
             try
             {
-                // Copy Documents folder
-                string sourceDocs = Path.Combine(sourceRoot, "Documents");
-                string destDocs = Path.Combine(destRoot, "Documents");
-                if (Directory.Exists(sourceDocs))
-                    CopyDirectory(sourceDocs, destDocs);
+                // Copy web.config from source root
+                string sourceWebConfig = Path.Combine(sourceRoot, "web.config");
+                if (File.Exists(sourceWebConfig))
+                {
+                    string destWebConfig = Path.Combine(destRoot, "web.config");
+                    File.Copy(sourceWebConfig, destWebConfig, overwrite: true);
+                }
 
                 // Copy appsettings.json from PetMatrixBackendAPI folder
                 string sourceAppSettings = Path.Combine(sourceRoot, "PetMatrixBackendAPI", "appsettings.json");
@@ -471,6 +475,21 @@ namespace ServerDeployment.Console.Forms
             MessageBox.Show("Ping completed.");
         }
 
+       
 
+        private void btnSetSiteRoot_Click_1(object sender, EventArgs e)
+        {
+            using var folderDialog = new FolderBrowserDialog
+            {
+                Description = "Select Site Root Directory"
+            };
+
+            if (folderDialog.ShowDialog() == DialogResult.OK)
+            {
+                siteRootFolder = folderDialog.SelectedPath;
+                txtSiteRoot.Text = siteRootFolder;
+ 
+            }
+        }
     }
 }

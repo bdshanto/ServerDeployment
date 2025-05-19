@@ -36,6 +36,8 @@
             btnDeleteFiles = new Button();
             btnCopyAppSettings = new Button();
             btnPingSite = new Button();
+            btnSetSiteRoot = new Button();
+            txtSiteRoot = new TextBox();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
@@ -50,7 +52,7 @@
             // 
             // btnReloadSites
             // 
-            btnReloadSites.Location = new Point(292, 538);
+            btnReloadSites.Location = new Point(281, 670);
             btnReloadSites.Name = "btnReloadSites";
             btnReloadSites.Size = new Size(267, 111);
             btnReloadSites.TabIndex = 1;
@@ -60,7 +62,7 @@
             // 
             // btnBackup
             // 
-            btnBackup.Location = new Point(581, 538);
+            btnBackup.Location = new Point(577, 670);
             btnBackup.Name = "btnBackup";
             btnBackup.Size = new Size(267, 111);
             btnBackup.TabIndex = 2;
@@ -70,7 +72,7 @@
             // 
             // btnStopIIS
             // 
-            btnStopIIS.Location = new Point(869, 538);
+            btnStopIIS.Location = new Point(873, 670);
             btnStopIIS.Name = "btnStopIIS";
             btnStopIIS.Size = new Size(267, 111);
             btnStopIIS.TabIndex = 2;
@@ -80,7 +82,7 @@
             // 
             // btnStartIIS
             // 
-            btnStartIIS.Location = new Point(1166, 538);
+            btnStartIIS.Location = new Point(1761, 670);
             btnStartIIS.Name = "btnStartIIS";
             btnStartIIS.Size = new Size(267, 111);
             btnStartIIS.TabIndex = 2;
@@ -90,7 +92,7 @@
             // 
             // btnDeleteFiles
             // 
-            btnDeleteFiles.Location = new Point(1448, 538);
+            btnDeleteFiles.Location = new Point(1169, 670);
             btnDeleteFiles.Name = "btnDeleteFiles";
             btnDeleteFiles.Size = new Size(267, 111);
             btnDeleteFiles.TabIndex = 2;
@@ -100,7 +102,7 @@
             // 
             // btnCopyAppSettings
             // 
-            btnCopyAppSettings.Location = new Point(1732, 538);
+            btnCopyAppSettings.Location = new Point(1465, 670);
             btnCopyAppSettings.Name = "btnCopyAppSettings";
             btnCopyAppSettings.Size = new Size(267, 111);
             btnCopyAppSettings.TabIndex = 2;
@@ -110,7 +112,7 @@
             // 
             // btnPingSite
             // 
-            btnPingSite.Location = new Point(2015, 538);
+            btnPingSite.Location = new Point(2057, 670);
             btnPingSite.Name = "btnPingSite";
             btnPingSite.Size = new Size(267, 111);
             btnPingSite.TabIndex = 2;
@@ -118,23 +120,43 @@
             btnPingSite.UseVisualStyleBackColor = true;
             btnPingSite.Click += btnPingSite_Click;
             // 
+            // btnSetSiteRoot
+            // 
+            btnSetSiteRoot.Location = new Point(281, 540);
+            btnSetSiteRoot.Name = "btnSetSiteRoot";
+            btnSetSiteRoot.Size = new Size(267, 111);
+            btnSetSiteRoot.TabIndex = 1;
+            btnSetSiteRoot.Text = "btnSetSiteRoot";
+            btnSetSiteRoot.UseVisualStyleBackColor = true;
+            btnSetSiteRoot.Click += btnSetSiteRoot_Click_1;
+            // 
+            // txtSiteRoot
+            // 
+            txtSiteRoot.Location = new Point(650, 580);
+            txtSiteRoot.Name = "txtSiteRoot";
+            txtSiteRoot.Size = new Size(927, 31);
+            txtSiteRoot.TabIndex = 3;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(2827, 1567);
+            Controls.Add(txtSiteRoot);
             Controls.Add(btnPingSite);
             Controls.Add(btnCopyAppSettings);
             Controls.Add(btnDeleteFiles);
             Controls.Add(btnStartIIS);
             Controls.Add(btnStopIIS);
             Controls.Add(btnBackup);
+            Controls.Add(btnSetSiteRoot);
             Controls.Add(btnReloadSites);
             Controls.Add(dataGridView1);
             Name = "MainForm";
             Text = "MainForm";
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -150,5 +172,7 @@
         private Button btnDeleteFiles;
         private Button btnCopyAppSettings;
         private Button btnPingSite;
+        private Button btnSetSiteRoot;
+        private TextBox txtSiteRoot;
     }
 }
