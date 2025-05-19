@@ -270,7 +270,7 @@ namespace ServerDeployment.Console.Forms
                 }
                 catch
                 {
-                    // Ignore files that cannot be deleted
+                    
                 }
             }
 
