@@ -15,6 +15,8 @@ namespace ServerDeployment.Console.Forms
     public partial class MainForm : Form
     {
         private string siteRootFolder = ""; // field to hold site root path
+
+        private Dictionary<string, string> siteBackupDirectory = new();
         public MainForm()
         {
             InitializeComponent();
@@ -165,6 +167,14 @@ namespace ServerDeployment.Console.Forms
                     string sourceDir = site.PhysicalPath;
                     string backupDir = Path.Combine(fbd.SelectedPath, $"{site.Name}_backup_{DateTime.Now:yyyyMMddHHmmss}");
                     CopyDirectory(sourceDir, backupDir);
+
+                    if (siteBackupDirectory.ContainsKey(site.Name))
+                    {
+                        siteBackupDirectory.Remove(site.Name);
+                    }
+
+                    siteBackupDirectory.Add(site.Name, backupDir);
+
                 }
                 catch (Exception ex)
                 {
@@ -407,49 +417,49 @@ namespace ServerDeployment.Console.Forms
                 MessageBox.Show("No sites found.");
                 return;
             }
-
+/*
             using var sourceDialog = new FolderBrowserDialog
             {
                 Description = "Select Source Directory"
             };
             if (sourceDialog.ShowDialog() != DialogResult.OK)
-                return;
-            string sourceRoot = sourceDialog.SelectedPath;
+                return;*/
 
-            /* // Select destination directory
-             using var destDialog = new FolderBrowserDialog
-             {
-                 Description = "Select Destination Directory"
-             };
-             if (destDialog.ShowDialog() != DialogResult.OK)
-                 return;*/
-            string destRoot = sites[0].PhysicalPath;
+            // string sourceRoot = sourceDialog.SelectedPath;
+
+            
 
             try
             {
-                // Copy web.config from source root
-                string sourceWebConfig = Path.Combine(sourceRoot, "web.config");
-                if (File.Exists(sourceWebConfig))
+                foreach (var site in sites)
                 {
-                    string destWebConfig = Path.Combine(destRoot, "web.config");
-                    File.Copy(sourceWebConfig, destWebConfig, overwrite: true);
-                }
+                    string sourceRoot =  siteBackupDirectory[site.Name];
+                    var destRoot = site.PhysicalPath;
 
-                // Copy appsettings.json from PetMatrixBackendAPI folder
-                string sourceAppSettings = Path.Combine(sourceRoot, "PetMatrixBackendAPI", "appsettings.json");
-                if (File.Exists(sourceAppSettings))
-                {
-                    string destApiFolder = Path.Combine(destRoot, "PetMatrixBackendAPI");
-                    Directory.CreateDirectory(destApiFolder);
-                    string destAppSettings = Path.Combine(destApiFolder, "appsettings.json");
-                    File.Copy(sourceAppSettings, destAppSettings, overwrite: true);
-                }
+                    // Copy web.config from source root
+                    string sourceWebConfig = Path.Combine(sourceRoot, "web.config");
+                    if (File.Exists(sourceWebConfig))
+                    {
+                        string destWebConfig = Path.Combine(destRoot, "web.config");
+                        File.Copy(sourceWebConfig, destWebConfig, overwrite: true);
+                    }
 
-                // Copy ReportsViewer folder
-                string sourceReportsViewer = Path.Combine(sourceRoot, "ReportsViewer");
-                string destReportsViewer = Path.Combine(destRoot, "ReportsViewer");
-                if (Directory.Exists(sourceReportsViewer))
-                    CopyDirectory(sourceReportsViewer, destReportsViewer);
+                    // Copy appsettings.json from PetMatrixBackendAPI folder
+                    string sourceAppSettings = Path.Combine(sourceRoot, "PetMatrixBackendAPI", "appsettings.json");
+                    if (File.Exists(sourceAppSettings))
+                    {
+                        string destApiFolder = Path.Combine(destRoot, "PetMatrixBackendAPI");
+                        Directory.CreateDirectory(destApiFolder);
+                        string destAppSettings = Path.Combine(destApiFolder, "appsettings.json");
+                        File.Copy(sourceAppSettings, destAppSettings, overwrite: true);
+                    }
+
+                    // Copy ReportsViewer folder
+                    string sourceReportsViewer = Path.Combine(sourceRoot, "ReportsViewer");
+                    string destReportsViewer = Path.Combine(destRoot, "ReportsViewer");
+                    if (Directory.Exists(sourceReportsViewer))
+                        CopyDirectory(sourceReportsViewer, destReportsViewer);
+                }
 
                 MessageBox.Show("Copy completed successfully.");
             }
@@ -498,27 +508,23 @@ namespace ServerDeployment.Console.Forms
 
         private void btnCopyContent_Click(object sender, EventArgs e)
         {
-            // Select source directory
-            using var sourceDialog = new FolderBrowserDialog
+            var selectedSites = GetSelectedSites();
+            if (selectedSites.Count == 0)
             {
-                Description = "Select Source Folder"
-            };
-            if (sourceDialog.ShowDialog() != DialogResult.OK)
+                MessageBox.Show("Please select at least one site to copy content.");
                 return;
-            string sourceFolder = sourceDialog.SelectedPath;
+            }
 
-            // Select destination directory
-            using var destDialog = new FolderBrowserDialog
-            {
-                Description = "Select Destination Folder"
-            };
-            if (destDialog.ShowDialog() != DialogResult.OK)
-                return;
-            string destFolder = destDialog.SelectedPath;
+            var sourceFolder = siteRootFolder;
+
 
             try
             {
-                CopyDirectory(sourceFolder, destFolder);
+                foreach (var site in selectedSites)
+                {
+
+                    CopyDirectory(sourceFolder, site.PhysicalPath);
+                }
                 MessageBox.Show("Content copied successfully.");
             }
             catch (Exception ex)
