@@ -38,6 +38,7 @@
             btnPingSite = new Button();
             btnSetSiteRoot = new Button();
             txtSiteRoot = new TextBox();
+            button1 = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
@@ -62,7 +63,7 @@
             // 
             // btnBackup
             // 
-            btnBackup.Location = new Point(577, 670);
+            btnBackup.Location = new Point(554, 670);
             btnBackup.Name = "btnBackup";
             btnBackup.Size = new Size(267, 111);
             btnBackup.TabIndex = 2;
@@ -72,7 +73,7 @@
             // 
             // btnStopIIS
             // 
-            btnStopIIS.Location = new Point(873, 670);
+            btnStopIIS.Location = new Point(827, 670);
             btnStopIIS.Name = "btnStopIIS";
             btnStopIIS.Size = new Size(267, 111);
             btnStopIIS.TabIndex = 2;
@@ -82,7 +83,7 @@
             // 
             // btnStartIIS
             // 
-            btnStartIIS.Location = new Point(1761, 670);
+            btnStartIIS.Location = new Point(1919, 670);
             btnStartIIS.Name = "btnStartIIS";
             btnStartIIS.Size = new Size(267, 111);
             btnStartIIS.TabIndex = 2;
@@ -92,7 +93,7 @@
             // 
             // btnDeleteFiles
             // 
-            btnDeleteFiles.Location = new Point(1169, 670);
+            btnDeleteFiles.Location = new Point(1100, 670);
             btnDeleteFiles.Name = "btnDeleteFiles";
             btnDeleteFiles.Size = new Size(267, 111);
             btnDeleteFiles.TabIndex = 2;
@@ -102,7 +103,7 @@
             // 
             // btnCopyAppSettings
             // 
-            btnCopyAppSettings.Location = new Point(1465, 670);
+            btnCopyAppSettings.Location = new Point(1373, 670);
             btnCopyAppSettings.Name = "btnCopyAppSettings";
             btnCopyAppSettings.Size = new Size(267, 111);
             btnCopyAppSettings.TabIndex = 2;
@@ -112,7 +113,7 @@
             // 
             // btnPingSite
             // 
-            btnPingSite.Location = new Point(2057, 670);
+            btnPingSite.Location = new Point(2192, 670);
             btnPingSite.Name = "btnPingSite";
             btnPingSite.Size = new Size(267, 111);
             btnPingSite.TabIndex = 2;
@@ -137,6 +138,16 @@
             txtSiteRoot.Size = new Size(927, 31);
             txtSiteRoot.TabIndex = 3;
             // 
+            // button1
+            // 
+            button1.Location = new Point(1646, 670);
+            button1.Name = "button1";
+            button1.Size = new Size(267, 111);
+            button1.TabIndex = 2;
+            button1.Text = "btnStartIIS";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += btnStartIIS_Click;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -146,6 +157,7 @@
             Controls.Add(btnPingSite);
             Controls.Add(btnCopyAppSettings);
             Controls.Add(btnDeleteFiles);
+            Controls.Add(button1);
             Controls.Add(btnStartIIS);
             Controls.Add(btnStopIIS);
             Controls.Add(btnBackup);
@@ -174,5 +186,6 @@
         private Button btnPingSite;
         private Button btnSetSiteRoot;
         private TextBox txtSiteRoot;
+        private Button button1;
     }
 }
