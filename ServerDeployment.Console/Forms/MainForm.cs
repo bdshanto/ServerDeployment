@@ -21,8 +21,9 @@ namespace ServerDeployment.Console.Forms
     {
         private DataTable sitesDataTable;
 
-        private string siteRootFolder = ""; // field to hold site root path
-        private string siteBackupFolder = ""; // field to hold backup path
+        private string backendPath = "";
+        private string frontendPath = "";
+        private string backupPath = "";
 
         private Dictionary<string, string> siteBackupDirectory = new();
         public MainForm()
@@ -55,7 +56,7 @@ namespace ServerDeployment.Console.Forms
 
         private void LoadSitesFromIIS()
         {
-            var selectedSites = GetSelectedSites();  
+            var selectedSites = GetSelectedSites();
 
             var sites = GetIISSites();
             var dt = CreateSitesDataTable();
@@ -177,10 +178,13 @@ namespace ServerDeployment.Console.Forms
 
         private void BackupSelectedSites()
         {
+            ClearLables();
+
             var selectedSites = GetSelectedSites();
             if (selectedSites.Count <= 0)
             {
-                MessageBox.Show("Please select at least one site to backup.");
+                lblMsg.Text = "Please select at least one site to backup.";
+                lblMsg.ForeColor = Color.Red;
                 return;
             }
 
@@ -189,8 +193,8 @@ namespace ServerDeployment.Console.Forms
                 try
                 {
                     string sourceDir = site.PhysicalPath;
-                    string folderName = @$"{DateTime.Now.Year}_{DateTime.Now.Month}_{DateTime.Now.Day}";
-                    string backupDir = Path.Combine(siteBackupFolder, folderName, $"{site.Name}_backup_{DateTime.Now:yyyyMMddHHmmss}");
+                    string backupDir = Path.Combine(backupPath, $"{site.Name}_backup_{DateTime.Now:yyyyMMddHHmmss}");
+
                     CopyDirectory(sourceDir, backupDir);
 
                     if (siteBackupDirectory.ContainsKey(site.Name))
@@ -277,7 +281,8 @@ namespace ServerDeployment.Console.Forms
             List<IISSiteInfo> selected = GetSelectedSites();
             if (selected.Count == 0)
             {
-                MessageBox.Show("Please select at least one site.");
+                lblMsg.Text = "Please select at least one site.";
+                lblMsg.ForeColor = Color.Red;
                 return;
             }
             var confirm = MessageBox.Show("Are you sure you want to delete all files in selected site folders? This cannot be undone!", "Confirm Delete", MessageBoxButtons.YesNo);
@@ -285,7 +290,7 @@ namespace ServerDeployment.Console.Forms
 
             foreach (var site in selected)
             {
-                var folder = Path.Combine(siteRootFolder, site.PhysicalPath);
+                var folder = Path.Combine(backendPath, site.PhysicalPath);
                 try
                 {
                     DeleteAllFiles(folder);
@@ -420,6 +425,12 @@ namespace ServerDeployment.Console.Forms
         private void StopIIS()
         {
             var selected = GetSelectedSites();
+            if (selected.Count == 0)
+            {
+                lblMsg.Text = "Please select at least one site.";
+                lblMsg.ForeColor = Color.Red;
+                return;
+            }
             foreach (var site in selected)
             {
                 StopSite(site.Name);
@@ -429,13 +440,23 @@ namespace ServerDeployment.Console.Forms
 
         private void btnStartIIS_Click(object sender, EventArgs e)
         {
+            StartIIS();
+        }
+
+        private void StartIIS()
+        {
             var selected = GetSelectedSites();
+            if (selected.Count == 0)
+            {
+                lblMsg.Text = "Please select at least one site.";
+                lblMsg.ForeColor = Color.Red;
+                return;
+            }
             foreach (var site in selected)
             {
                 StartSite(site.Name);
             }
             LoadSitesFromIIS();
-            // MessageBox.Show("Start commands sent.");
         }
 
         private void btnDeleteFiles_Click(object sender, EventArgs e)
@@ -445,23 +466,18 @@ namespace ServerDeployment.Console.Forms
 
         private void btnCopyAppSettings_Click(object sender, EventArgs e)
         {
+
+            CopyAppSettings();
+        }
+
+        private void CopyAppSettings()
+        {
             var sites = GetIISSites();
             if (sites.Count <= 0)
             {
                 MessageBox.Show("No sites found.");
                 return;
             }
-            /*
-                        using var sourceDialog = new FolderBrowserDialog
-                        {
-                            Description = "Select Source Directory"
-                        };
-                        if (sourceDialog.ShowDialog() != DialogResult.OK)
-                            return;*/
-
-            // string sourceRoot = sourceDialog.SelectedPath;
-
-
 
             try
             {
@@ -503,12 +519,16 @@ namespace ServerDeployment.Console.Forms
             }
 
         }
-
         private void btnReloadSites_Click(object sender, EventArgs e)
         {
             LoadSitesFromIIS();
         }
         private async void btnPingSite_Click(object sender, EventArgs e)
+        {
+            await PingSite();
+        }
+
+        private async Task PingSite()
         {
             var selected = GetSelectedSites();
             if (selected.Count == 0)
@@ -520,7 +540,6 @@ namespace ServerDeployment.Console.Forms
             {
                 await PingSiteAsync(site.Name);
             }
-            MessageBox.Show("Ping completed.");
         }
 
 
@@ -534,8 +553,8 @@ namespace ServerDeployment.Console.Forms
 
             if (folderDialog.ShowDialog() == DialogResult.OK)
             {
-                siteRootFolder = folderDialog.SelectedPath;
-                txtBackend.Text = siteRootFolder;
+                backendPath = folderDialog.SelectedPath;
+                txtBackend.Text = backendPath;
 
                 ButtonsSwitch(true);
 
@@ -544,6 +563,11 @@ namespace ServerDeployment.Console.Forms
 
         private void btnCopyContent_Click(object sender, EventArgs e)
         {
+            CopyContent();
+        }
+
+        private void CopyContent()
+        {
             var selectedSites = GetSelectedSites();
             if (selectedSites.Count == 0)
             {
@@ -551,7 +575,7 @@ namespace ServerDeployment.Console.Forms
                 return;
             }
 
-            var sourceFolder = siteRootFolder;
+            var sourceFolder = backendPath;
 
 
             try
@@ -568,16 +592,19 @@ namespace ServerDeployment.Console.Forms
                 MessageBox.Show("Error copying content: " + ex.Message);
             }
         }
-
         private void btnBackupPath_Click(object sender, EventArgs e)
+        {
+            BackupPath();
+        }
+
+        private void BackupPath()
         {
             using var fbd = new FolderBrowserDialog { Description = "Select Backup Destination Folder" };
             if (fbd.ShowDialog() != DialogResult.OK) return;
 
-            siteBackupFolder = fbd.SelectedPath;
+            backupPath = fbd.SelectedPath;
             txtBackupPath.Text = fbd.SelectedPath;
             ButtonsSwitch(true);
-
         }
 
         private void ButtonsSwitch(bool value)
@@ -684,7 +711,7 @@ namespace ServerDeployment.Console.Forms
         {
             ClearLables();
 
-            if (HasNoStr(siteRootFolder) || HasNoStr(siteBackupFolder))
+            if (HasNoStr(backendPath) || HasNoStr(backupPath))
             {
                 lblMsg.Text = "Please set both Site Root and Backup Path before publishing.";
                 lblMsg.BackColor = Color.Red;
@@ -701,9 +728,11 @@ namespace ServerDeployment.Console.Forms
         private void ClearLables()
         {
             lblMsg.Text = string.Empty;
-            lblMsg.BackColor = SystemColors.Control; 
+            lblMsg.BackColor = SystemColors.Control;
         }
 
-        
+
+
+
     }
 }

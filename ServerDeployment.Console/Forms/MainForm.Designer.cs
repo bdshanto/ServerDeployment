@@ -45,9 +45,9 @@
             btnPublish = new Infragistics.Win.Misc.UltraButton();
             ultraLabel1 = new Infragistics.Win.Misc.UltraLabel();
             txtBackupPath = new TextBox();
-            btnBackend = new Button();
-            btnFrontend = new Button();
             txtFrontend = new TextBox();
+            btnFrontend = new Button();
+            btnBackend = new Button();
             ((System.ComponentModel.ISupportInitialize)ultraGrid).BeginInit();
             ultraPanel1.ClientArea.SuspendLayout();
             ultraPanel1.SuspendLayout();
@@ -155,9 +155,11 @@
             // ultraGrid
             // 
             ultraGrid.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            ultraGrid.DisplayLayout.AutoFitStyle = Infragistics.Win.UltraWinGrid.AutoFitStyle.ResizeAllColumns;
+            ultraGrid.Font = new Font("Segoe UI", 9F);
             ultraGrid.Location = new Point(274, 21);
             ultraGrid.Name = "ultraGrid";
-            ultraGrid.Size = new Size(1105, 375);
+            ultraGrid.Size = new Size(1032, 375);
             ultraGrid.TabIndex = 4;
             ultraGrid.Text = "Web Sites";
             // 
@@ -187,7 +189,7 @@
             ultraPanel1.ClientArea.Controls.Add(btnStartIIS);
             ultraPanel1.Location = new Point(12, 12);
             ultraPanel1.Name = "ultraPanel1";
-            ultraPanel1.Size = new Size(1873, 1543);
+            ultraPanel1.Size = new Size(1800, 1148);
             ultraPanel1.TabIndex = 5;
             // 
             // lblMsg
@@ -207,7 +209,7 @@
             appearance11.BackGradientStyle = Infragistics.Win.GradientStyle.Vertical;
             appearance11.ForeColor = Color.FromArgb(0, 192, 0);
             btnPublish.HotTrackAppearance = appearance11;
-            btnPublish.Location = new Point(842, 1048);
+            btnPublish.Location = new Point(742, 895);
             btnPublish.Name = "btnPublish";
             btnPublish.Size = new Size(252, 171);
             btnPublish.TabIndex = 6;
@@ -217,7 +219,7 @@
             // ultraLabel1
             // 
             ultraLabel1.Font = new Font("Comic Sans MS", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            ultraLabel1.Location = new Point(27, 1462);
+            ultraLabel1.Location = new Point(100, 1101);
             ultraLabel1.Name = "ultraLabel1";
             ultraLabel1.Size = new Size(564, 34);
             ultraLabel1.TabIndex = 5;
@@ -231,16 +233,13 @@
             txtBackupPath.Size = new Size(927, 31);
             txtBackupPath.TabIndex = 3;
             // 
-            // btnBackend
+            // txtFrontend
             // 
-            btnBackend.Font = new Font("Segoe UI", 12F);
-            btnBackend.Location = new Point(124, 464);
-            btnBackend.Name = "btnBackend";
-            btnBackend.Size = new Size(171, 50);
-            btnBackend.TabIndex = 1;
-            btnBackend.Text = "Backend";
-            btnBackend.UseVisualStyleBackColor = true;
-            btnBackend.Click += btnSetSiteRoot_Click;
+            txtFrontend.Location = new Point(1127, 474);
+            txtFrontend.Name = "txtFrontend";
+            txtFrontend.ReadOnly = true;
+            txtFrontend.Size = new Size(522, 31);
+            txtFrontend.TabIndex = 3;
             // 
             // btnFrontend
             // 
@@ -253,19 +252,22 @@
             btnFrontend.UseVisualStyleBackColor = true;
             btnFrontend.Click += btnSetSiteRoot_Click;
             // 
-            // txtFrontend
+            // btnBackend
             // 
-            txtFrontend.Location = new Point(1127, 474);
-            txtFrontend.Name = "txtFrontend";
-            txtFrontend.ReadOnly = true;
-            txtFrontend.Size = new Size(522, 31);
-            txtFrontend.TabIndex = 3;
+            btnBackend.Font = new Font("Segoe UI", 12F);
+            btnBackend.Location = new Point(124, 464);
+            btnBackend.Name = "btnBackend";
+            btnBackend.Size = new Size(171, 50);
+            btnBackend.TabIndex = 1;
+            btnBackend.Text = "Backend";
+            btnBackend.UseVisualStyleBackColor = true;
+            btnBackend.Click += btnSetSiteRoot_Click;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1897, 1567);
+            ClientSize = new Size(1824, 1172);
             Controls.Add(ultraPanel1);
             Name = "MainForm";
             Text = "MainForm";
