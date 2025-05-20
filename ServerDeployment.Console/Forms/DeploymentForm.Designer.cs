@@ -1,6 +1,6 @@
 ﻿namespace ServerDeployment.Console.Forms
 {
-    partial class MainForm
+    partial class DeploymentForm
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             Infragistics.Win.Appearance appearance11 = new Infragistics.Win.Appearance();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DeploymentForm));
             btnReloadSites = new Button();
             btnBackup = new Button();
             btnStopIIS = new Button();

@@ -21,7 +21,7 @@ namespace ServerDeployment.Console
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Infragistics.Win.AppStyling.StyleManager.Load("Aero.isl");
-            Application.Run(new MainForm());
+            Application.Run(new DeploymentForm());
         }
     }
 }

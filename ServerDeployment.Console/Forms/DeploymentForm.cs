@@ -10,7 +10,7 @@ using System.Text.Json;
 
 namespace ServerDeployment.Console.Forms
 {
-    public partial class MainForm : Form
+    public partial class DeploymentForm : Form
     {
         private DataTable sitesDataTable;
 
@@ -27,7 +27,7 @@ namespace ServerDeployment.Console.Forms
         public event EventHandler<ProgressEventArgs>? ProgressUpdated;
 
 
-        public MainForm()
+        public DeploymentForm()
         {
             InitializeComponent();
 
