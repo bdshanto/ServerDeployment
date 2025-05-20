@@ -38,26 +38,6 @@ namespace ARAKDataSetup.Domains.Utility
             }
         }
         
-        /*public static string JsonSerialize(object obj)
-        {
-            try
-            {
-                var settings = new Newtonsoft.Json.JsonSerializerSettings
-                {
-                    ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore,
-                    Formatting = Newtonsoft.Json.Formatting.Indented
-
-                };
-
-                return Newtonsoft.Json.JsonConvert.SerializeObject(obj, settings);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return "";
-            }
-        }*/
-
         #region Has no string 
 
         public static bool HasNoStr(string strVal)

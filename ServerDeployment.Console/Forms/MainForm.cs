@@ -27,13 +27,22 @@ namespace ServerDeployment.Console.Forms
         private string backupPath = "";
 
         private Dictionary<string, string> siteBackupDirectory = new();
+
+        public delegate void ProgressUpdateHandler(string message);
+        // public event ProgressUpdateHandler? ProgressUpdated;
+
+        public event EventHandler<ProgressEventArgs>? ProgressUpdated;
+
+
         public MainForm()
         {
             InitializeComponent();
+
+            ProgressUpdated += MainForm_ProgressUpdated;
+
             ButtonsSwitch(false);
             InitializeUltraGrid();
             LoadSitesFromIIS();
-
 
             lblMsg.Text = "Please set both Site Root and Backup Path before publishing.";
             lblMsg.ForeColor = Color.Red;
@@ -189,10 +198,16 @@ namespace ServerDeployment.Console.Forms
                 return;
             }
 
+            int totalSites = selectedSites.Count;
+            int currentSite = 0;
+
             foreach (var site in selectedSites)
             {
+                currentSite++;
                 try
                 {
+                    OnProgressUpdated($"Backing up site '{site.Name}' ({currentSite} of {totalSites})...", (currentSite * 100) / totalSites);
+
                     string sourceDir = site.PhysicalPath;
                     string backupDir = Path.Combine(backupPath, $"{site.Name}_backup_{DateTime.Now:yyyyMMddHHmmss}");
 
@@ -204,14 +219,13 @@ namespace ServerDeployment.Console.Forms
                     }
 
                     siteBackupDirectory.Add(site.Name, backupDir);
-
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Failed to backup site '{site.Name}': {ex.Message}");
+                    OnProgressUpdated($"Failed to backup site '{site.Name}': {ex.Message}");
                 }
             }
-            MessageBox.Show("Backup completed.");
+            OnProgressUpdated("Backup completed.", 100);
         }
         private void CopySiteContent(string sourceRoot, string destinationSiteFolder)
         {
@@ -649,14 +663,14 @@ namespace ServerDeployment.Console.Forms
             if (fbd.ShowDialog() != DialogResult.OK) return;
 
             backupPath = fbd.SelectedPath;
-            txtBackupPath.Text = fbd.SelectedPath;
+            txtBackup.Text = fbd.SelectedPath;
             ButtonsSwitch(true);
         }
 
         private void ButtonsSwitch(bool value)
         {
 
-            if (!HasNoStr(txtBackupPath.Text) && txtBackupPath.Text.Length > 0)
+            if (!HasNoStr(txtBackup.Text) && txtBackup.Text.Length > 0)
             {
                 btnBackupPath.ForeColor = Color.Green;
             }
@@ -722,8 +736,8 @@ namespace ServerDeployment.Console.Forms
             ultraGrid.DisplayLayout.Override.SelectTypeRow = Infragistics.Win.UltraWinGrid.SelectType.Extended;
             ultraGrid.DisplayLayout.Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
             ultraGrid.DisplayLayout.Override.RowSelectors = Infragistics.Win.DefaultableBoolean.False;
-        } 
-      
+        }
+
         private void btnPublish_Click(object sender, EventArgs e)
         {
             ClearLables();
@@ -749,7 +763,69 @@ namespace ServerDeployment.Console.Forms
         }
 
 
+        private void OnProgressUpdated(string message, int? percent = null)
+        {
+            if (ProgressUpdated != null)
+            {
+                ProgressUpdated(this, new ProgressEventArgs(message, percent));
+            }
+        }
 
+        private void MainForm_ProgressUpdated(object? sender, ProgressEventArgs e)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => UpdateProgressUI(e)));
+            }
+            else
+            {
+                UpdateProgressUI(e);
+            }
+        }
 
+        private void UpdateProgressUI(ProgressEventArgs e)
+        {
+            lblMsg.Text = e.Message;
+
+            // Optional: if you have a progress bar, update it here:
+            if (e.Percent.HasValue)
+            {
+                progressBar1.Value = Math.Min(Math.Max(e.Percent.Value, 0), 100);
+            }
+        }
+
+        private void btnFrontend_Click(object sender, EventArgs e)
+        {
+            using var folderDialog = new FolderBrowserDialog
+            {
+                Description = "Select Site Root Directory"
+            };
+
+            if (folderDialog.ShowDialog() == DialogResult.OK)
+            {
+                backendPath = folderDialog.SelectedPath;
+                txtFrontend.Text = backendPath;
+
+                ButtonsSwitch(true);
+
+            }
+        }
+
+        private void btnReport_Click(object sender, EventArgs e)
+        {
+            using var folderDialog = new FolderBrowserDialog
+            {
+                Description = "Select Site Root Directory"
+            };
+
+            if (folderDialog.ShowDialog() == DialogResult.OK)
+            {
+                backendPath = folderDialog.SelectedPath;
+                txtReport.Text = backendPath;
+
+                ButtonsSwitch(true);
+
+            }
+        }
     }
 }
