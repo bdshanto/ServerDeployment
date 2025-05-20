@@ -1,7 +1,10 @@
-﻿using Microsoft.Web.Administration;
+﻿using Infragistics.Win;
+using Infragistics.Win.UltraWinGrid;
+using Microsoft.Web.Administration;
 using ServerDeployment.Console.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -9,76 +12,82 @@ using System.Net.NetworkInformation;
 using System.Security.Policy;
 using System.Text.Json;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using ColumnStyle = Infragistics.Win.UltraWinGrid.ColumnStyle;
 
 namespace ServerDeployment.Console.Forms
 {
     public partial class MainForm : Form
     {
+        private DataTable sitesDataTable;
+
         private string siteRootFolder = ""; // field to hold site root path
         private string siteBackupFolder = ""; // field to hold backup path
 
         private Dictionary<string, string> siteBackupDirectory = new();
         public MainForm()
         {
-            InitializeComponent();
-            InitializeDataGrid();
+            InitializeComponent(); 
+
+            InitializeUltraGrid();
             LoadSitesFromIIS();
             DispableAllButtons();
         }
 
-        private void InitializeDataGrid()
+        private void InitializeUltraGrid()
         {
-            dataGridView1.AllowUserToAddRows = false;
-            dataGridView1.MultiSelect = true;
-            dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            // Create schema once
+            sitesDataTable = CreateSitesDataTable();
 
-            dataGridView1.Columns.Clear();
+            // Bind empty schema
+            ultraGrid.DataSource = sitesDataTable;
 
-            var checkBoxCol = new DataGridViewCheckBoxColumn()
-            {
-                HeaderText = "Select",
-                Width = 80,
-                Name = "chkSelect"
-            };
-            dataGridView1.Columns.Add(checkBoxCol);
+            // Customize columns once after binding
+            CustomizeUltraGridColumns();
 
-            var nameCol = new DataGridViewTextBoxColumn()
-            {
-                HeaderText = "Site",
-                Name = "Site",
-                ReadOnly = true,
-                Width = 100
-            };
-            dataGridView1.Columns.Add(nameCol);
-            var siteFolder = new DataGridViewTextBoxColumn()
-            {
-                HeaderText = "Site Folder",
-                Name = "SiteFolder",
-                ReadOnly = true,
-                Width = 600
-            };
-            dataGridView1.Columns.Add(siteFolder);
 
-            var statusCol = new DataGridViewTextBoxColumn()
-            {
-                HeaderText = "Status",
-                Name = "Status",
-                ReadOnly = true,
-                Width = 100
-            };
-            dataGridView1.Columns.Add(statusCol);
         }
+
 
         private void LoadSitesFromIIS()
         {
-            dataGridView1.Rows.Clear();
+
 
             var sites = GetIISSites();
+            var dt = CreateSitesDataTable();
 
             foreach (var site in sites)
             {
-                dataGridView1.Rows.Add(false, site.Name, site.PhysicalPath, site.State);
+                dt.Rows.Add(false, site.Name, site.PhysicalPath, site.State);
             }
+            // Bind the DataTable to ultraGrid
+            ultraGrid.DataSource = dt;
+
+            // Customize columns after binding
+            var band = ultraGrid.DisplayLayout.Bands[0];
+
+            band.Columns["Select"].Header.Caption = "Select";
+            band.Columns["Select"].Width = 80;
+            band.Columns["Select"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.CheckBox;
+            band.Columns["Select"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.AllowEdit;
+
+            band.Columns["Name"].Header.Caption = "Site";
+            band.Columns["Name"].Width = 150;
+            band.Columns["Name"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
+
+            band.Columns["PhysicalPath"].Header.Caption = "Site Folder";
+            band.Columns["PhysicalPath"].Width = 400;
+            band.Columns["PhysicalPath"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
+
+            band.Columns["State"].Header.Caption = "Status";
+            band.Columns["State"].Width = 100;
+            band.Columns["State"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
+
+            // Selection settings
+            ultraGrid.DisplayLayout.Override.SelectTypeRow = Infragistics.Win.UltraWinGrid.SelectType.Extended;
+            ultraGrid.DisplayLayout.Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
+            ultraGrid.DisplayLayout.Override.RowSelectors = Infragistics.Win.DefaultableBoolean.False;
+
         }
         private List<IISSiteInfo> GetIISSites()
         {
@@ -134,19 +143,22 @@ namespace ServerDeployment.Console.Forms
 
         private List<IISSiteInfo> GetSelectedSites()
         {
-            List<IISSiteInfo> selected = new();
-            foreach (DataGridViewRow row in dataGridView1.Rows)
+            List<IISSiteInfo> selected = new List<IISSiteInfo>();
+
+            foreach (UltraGridRow row in ultraGrid.Rows)
             {
-                if (Convert.ToBoolean(row.Cells["chkSelect"].Value) == true)
+                // Check if the checkbox cell is true (checked)
+                if (row.Cells["Select"].Value is bool isChecked && isChecked)
                 {
                     selected.Add(new IISSiteInfo
                     {
-                        Name = row.Cells["Site"].Value.ToString(),
-                        PhysicalPath = row.Cells["SiteFolder"].Value.ToString(),
-                        State = row.Cells["Status"].Value.ToString()
+                        Name = row.Cells["Name"].Value?.ToString() ?? string.Empty,
+                        PhysicalPath = row.Cells["PhysicalPath"].Value?.ToString() ?? string.Empty,
+                        State = row.Cells["State"].Value?.ToString() ?? string.Empty
                     });
                 }
             }
+
             return selected;
         }
 
@@ -164,7 +176,8 @@ namespace ServerDeployment.Console.Forms
                 try
                 {
                     string sourceDir = site.PhysicalPath;
-                    string backupDir = Path.Combine(siteBackupFolder, $"{site.Name}_backup_{DateTime.Now:yyyyMMddHHmmss}");
+                    string folderName = @$"{DateTime.Now.Year}_{DateTime.Now.Month}_{DateTime.Now.Day}";
+                    string backupDir = Path.Combine(siteBackupFolder, folderName,$"{site.Name}_backup_{DateTime.Now:yyyyMMddHHmmss}");
                     CopyDirectory(sourceDir, backupDir);
 
                     if (siteBackupDirectory.ContainsKey(site.Name))
@@ -368,12 +381,13 @@ namespace ServerDeployment.Console.Forms
 
         private void UpdateSiteStatus(string siteFolderName, string status)
         {
-            foreach (DataGridViewRow row in dataGridView1.Rows)
+
+            foreach (UltraGridRow row in ultraGrid.Rows)
             {
-                if ((string)row.Cells["SiteFolder"].Value == siteFolderName)
+                if (row.Cells["PhysicalPath"].Value?.ToString() == siteFolderName)
                 {
-                    row.Cells["Status"].Value = status;
-                    break;
+                    row.Cells["State"].Value = status;
+                    break;  // Exit after updating first match
                 }
             }
         }
@@ -544,6 +558,7 @@ namespace ServerDeployment.Console.Forms
             if (fbd.ShowDialog() != DialogResult.OK) return;
 
             siteBackupFolder = fbd.SelectedPath;
+            txtBackupPath.Text = fbd.SelectedPath;
             ButtonsSwitch(true);
 
         }
@@ -580,5 +595,70 @@ namespace ServerDeployment.Console.Forms
         {
             return string.IsNullOrWhiteSpace(str) || string.IsNullOrEmpty(str);
         }
+
+        private DataTable CreateSitesDataTable()
+        {
+            DataTable dt = new DataTable();
+            dt.Columns.Add("Select", typeof(bool));      // checkbox column
+            dt.Columns.Add("Name", typeof(string));
+            dt.Columns.Add("PhysicalPath", typeof(string));
+            dt.Columns.Add("State", typeof(string));
+            return dt;
+        }
+
+        private void CustomizeUltraGridColumns()
+        {
+            var band = ultraGrid.DisplayLayout.Bands[0];
+
+            band.Columns["Select"].Header.Caption = "Select";
+            band.Columns["Select"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.CheckBox;
+            band.Columns["Select"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.AllowEdit;
+
+            band.Columns["Name"].Header.Caption = "Name";
+            band.Columns["Name"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
+
+            band.Columns["PhysicalPath"].Header.Caption = "Site Folder";
+            band.Columns["PhysicalPath"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
+
+            band.Columns["State"].Header.Caption = "Status";
+            band.Columns["State"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
+            SetColumnWidthsByPercent(); 
+
+            ultraGrid.DisplayLayout.Override.SelectTypeRow = Infragistics.Win.UltraWinGrid.SelectType.Extended;
+            ultraGrid.DisplayLayout.Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
+            ultraGrid.DisplayLayout.Override.RowSelectors = Infragistics.Win.DefaultableBoolean.False;
+        }
+
+        private void SetColumnWidthsByPercent()
+        {
+            ultraGrid.Width = 730;
+            if (ultraGrid.DisplayLayout.Bands.Count == 0)
+                return; // No bands yet
+
+            int totalWidth = ultraGrid.ClientSize.Width;
+
+            var band = ultraGrid.DisplayLayout.Bands[0];
+
+            // Calculate widths
+            int selectWidth = (int)(totalWidth * 0.10);
+            int nameWidth = (int)(totalWidth * 0.25);
+            int physicalPathWidth = (int)(totalWidth * 0.45);
+
+            // Assign widths
+            band.Columns["Select"].Width = selectWidth;
+            band.Columns["Name"].Width = nameWidth;
+            band.Columns["PhysicalPath"].Width = physicalPathWidth;
+
+            // Assign remaining width to last column to avoid rounding issues
+            int assignedWidth = selectWidth + nameWidth + physicalPathWidth;
+            int remainingWidth = totalWidth - assignedWidth;
+
+            if (remainingWidth < 0) remainingWidth = 0; // Safety check
+
+            band.Columns["State"].Width = remainingWidth;
+        }
+
+     
+
     }
 }
