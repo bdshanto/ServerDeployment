@@ -12,8 +12,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Infragistics.WinForms" Version="22.2.16" />
+		<PackageReference Include="Infragistics.WinForms.AppStylistSupport" Version="22.2.16" />
+		<PackageReference Include="Infragistics.WinForms.DataSource" Version="22.2.16" />
+		<PackageReference Include="Infragistics.WinForms.IO" Version="22.2.16" />
+		<PackageReference Include="Infragistics.WinForms.Misc" Version="22.2.16" />
+		<PackageReference Include="Infragistics.WinForms.Shared" Version="22.2.16" />
+		<PackageReference Include="Infragistics.WinForms.WinGrid" Version="22.2.16" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-		<!--<PackageReference Include="Microsoft.PowerShell.SDK" Version="7.3.9" />-->
 		<PackageReference Include="Microsoft.Management.Infrastructure" Version="2.0.0" />
 		<PackageReference Include="Microsoft.Web.Administration" Version="11.1.0" />
 	</ItemGroup>

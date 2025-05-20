@@ -3,8 +3,6 @@ using ServerDeployment.Console.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-
-// PowerShell SDK is required for PowerShell integration
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
@@ -17,6 +15,7 @@ namespace ServerDeployment.Console.Forms
     public partial class MainForm : Form
     {
         private string siteRootFolder = ""; // field to hold site root path
+        private string siteBackupFolder = ""; // field to hold backup path
 
         private Dictionary<string, string> siteBackupDirectory = new();
         public MainForm()
@@ -24,6 +23,7 @@ namespace ServerDeployment.Console.Forms
             InitializeComponent();
             InitializeDataGrid();
             LoadSitesFromIIS();
+            DispableAllButtons();
         }
 
         private void InitializeDataGrid()
@@ -159,15 +159,12 @@ namespace ServerDeployment.Console.Forms
                 return;
             }
 
-            using var fbd = new FolderBrowserDialog { Description = "Select Backup Destination Folder" };
-            if (fbd.ShowDialog() != DialogResult.OK) return;
-
             foreach (var site in selectedSites)
             {
                 try
                 {
                     string sourceDir = site.PhysicalPath;
-                    string backupDir = Path.Combine(fbd.SelectedPath, $"{site.Name}_backup_{DateTime.Now:yyyyMMddHHmmss}");
+                    string backupDir = Path.Combine(siteBackupFolder, $"{site.Name}_backup_{DateTime.Now:yyyyMMddHHmmss}");
                     CopyDirectory(sourceDir, backupDir);
 
                     if (siteBackupDirectory.ContainsKey(site.Name))
@@ -356,7 +353,7 @@ namespace ServerDeployment.Console.Forms
                     string status = reply.Status == IPStatus.Success ? "Online" : "Offline";
                     UpdateSiteStatus(siteName, status);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     UpdateSiteStatus(siteName, "Offline");
                 }
@@ -497,7 +494,7 @@ namespace ServerDeployment.Console.Forms
 
 
 
-        private void btnSetSiteRoot_Click_1(object sender, EventArgs e)
+        private void btnSetSiteRoot_Click(object sender, EventArgs e)
         {
             using var folderDialog = new FolderBrowserDialog
             {
@@ -508,6 +505,8 @@ namespace ServerDeployment.Console.Forms
             {
                 siteRootFolder = folderDialog.SelectedPath;
                 txtSiteRoot.Text = siteRootFolder;
+
+                ButtonsSwitch(true);
 
             }
         }
@@ -539,6 +538,47 @@ namespace ServerDeployment.Console.Forms
             }
         }
 
+        private void btnBackupPath_Click(object sender, EventArgs e)
+        {
+            using var fbd = new FolderBrowserDialog { Description = "Select Backup Destination Folder" };
+            if (fbd.ShowDialog() != DialogResult.OK) return;
 
+            siteBackupFolder = fbd.SelectedPath;
+            ButtonsSwitch(true);
+
+        }
+
+        private void ButtonsSwitch(bool value)
+        {
+            if (HasNoStr(siteRootFolder) || HasNoStr(siteBackupFolder)) return;
+
+            btnReloadSites.Enabled = value;
+            btnBackup.Enabled = value;
+            btnStopIIS.Enabled = value;
+            btnStartIIS.Enabled = value;
+            btnDeleteFiles.Enabled = value;
+            btnCopyAppSettings.Enabled = value;
+            btnPingSite.Enabled = value;
+            btnCopyContent.Enabled = value;
+
+        }
+
+        private void DispableAllButtons()
+        {
+            btnReloadSites.Enabled = false;
+            btnBackup.Enabled = false;
+            btnStopIIS.Enabled = false;
+            btnStartIIS.Enabled = false;
+            btnDeleteFiles.Enabled = false;
+            btnCopyAppSettings.Enabled = false;
+            btnPingSite.Enabled = false;
+            btnCopyContent.Enabled = false;
+
+        }
+
+        private bool HasNoStr(string str)
+        {
+            return string.IsNullOrWhiteSpace(str) || string.IsNullOrEmpty(str);
+        }
     }
 }

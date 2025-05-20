@@ -39,6 +39,7 @@
             btnSetSiteRoot = new Button();
             txtSiteRoot = new TextBox();
             btnCopyContent = new Button();
+            btnBackupPath = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
@@ -53,7 +54,7 @@
             // 
             // btnReloadSites
             // 
-            btnReloadSites.Location = new Point(281, 670);
+            btnReloadSites.Location = new Point(269, 806);
             btnReloadSites.Name = "btnReloadSites";
             btnReloadSites.Size = new Size(267, 111);
             btnReloadSites.TabIndex = 1;
@@ -63,7 +64,7 @@
             // 
             // btnBackup
             // 
-            btnBackup.Location = new Point(554, 670);
+            btnBackup.Location = new Point(542, 806);
             btnBackup.Name = "btnBackup";
             btnBackup.Size = new Size(267, 111);
             btnBackup.TabIndex = 2;
@@ -73,7 +74,7 @@
             // 
             // btnStopIIS
             // 
-            btnStopIIS.Location = new Point(827, 670);
+            btnStopIIS.Location = new Point(815, 806);
             btnStopIIS.Name = "btnStopIIS";
             btnStopIIS.Size = new Size(267, 111);
             btnStopIIS.TabIndex = 2;
@@ -83,7 +84,7 @@
             // 
             // btnStartIIS
             // 
-            btnStartIIS.Location = new Point(1919, 670);
+            btnStartIIS.Location = new Point(1907, 806);
             btnStartIIS.Name = "btnStartIIS";
             btnStartIIS.Size = new Size(267, 111);
             btnStartIIS.TabIndex = 2;
@@ -93,7 +94,7 @@
             // 
             // btnDeleteFiles
             // 
-            btnDeleteFiles.Location = new Point(1100, 670);
+            btnDeleteFiles.Location = new Point(1088, 806);
             btnDeleteFiles.Name = "btnDeleteFiles";
             btnDeleteFiles.Size = new Size(267, 111);
             btnDeleteFiles.TabIndex = 2;
@@ -103,7 +104,7 @@
             // 
             // btnCopyAppSettings
             // 
-            btnCopyAppSettings.Location = new Point(1646, 670);
+            btnCopyAppSettings.Location = new Point(1634, 806);
             btnCopyAppSettings.Name = "btnCopyAppSettings";
             btnCopyAppSettings.Size = new Size(267, 111);
             btnCopyAppSettings.TabIndex = 2;
@@ -113,7 +114,7 @@
             // 
             // btnPingSite
             // 
-            btnPingSite.Location = new Point(2192, 670);
+            btnPingSite.Location = new Point(2180, 806);
             btnPingSite.Name = "btnPingSite";
             btnPingSite.Size = new Size(267, 111);
             btnPingSite.TabIndex = 2;
@@ -123,30 +124,40 @@
             // 
             // btnSetSiteRoot
             // 
-            btnSetSiteRoot.Location = new Point(281, 540);
+            btnSetSiteRoot.Location = new Point(281, 474);
             btnSetSiteRoot.Name = "btnSetSiteRoot";
             btnSetSiteRoot.Size = new Size(267, 111);
             btnSetSiteRoot.TabIndex = 1;
             btnSetSiteRoot.Text = "btnSetSiteRoot";
             btnSetSiteRoot.UseVisualStyleBackColor = true;
-            btnSetSiteRoot.Click += btnSetSiteRoot_Click_1;
+            btnSetSiteRoot.Click += btnSetSiteRoot_Click;
             // 
             // txtSiteRoot
             // 
-            txtSiteRoot.Location = new Point(650, 580);
+            txtSiteRoot.Location = new Point(581, 502);
             txtSiteRoot.Name = "txtSiteRoot";
             txtSiteRoot.Size = new Size(927, 31);
             txtSiteRoot.TabIndex = 3;
             // 
             // btnCopyContent
             // 
-            btnCopyContent.Location = new Point(1373, 670);
+            btnCopyContent.Location = new Point(1361, 806);
             btnCopyContent.Name = "btnCopyContent";
             btnCopyContent.Size = new Size(267, 111);
             btnCopyContent.TabIndex = 2;
             btnCopyContent.Text = "btnCopyContent";
             btnCopyContent.UseVisualStyleBackColor = true;
             btnCopyContent.Click += btnCopyContent_Click;
+            // 
+            // btnBackupPath
+            // 
+            btnBackupPath.Location = new Point(281, 609);
+            btnBackupPath.Name = "btnBackupPath";
+            btnBackupPath.Size = new Size(267, 111);
+            btnBackupPath.TabIndex = 1;
+            btnBackupPath.Text = "btnBackupPath";
+            btnBackupPath.UseVisualStyleBackColor = true;
+            btnBackupPath.Click += btnBackupPath_Click;
             // 
             // MainForm
             // 
@@ -161,6 +172,7 @@
             Controls.Add(btnStartIIS);
             Controls.Add(btnStopIIS);
             Controls.Add(btnBackup);
+            Controls.Add(btnBackupPath);
             Controls.Add(btnSetSiteRoot);
             Controls.Add(btnReloadSites);
             Controls.Add(dataGridView1);
@@ -187,5 +199,6 @@
         private Button btnSetSiteRoot;
         private TextBox txtSiteRoot;
         private Button btnCopyContent;
+        private Button btnBackupPath;
     }
 }
