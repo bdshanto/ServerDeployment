@@ -129,7 +129,7 @@
             // 
             // txtBackend
             // 
-            txtBackend.Location = new Point(248, 531);
+            txtBackend.Location = new Point(248, 579);
             txtBackend.Name = "txtBackend";
             txtBackend.ReadOnly = true;
             txtBackend.Size = new Size(522, 31);
@@ -148,17 +148,17 @@
             // btnBackupPath
             // 
             btnBackupPath.Font = new Font("Segoe UI", 12F);
-            btnBackupPath.Location = new Point(21, 633);
+            btnBackupPath.Location = new Point(21, 513);
             btnBackupPath.Name = "btnBackupPath";
             btnBackupPath.Size = new Size(171, 50);
             btnBackupPath.TabIndex = 1;
-            btnBackupPath.Text = "Set Backup Folder";
+            btnBackupPath.Text = "Backup";
             btnBackupPath.UseVisualStyleBackColor = true;
             btnBackupPath.Click += btnBackupPath_Click;
             // 
             // ultraGrid
             // 
-            ultraGrid.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            ultraGrid.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             ultraGrid.DisplayLayout.AutoFitStyle = Infragistics.Win.UltraWinGrid.AutoFitStyle.ResizeAllColumns;
             ultraGrid.Font = new Font("Segoe UI", 9F);
             ultraGrid.Location = new Point(34, 84);
@@ -169,6 +169,7 @@
             // 
             // ultraPanel1
             // 
+            ultraPanel1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             // 
             // ultraPanel1.ClientArea
             // 
@@ -250,7 +251,7 @@
             // 
             // txtBackup
             // 
-            txtBackup.Location = new Point(248, 643);
+            txtBackup.Location = new Point(248, 523);
             txtBackup.Name = "txtBackup";
             txtBackup.ReadOnly = true;
             txtBackup.Size = new Size(522, 31);
@@ -258,7 +259,7 @@
             // 
             // txtFrontend
             // 
-            txtFrontend.Location = new Point(248, 587);
+            txtFrontend.Location = new Point(248, 635);
             txtFrontend.Name = "txtFrontend";
             txtFrontend.ReadOnly = true;
             txtFrontend.Size = new Size(522, 31);
@@ -275,7 +276,7 @@
             // btnFrontend
             // 
             btnFrontend.Font = new Font("Segoe UI", 12F);
-            btnFrontend.Location = new Point(21, 577);
+            btnFrontend.Location = new Point(21, 625);
             btnFrontend.Name = "btnFrontend";
             btnFrontend.Size = new Size(171, 50);
             btnFrontend.TabIndex = 1;
@@ -297,7 +298,7 @@
             // btnBackend
             // 
             btnBackend.Font = new Font("Segoe UI", 12F);
-            btnBackend.Location = new Point(21, 521);
+            btnBackend.Location = new Point(21, 569);
             btnBackend.Name = "btnBackend";
             btnBackend.Size = new Size(171, 50);
             btnBackend.TabIndex = 1;

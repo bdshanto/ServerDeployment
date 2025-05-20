@@ -51,6 +51,8 @@ namespace ServerDeployment.Console.Forms
 
         private void InitializeUltraGrid()
         {
+            ultraGrid.Font = new Font("Arial", 12);
+
             // Create schema once
             sitesDataTable = CreateSitesDataTable();
 
@@ -688,6 +690,26 @@ namespace ServerDeployment.Console.Forms
                 btnBackend.ForeColor = Color.Red;
             }
 
+            if (!HasNoStr(txtFrontend.Text) && txtFrontend.Text.Length > 0)
+            {
+                btnFrontend.ForeColor = Color.Green;
+            }
+            else
+            {
+                btnFrontend.ForeColor = Color.Red;
+            }
+
+            if (!HasNoStr(txtReport.Text) && txtReport.Text.Length > 0)
+            {
+                btnReport.ForeColor = Color.Green;
+            }
+            else
+            {
+                btnReport.ForeColor = Color.Red;
+            }
+
+
+
             btnReloadSites.Enabled = value;
             btnBackup.Enabled = value;
             btnStopIIS.Enabled = value;
@@ -731,11 +753,28 @@ namespace ServerDeployment.Console.Forms
 
             band.Columns["State"].Header.Caption = "Status";
             band.Columns["State"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
-            //             SetColumnWidthsByPercent();
 
-            ultraGrid.DisplayLayout.Override.SelectTypeRow = Infragistics.Win.UltraWinGrid.SelectType.Extended;
-            ultraGrid.DisplayLayout.Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
-            ultraGrid.DisplayLayout.Override.RowSelectors = Infragistics.Win.DefaultableBoolean.False;
+            // Set Header Font (size, style, color)
+            band.Columns["Name"].Header.Appearance.FontData.SizeInPoints = 13; // Font size
+            band.Columns["Name"].Header.Appearance.FontData.Bold = Infragistics.Win.DefaultableBoolean.True; // Bold
+            band.Columns["Name"].Header.Appearance.ForeColor = Color.Black; // Text color (black to match white theme)
+            band.Columns["Name"].Header.Appearance.BackColor = Color.LightGray; // Light gray background for header
+
+            band.Columns["State"].Header.Appearance.FontData.SizeInPoints = 13; // Font size
+            band.Columns["State"].Header.Appearance.FontData.Bold = Infragistics.Win.DefaultableBoolean.True; // Bold
+            band.Columns["State"].Header.Appearance.ForeColor = Color.Black; // Text color
+            band.Columns["State"].Header.Appearance.BackColor = Color.LightGray; // Light gray background for header
+
+            // Optionally, align header text
+            band.Columns["Name"].Header.Appearance.TextHAlign = Infragistics.Win.HAlign.Center; // Center alignment
+            band.Columns["State"].Header.Appearance.TextHAlign = Infragistics.Win.HAlign.Center; // Center alignment
+
+            // General header customizations for all columns
+            ultraGrid.DisplayLayout.Override.HeaderAppearance.FontData.SizeInPoints = 13; // Set header font size for all columns
+            ultraGrid.DisplayLayout.Override.HeaderAppearance.FontData.Bold = Infragistics.Win.DefaultableBoolean.True; // Set all headers to bold
+            ultraGrid.DisplayLayout.Override.HeaderAppearance.ForeColor = Color.Black; // Set header text color
+            ultraGrid.DisplayLayout.Override.HeaderAppearance.BackColor = Color.LightGray; // Set header background color for all columns
+
         }
 
         private void btnPublish_Click(object sender, EventArgs e)
@@ -805,6 +844,7 @@ namespace ServerDeployment.Console.Forms
             {
                 backendPath = folderDialog.SelectedPath;
                 txtFrontend.Text = backendPath;
+                txtFrontend.Text = backendPath;
 
                 ButtonsSwitch(true);
 
@@ -822,6 +862,7 @@ namespace ServerDeployment.Console.Forms
             {
                 backendPath = folderDialog.SelectedPath;
                 txtReport.Text = backendPath;
+                reportPath = backendPath;
 
                 ButtonsSwitch(true);
 
