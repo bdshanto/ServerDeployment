@@ -23,6 +23,7 @@ namespace ServerDeployment.Console.Forms
 
         private string backendPath = "";
         private string frontendPath = "";
+        private string reportPath = "";
         private string backupPath = "";
 
         private Dictionary<string, string> siteBackupDirectory = new();
@@ -212,6 +213,46 @@ namespace ServerDeployment.Console.Forms
             }
             MessageBox.Show("Backup completed.");
         }
+        private void CopySiteContent(string sourceRoot, string destinationSiteFolder)
+        {
+            // Copy frontend files/folders (everything except PetMatrixBackendAPI and ReportsViewer) directly to site root
+            var frontendSource = new DirectoryInfo(sourceRoot);
+
+            foreach (var file in frontendSource.GetFiles())
+            {
+                string destFile = Path.Combine(destinationSiteFolder, file.Name);
+                file.CopyTo(destFile, true);
+            }
+
+            foreach (var dir in frontendSource.GetDirectories())
+            {
+                // Skip backend and ReportsViewer folders here, they get copied separately
+                if (dir.Name.Equals("PetMatrixBackendAPI", StringComparison.OrdinalIgnoreCase) ||
+                    dir.Name.Equals("ReportsViewer", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+                CopyDirectory(dir.FullName, Path.Combine(destinationSiteFolder, dir.Name));
+            }
+
+            // Copy backend files to PetMatrixBackendAPI folder inside site folder
+            string backendSourceFolder = Path.Combine(sourceRoot, "PetMatrixBackendAPI");
+            if (Directory.Exists(backendSourceFolder))
+            {
+                string backendDestFolder = Path.Combine(destinationSiteFolder, "PetMatrixBackendAPI");
+                Directory.CreateDirectory(backendDestFolder);
+                CopyDirectory(backendSourceFolder, backendDestFolder);
+            }
+
+            // Copy ReportsViewer folder
+            string reportsViewerSourceFolder = Path.Combine(sourceRoot, "ReportsViewer");
+            if (Directory.Exists(reportsViewerSourceFolder))
+            {
+                string reportsViewerDestFolder = Path.Combine(destinationSiteFolder, "ReportsViewer");
+                CopyDirectory(reportsViewerSourceFolder, reportsViewerDestFolder);
+            }
+        }
+
 
         private void CopyDirectory(string sourceDir, string destDir)
         {
@@ -229,6 +270,8 @@ namespace ServerDeployment.Console.Forms
                 CopyDirectory(subDir.FullName, Path.Combine(destDir, subDir.Name));
             }
         }
+
+
         private void StopSite(string siteFolderName)
         {
             // Find IIS site name from folder name - simplified as folder name is site name
@@ -571,19 +614,22 @@ namespace ServerDeployment.Console.Forms
             var selectedSites = GetSelectedSites();
             if (selectedSites.Count == 0)
             {
-                MessageBox.Show("Please select at least one site to copy content.");
+                lblMsg.Text = "Please set both Site Root and Backup Path before publishing.";
+                lblMsg.BackColor = Color.Red;
                 return;
             }
 
-            var sourceFolder = backendPath;
 
 
             try
             {
+                var sourceFolder = backendPath;
+
                 foreach (var site in selectedSites)
                 {
 
-                    CopyDirectory(sourceFolder, site.PhysicalPath);
+                    CopySiteContent(sourceFolder, site.PhysicalPath);
+
                 }
                 MessageBox.Show("Content copied successfully.");
             }

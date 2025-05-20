@@ -41,12 +41,15 @@
             btnBackupPath = new Button();
             ultraGrid = new Infragistics.Win.UltraWinGrid.UltraGrid();
             ultraPanel1 = new Infragistics.Win.Misc.UltraPanel();
+            ultraLabel2 = new Infragistics.Win.Misc.UltraLabel();
             lblMsg = new Label();
             btnPublish = new Infragistics.Win.Misc.UltraButton();
             ultraLabel1 = new Infragistics.Win.Misc.UltraLabel();
             txtBackupPath = new TextBox();
             txtFrontend = new TextBox();
+            textBox1 = new TextBox();
             btnFrontend = new Button();
+            btnReport = new Button();
             btnBackend = new Button();
             ((System.ComponentModel.ISupportInitialize)ultraGrid).BeginInit();
             ultraPanel1.ClientArea.SuspendLayout();
@@ -55,7 +58,7 @@
             // 
             // btnReloadSites
             // 
-            btnReloadSites.Location = new Point(124, 641);
+            btnReloadSites.Location = new Point(9, 787);
             btnReloadSites.Name = "btnReloadSites";
             btnReloadSites.Size = new Size(267, 111);
             btnReloadSites.TabIndex = 1;
@@ -65,7 +68,7 @@
             // 
             // btnBackup
             // 
-            btnBackup.Location = new Point(397, 641);
+            btnBackup.Location = new Point(282, 787);
             btnBackup.Name = "btnBackup";
             btnBackup.Size = new Size(267, 111);
             btnBackup.TabIndex = 2;
@@ -75,7 +78,7 @@
             // 
             // btnStopIIS
             // 
-            btnStopIIS.Location = new Point(670, 641);
+            btnStopIIS.Location = new Point(555, 787);
             btnStopIIS.Name = "btnStopIIS";
             btnStopIIS.Size = new Size(267, 111);
             btnStopIIS.TabIndex = 2;
@@ -85,7 +88,7 @@
             // 
             // btnStartIIS
             // 
-            btnStartIIS.Location = new Point(124, 758);
+            btnStartIIS.Location = new Point(555, 904);
             btnStartIIS.Name = "btnStartIIS";
             btnStartIIS.Size = new Size(267, 111);
             btnStartIIS.TabIndex = 2;
@@ -95,7 +98,7 @@
             // 
             // btnDeleteFiles
             // 
-            btnDeleteFiles.Location = new Point(943, 641);
+            btnDeleteFiles.Location = new Point(828, 787);
             btnDeleteFiles.Name = "btnDeleteFiles";
             btnDeleteFiles.Size = new Size(267, 111);
             btnDeleteFiles.TabIndex = 2;
@@ -105,7 +108,7 @@
             // 
             // btnCopyAppSettings
             // 
-            btnCopyAppSettings.Location = new Point(1489, 641);
+            btnCopyAppSettings.Location = new Point(282, 904);
             btnCopyAppSettings.Name = "btnCopyAppSettings";
             btnCopyAppSettings.Size = new Size(267, 111);
             btnCopyAppSettings.TabIndex = 2;
@@ -115,7 +118,7 @@
             // 
             // btnPingSite
             // 
-            btnPingSite.Location = new Point(397, 758);
+            btnPingSite.Location = new Point(828, 904);
             btnPingSite.Name = "btnPingSite";
             btnPingSite.Size = new Size(267, 111);
             btnPingSite.TabIndex = 2;
@@ -125,7 +128,7 @@
             // 
             // txtBackend
             // 
-            txtBackend.Location = new Point(351, 474);
+            txtBackend.Location = new Point(248, 531);
             txtBackend.Name = "txtBackend";
             txtBackend.ReadOnly = true;
             txtBackend.Size = new Size(522, 31);
@@ -133,7 +136,7 @@
             // 
             // btnCopyContent
             // 
-            btnCopyContent.Location = new Point(1216, 641);
+            btnCopyContent.Location = new Point(9, 904);
             btnCopyContent.Name = "btnCopyContent";
             btnCopyContent.Size = new Size(267, 111);
             btnCopyContent.TabIndex = 2;
@@ -144,9 +147,9 @@
             // btnBackupPath
             // 
             btnBackupPath.Font = new Font("Segoe UI", 12F);
-            btnBackupPath.Location = new Point(124, 529);
+            btnBackupPath.Location = new Point(21, 633);
             btnBackupPath.Name = "btnBackupPath";
-            btnBackupPath.Size = new Size(151, 50);
+            btnBackupPath.Size = new Size(171, 50);
             btnBackupPath.TabIndex = 1;
             btnBackupPath.Text = "Set Backup Folder";
             btnBackupPath.UseVisualStyleBackColor = true;
@@ -154,21 +157,21 @@
             // 
             // ultraGrid
             // 
-            ultraGrid.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            ultraGrid.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
             ultraGrid.DisplayLayout.AutoFitStyle = Infragistics.Win.UltraWinGrid.AutoFitStyle.ResizeAllColumns;
             ultraGrid.Font = new Font("Segoe UI", 9F);
-            ultraGrid.Location = new Point(274, 21);
+            ultraGrid.Location = new Point(34, 84);
             ultraGrid.Name = "ultraGrid";
-            ultraGrid.Size = new Size(1032, 375);
+            ultraGrid.Size = new Size(1095, 375);
             ultraGrid.TabIndex = 4;
             ultraGrid.Text = "Web Sites";
             // 
             // ultraPanel1
             // 
-            ultraPanel1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             // 
             // ultraPanel1.ClientArea
             // 
+            ultraPanel1.ClientArea.Controls.Add(ultraLabel2);
             ultraPanel1.ClientArea.Controls.Add(lblMsg);
             ultraPanel1.ClientArea.Controls.Add(btnPublish);
             ultraPanel1.ClientArea.Controls.Add(ultraLabel1);
@@ -176,9 +179,11 @@
             ultraPanel1.ClientArea.Controls.Add(btnReloadSites);
             ultraPanel1.ClientArea.Controls.Add(txtBackupPath);
             ultraPanel1.ClientArea.Controls.Add(txtFrontend);
+            ultraPanel1.ClientArea.Controls.Add(textBox1);
             ultraPanel1.ClientArea.Controls.Add(txtBackend);
             ultraPanel1.ClientArea.Controls.Add(btnFrontend);
             ultraPanel1.ClientArea.Controls.Add(btnPingSite);
+            ultraPanel1.ClientArea.Controls.Add(btnReport);
             ultraPanel1.ClientArea.Controls.Add(btnBackend);
             ultraPanel1.ClientArea.Controls.Add(btnBackupPath);
             ultraPanel1.ClientArea.Controls.Add(btnCopyAppSettings);
@@ -189,8 +194,17 @@
             ultraPanel1.ClientArea.Controls.Add(btnStartIIS);
             ultraPanel1.Location = new Point(12, 12);
             ultraPanel1.Name = "ultraPanel1";
-            ultraPanel1.Size = new Size(1800, 1148);
+            ultraPanel1.Size = new Size(1161, 1148);
             ultraPanel1.TabIndex = 5;
+            // 
+            // ultraLabel2
+            // 
+            ultraLabel2.Font = new Font("Segoe UI Variable Text", 18F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            ultraLabel2.Location = new Point(481, 3);
+            ultraLabel2.Name = "ultraLabel2";
+            ultraLabel2.Size = new Size(341, 56);
+            ultraLabel2.TabIndex = 8;
+            ultraLabel2.Text = "PETMATRIX";
             // 
             // lblMsg
             // 
@@ -209,7 +223,7 @@
             appearance11.BackGradientStyle = Infragistics.Win.GradientStyle.Vertical;
             appearance11.ForeColor = Color.FromArgb(0, 192, 0);
             btnPublish.HotTrackAppearance = appearance11;
-            btnPublish.Location = new Point(742, 895);
+            btnPublish.Location = new Point(818, 568);
             btnPublish.Name = "btnPublish";
             btnPublish.Size = new Size(252, 171);
             btnPublish.TabIndex = 6;
@@ -219,43 +233,62 @@
             // ultraLabel1
             // 
             ultraLabel1.Font = new Font("Comic Sans MS", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            ultraLabel1.Location = new Point(100, 1101);
+            ultraLabel1.Location = new Point(9, 1111);
             ultraLabel1.Name = "ultraLabel1";
-            ultraLabel1.Size = new Size(564, 34);
+            ultraLabel1.Size = new Size(299, 34);
             ultraLabel1.TabIndex = 5;
             ultraLabel1.Text = "MD HASIBUL ISLAM SHANTO";
             // 
             // txtBackupPath
             // 
-            txtBackupPath.Location = new Point(351, 539);
+            txtBackupPath.Location = new Point(248, 643);
             txtBackupPath.Name = "txtBackupPath";
             txtBackupPath.ReadOnly = true;
-            txtBackupPath.Size = new Size(927, 31);
+            txtBackupPath.Size = new Size(522, 31);
             txtBackupPath.TabIndex = 3;
             // 
             // txtFrontend
             // 
-            txtFrontend.Location = new Point(1127, 474);
+            txtFrontend.Location = new Point(248, 587);
             txtFrontend.Name = "txtFrontend";
             txtFrontend.ReadOnly = true;
             txtFrontend.Size = new Size(522, 31);
             txtFrontend.TabIndex = 3;
             // 
+            // textBox1
+            // 
+            textBox1.Location = new Point(248, 717);
+            textBox1.Name = "textBox1";
+            textBox1.ReadOnly = true;
+            textBox1.Size = new Size(522, 31);
+            textBox1.TabIndex = 3;
+            // 
             // btnFrontend
             // 
             btnFrontend.Font = new Font("Segoe UI", 12F);
-            btnFrontend.Location = new Point(900, 464);
+            btnFrontend.Location = new Point(21, 577);
             btnFrontend.Name = "btnFrontend";
-            btnFrontend.Size = new Size(151, 50);
+            btnFrontend.Size = new Size(171, 50);
             btnFrontend.TabIndex = 1;
             btnFrontend.Text = "Frontend";
             btnFrontend.UseVisualStyleBackColor = true;
             btnFrontend.Click += btnSetSiteRoot_Click;
             // 
+            // btnReport
+            // 
+            btnReport.Font = new Font("Segoe UI", 12F);
+            btnReport.Location = new Point(21, 689);
+            btnReport.Name = "btnReport";
+            btnReport.Size = new Size(171, 50);
+            btnReport.TabIndex = 1;
+            btnReport.Text = "Report";
+            btnReport.UseVisualStyleBackColor = true;
+            btnReport.Click += btnSetSiteRoot_Click;
+            // 
             // btnBackend
             // 
             btnBackend.Font = new Font("Segoe UI", 12F);
-            btnBackend.Location = new Point(124, 464);
+            btnBackend.Location = new Point(21, 521);
             btnBackend.Name = "btnBackend";
             btnBackend.Size = new Size(171, 50);
             btnBackend.TabIndex = 1;
@@ -267,10 +300,10 @@
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1824, 1172);
+            ClientSize = new Size(1200, 1172);
             Controls.Add(ultraPanel1);
             Name = "MainForm";
-            Text = "MainForm";
+            Text = "Main Form";
             ((System.ComponentModel.ISupportInitialize)ultraGrid).EndInit();
             ultraPanel1.ClientArea.ResumeLayout(false);
             ultraPanel1.ClientArea.PerformLayout();
@@ -298,5 +331,8 @@
         private Button btnBackend;
         private TextBox txtFrontend;
         private Button btnFrontend;
+        private TextBox textBox1;
+        private Button btnReport;
+        private Infragistics.Win.Misc.UltraLabel ultraLabel2;
     }
 }
