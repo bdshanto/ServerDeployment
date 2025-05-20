@@ -535,7 +535,7 @@ namespace ServerDeployment.Console.Forms
             if (folderDialog.ShowDialog() == DialogResult.OK)
             {
                 siteRootFolder = folderDialog.SelectedPath;
-                txtSiteRoot.Text = siteRootFolder;
+                txtBackend.Text = siteRootFolder;
 
                 ButtonsSwitch(true);
 
@@ -592,13 +592,13 @@ namespace ServerDeployment.Console.Forms
                 btnBackupPath.ForeColor = Color.Red;
             }
 
-            if (!HasNoStr(txtSiteRoot.Text) && txtSiteRoot.Text.Length > 0)
+            if (!HasNoStr(txtBackend.Text) && txtBackend.Text.Length > 0)
             {
-                btnSetSiteRoot.ForeColor = Color.Green;
+                btnBackend.ForeColor = Color.Green;
             }
             else
             {
-                btnSetSiteRoot.ForeColor = Color.Red;
+                btnBackend.ForeColor = Color.Red;
             }
 
             btnReloadSites.Enabled = value;
@@ -692,7 +692,7 @@ namespace ServerDeployment.Console.Forms
             }
 
             // 1. backup selected sites
-            BackupSelectedSites();
+            // BackupSelectedSites();
 
         }
 
