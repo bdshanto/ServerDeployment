@@ -722,37 +722,8 @@ namespace ServerDeployment.Console.Forms
             ultraGrid.DisplayLayout.Override.SelectTypeRow = Infragistics.Win.UltraWinGrid.SelectType.Extended;
             ultraGrid.DisplayLayout.Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
             ultraGrid.DisplayLayout.Override.RowSelectors = Infragistics.Win.DefaultableBoolean.False;
-        }
-
-        private void SetColumnWidthsByPercent()
-        {
-            ultraGrid.Width = 730;
-            if (ultraGrid.DisplayLayout.Bands.Count == 0)
-                return; // No bands yet
-
-            int totalWidth = ultraGrid.ClientSize.Width;
-
-            var band = ultraGrid.DisplayLayout.Bands[0];
-
-            // Calculate widths
-            int selectWidth = (int)(totalWidth * 0.10);
-            int nameWidth = (int)(totalWidth * 0.25);
-            int physicalPathWidth = (int)(totalWidth * 0.45);
-
-            // Assign widths
-            band.Columns["Select"].Width = selectWidth;
-            band.Columns["Name"].Width = nameWidth;
-            band.Columns["PhysicalPath"].Width = physicalPathWidth;
-
-            // Assign remaining width to last column to avoid rounding issues
-            int assignedWidth = selectWidth + nameWidth + physicalPathWidth;
-            int remainingWidth = totalWidth - assignedWidth;
-
-            if (remainingWidth < 0) remainingWidth = 0; // Safety check
-
-            band.Columns["State"].Width = remainingWidth;
-        }
-
+        } 
+      
         private void btnPublish_Click(object sender, EventArgs e)
         {
             ClearLables();
