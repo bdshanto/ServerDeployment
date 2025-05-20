@@ -311,43 +311,6 @@ namespace ServerDeployment.Console.Forms
             }
         }
 
-
-        // Copy appsettings.json from each selected site to a backup folder
-        private void CopyAppSettings()
-        {
-            var selected = GetSelectedSites();
-            if (selected.Count == 0)
-            {
-                MessageBox.Show("Please select at least one site.");
-                return;
-            }
-
-            using var fbd = new FolderBrowserDialog()
-            {
-                Description = "Select destination folder for appsettings.json backup",
-                AddToRecent = true
-            };
-            if (fbd.ShowDialog() != DialogResult.OK) return;
-
-            foreach (var site in selected)
-            {
-                var sourceFile = Path.Combine(siteRootFolder, site.PhysicalPath, "appsettings.json");
-                if (!File.Exists(sourceFile)) continue;
-
-                var destFile = Path.Combine(fbd.SelectedPath, $"{site}_appsettings_{DateTime.Now:yyyyMMddHHmmss}.json");
-                try
-                {
-                    File.Copy(sourceFile, destFile, true);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error copying appsettings.json for {site}: {ex.Message}");
-                }
-            }
-
-            MessageBox.Show("Appsettings.json files copied.");
-        }
-
         // Ping the site folder as hostname or IP (simplified)
         private async Task PingSiteAsync(string siteName)
         {
