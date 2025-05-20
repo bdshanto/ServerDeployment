@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            Infragistics.Win.Appearance appearance11 = new Infragistics.Win.Appearance();
             btnReloadSites = new Button();
             btnBackup = new Button();
             btnStopIIS = new Button();
@@ -35,14 +36,16 @@
             btnDeleteFiles = new Button();
             btnCopyAppSettings = new Button();
             btnPingSite = new Button();
-            btnSetSiteRoot = new Button();
             txtSiteRoot = new TextBox();
             btnCopyContent = new Button();
             btnBackupPath = new Button();
             ultraGrid = new Infragistics.Win.UltraWinGrid.UltraGrid();
             ultraPanel1 = new Infragistics.Win.Misc.UltraPanel();
+            lblMsg = new Label();
+            btnPublish = new Infragistics.Win.Misc.UltraButton();
             ultraLabel1 = new Infragistics.Win.Misc.UltraLabel();
             txtBackupPath = new TextBox();
+            btnSetSiteRoot = new Button();
             ((System.ComponentModel.ISupportInitialize)ultraGrid).BeginInit();
             ultraPanel1.ClientArea.SuspendLayout();
             ultraPanel1.SuspendLayout();
@@ -118,23 +121,13 @@
             btnPingSite.UseVisualStyleBackColor = true;
             btnPingSite.Click += btnPingSite_Click;
             // 
-            // btnSetSiteRoot
-            // 
-            btnSetSiteRoot.Location = new Point(103, 512);
-            btnSetSiteRoot.Name = "btnSetSiteRoot";
-            btnSetSiteRoot.Size = new Size(267, 111);
-            btnSetSiteRoot.TabIndex = 1;
-            btnSetSiteRoot.Text = "btnSetSiteRoot";
-            btnSetSiteRoot.UseVisualStyleBackColor = true;
-            btnSetSiteRoot.Click += btnSetSiteRoot_Click;
-            // 
             // txtSiteRoot
             // 
-            txtSiteRoot.Location = new Point(403, 540);
+            txtSiteRoot.Location = new Point(1201, 40);
             txtSiteRoot.Name = "txtSiteRoot";
             txtSiteRoot.Size = new Size(927, 31);
             txtSiteRoot.TabIndex = 3;
-            // 
+            txtSiteRoot.ReadOnly = true;
             // btnCopyContent
             // 
             btnCopyContent.Location = new Point(1183, 844);
@@ -147,17 +140,18 @@
             // 
             // btnBackupPath
             // 
-            btnBackupPath.Location = new Point(103, 647);
+            btnBackupPath.Font = new Font("Segoe UI", 12F);
+            btnBackupPath.Location = new Point(974, 86);
             btnBackupPath.Name = "btnBackupPath";
-            btnBackupPath.Size = new Size(267, 111);
+            btnBackupPath.Size = new Size(151, 50);
             btnBackupPath.TabIndex = 1;
-            btnBackupPath.Text = "btnBackupPath";
+            btnBackupPath.Text = "Set Backup Folder";
             btnBackupPath.UseVisualStyleBackColor = true;
             btnBackupPath.Click += btnBackupPath_Click;
             // 
             // ultraGrid
             // 
-            ultraGrid.Location = new Point(524, 61);
+            ultraGrid.Location = new Point(116, 30);
             ultraGrid.Name = "ultraGrid";
             ultraGrid.Size = new Size(806, 375);
             ultraGrid.TabIndex = 4;
@@ -168,13 +162,15 @@
             // 
             // ultraPanel1.ClientArea
             // 
+            ultraPanel1.ClientArea.Controls.Add(lblMsg);
+            ultraPanel1.ClientArea.Controls.Add(btnPublish);
             ultraPanel1.ClientArea.Controls.Add(ultraLabel1);
             ultraPanel1.ClientArea.Controls.Add(ultraGrid);
             ultraPanel1.ClientArea.Controls.Add(btnReloadSites);
             ultraPanel1.ClientArea.Controls.Add(txtBackupPath);
             ultraPanel1.ClientArea.Controls.Add(txtSiteRoot);
-            ultraPanel1.ClientArea.Controls.Add(btnSetSiteRoot);
             ultraPanel1.ClientArea.Controls.Add(btnPingSite);
+            ultraPanel1.ClientArea.Controls.Add(btnSetSiteRoot);
             ultraPanel1.ClientArea.Controls.Add(btnBackupPath);
             ultraPanel1.ClientArea.Controls.Add(btnCopyAppSettings);
             ultraPanel1.ClientArea.Controls.Add(btnBackup);
@@ -187,6 +183,30 @@
             ultraPanel1.Size = new Size(2568, 1543);
             ultraPanel1.TabIndex = 5;
             // 
+            // lblMsg
+            // 
+            lblMsg.AutoSize = true;
+            lblMsg.Font = new Font("Segoe UI Semibold", 16F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblMsg.Location = new Point(777, 1271);
+            lblMsg.Name = "lblMsg";
+            lblMsg.Size = new Size(0, 45);
+            lblMsg.TabIndex = 7;
+            // 
+            // btnPublish
+            // 
+            btnPublish.ButtonStyle = Infragistics.Win.UIElementButtonStyle.Button3D;
+            btnPublish.Font = new Font("Segoe UI", 25F, FontStyle.Bold);
+            appearance11.BackColor = Color.Lime;
+            appearance11.BackGradientStyle = Infragistics.Win.GradientStyle.Vertical;
+            appearance11.ForeColor = Color.FromArgb(0, 192, 0);
+            btnPublish.HotTrackAppearance = appearance11;
+            btnPublish.Location = new Point(842, 1048);
+            btnPublish.Name = "btnPublish";
+            btnPublish.Size = new Size(252, 171);
+            btnPublish.TabIndex = 6;
+            btnPublish.Text = "Publish";
+            btnPublish.Click += btnPublish_Click;
+            // 
             // ultraLabel1
             // 
             ultraLabel1.Font = new Font("Comic Sans MS", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
@@ -198,10 +218,22 @@
             // 
             // txtBackupPath
             // 
-            txtBackupPath.Location = new Point(403, 592);
+            txtBackupPath.Location = new Point(1201, 96);
             txtBackupPath.Name = "txtBackupPath";
             txtBackupPath.Size = new Size(927, 31);
             txtBackupPath.TabIndex = 3;
+            txtBackupPath.ReadOnly = true;
+            // 
+            // btnSetSiteRoot
+            // 
+            btnSetSiteRoot.Font = new Font("Segoe UI", 12F);
+            btnSetSiteRoot.Location = new Point(974, 21);
+            btnSetSiteRoot.Name = "btnSetSiteRoot";
+            btnSetSiteRoot.Size = new Size(151, 50);
+            btnSetSiteRoot.TabIndex = 1;
+            btnSetSiteRoot.Text = "Set Source";
+            btnSetSiteRoot.UseVisualStyleBackColor = true;
+            btnSetSiteRoot.Click += btnSetSiteRoot_Click;
             // 
             // MainForm
             // 
@@ -226,7 +258,6 @@
         private Button btnDeleteFiles;
         private Button btnCopyAppSettings;
         private Button btnPingSite;
-        private Button btnSetSiteRoot;
         private TextBox txtSiteRoot;
         private Button btnCopyContent;
         private Button btnBackupPath;
@@ -234,5 +265,8 @@
         private Infragistics.Win.Misc.UltraPanel ultraPanel1;
         private Infragistics.Win.Misc.UltraLabel ultraLabel1;
         private TextBox txtBackupPath;
+        private Infragistics.Win.Misc.UltraButton btnPublish;
+        private Label lblMsg;
+        private Button btnSetSiteRoot;
     }
 }

@@ -27,11 +27,15 @@ namespace ServerDeployment.Console.Forms
         private Dictionary<string, string> siteBackupDirectory = new();
         public MainForm()
         {
-            InitializeComponent(); 
-
+            InitializeComponent();
+            ButtonsSwitch(false);
             InitializeUltraGrid();
             LoadSitesFromIIS();
-            DispableAllButtons();
+
+
+            lblMsg.Text = "Please set both Site Root and Backup Path before publishing.";
+            lblMsg.ForeColor = Color.Red;
+
         }
 
         private void InitializeUltraGrid()
@@ -51,14 +55,22 @@ namespace ServerDeployment.Console.Forms
 
         private void LoadSitesFromIIS()
         {
-
+            var selectedSites = GetSelectedSites();  
 
             var sites = GetIISSites();
             var dt = CreateSitesDataTable();
 
             foreach (var site in sites)
             {
-                dt.Rows.Add(false, site.Name, site.PhysicalPath, site.State);
+                bool isSelected = false;
+                var selected = selectedSites.FirstOrDefault(c => c.Name.Equals(site.Name));
+                if (selected != null)
+                {
+                    isSelected = selected.Select;
+                }
+
+
+                dt.Rows.Add(isSelected, site.Name, site.PhysicalPath, site.State);
             }
             // Bind the DataTable to ultraGrid
             ultraGrid.DataSource = dt;
@@ -154,7 +166,8 @@ namespace ServerDeployment.Console.Forms
                     {
                         Name = row.Cells["Name"].Value?.ToString() ?? string.Empty,
                         PhysicalPath = row.Cells["PhysicalPath"].Value?.ToString() ?? string.Empty,
-                        State = row.Cells["State"].Value?.ToString() ?? string.Empty
+                        State = row.Cells["State"].Value?.ToString() ?? string.Empty,
+                        Select = isChecked
                     });
                 }
             }
@@ -177,7 +190,7 @@ namespace ServerDeployment.Console.Forms
                 {
                     string sourceDir = site.PhysicalPath;
                     string folderName = @$"{DateTime.Now.Year}_{DateTime.Now.Month}_{DateTime.Now.Day}";
-                    string backupDir = Path.Combine(siteBackupFolder, folderName,$"{site.Name}_backup_{DateTime.Now:yyyyMMddHHmmss}");
+                    string backupDir = Path.Combine(siteBackupFolder, folderName, $"{site.Name}_backup_{DateTime.Now:yyyyMMddHHmmss}");
                     CopyDirectory(sourceDir, backupDir);
 
                     if (siteBackupDirectory.ContainsKey(site.Name))
@@ -401,13 +414,17 @@ namespace ServerDeployment.Console.Forms
 
         private void btnStopIIS_Click(object sender, EventArgs e)
         {
+            StopIIS();
+        }
+
+        private void StopIIS()
+        {
             var selected = GetSelectedSites();
             foreach (var site in selected)
             {
                 StopSite(site.Name);
             }
             LoadSitesFromIIS();
-            // MessageBox.Show("Stop commands sent.");
         }
 
         private void btnStartIIS_Click(object sender, EventArgs e)
@@ -565,7 +582,24 @@ namespace ServerDeployment.Console.Forms
 
         private void ButtonsSwitch(bool value)
         {
-            if (HasNoStr(siteRootFolder) || HasNoStr(siteBackupFolder)) return;
+
+            if (!HasNoStr(txtBackupPath.Text) && txtBackupPath.Text.Length > 0)
+            {
+                btnBackupPath.ForeColor = Color.Green;
+            }
+            else
+            {
+                btnBackupPath.ForeColor = Color.Red;
+            }
+
+            if (!HasNoStr(txtSiteRoot.Text) && txtSiteRoot.Text.Length > 0)
+            {
+                btnSetSiteRoot.ForeColor = Color.Green;
+            }
+            else
+            {
+                btnSetSiteRoot.ForeColor = Color.Red;
+            }
 
             btnReloadSites.Enabled = value;
             btnBackup.Enabled = value;
@@ -575,21 +609,9 @@ namespace ServerDeployment.Console.Forms
             btnCopyAppSettings.Enabled = value;
             btnPingSite.Enabled = value;
             btnCopyContent.Enabled = value;
-
         }
 
-        private void DispableAllButtons()
-        {
-            btnReloadSites.Enabled = false;
-            btnBackup.Enabled = false;
-            btnStopIIS.Enabled = false;
-            btnStartIIS.Enabled = false;
-            btnDeleteFiles.Enabled = false;
-            btnCopyAppSettings.Enabled = false;
-            btnPingSite.Enabled = false;
-            btnCopyContent.Enabled = false;
 
-        }
 
         private bool HasNoStr(string str)
         {
@@ -622,7 +644,7 @@ namespace ServerDeployment.Console.Forms
 
             band.Columns["State"].Header.Caption = "Status";
             band.Columns["State"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
-            SetColumnWidthsByPercent(); 
+            SetColumnWidthsByPercent();
 
             ultraGrid.DisplayLayout.Override.SelectTypeRow = Infragistics.Win.UltraWinGrid.SelectType.Extended;
             ultraGrid.DisplayLayout.Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
@@ -658,7 +680,30 @@ namespace ServerDeployment.Console.Forms
             band.Columns["State"].Width = remainingWidth;
         }
 
-     
+        private void btnPublish_Click(object sender, EventArgs e)
+        {
+            ClearLables();
 
+            if (HasNoStr(siteRootFolder) || HasNoStr(siteBackupFolder))
+            {
+                lblMsg.Text = "Please set both Site Root and Backup Path before publishing.";
+                lblMsg.BackColor = Color.Red;
+                return;
+            }
+
+            // 1. backup selected sites
+            BackupSelectedSites();
+
+        }
+
+
+
+        private void ClearLables()
+        {
+            lblMsg.Text = string.Empty;
+            lblMsg.BackColor = SystemColors.Control; 
+        }
+
+        
     }
 }
