@@ -12,6 +12,86 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Include="bin\Debug\net8.0-windows\Aero.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Chameleon.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Claymation.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Excel2013 - Dark Gray.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Excel2013 - Light Gray.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Excel2013 - White.isl" />
+	  <None Include="bin\Debug\net8.0-windows\GrapeTomato.isl" />
+	  <None Include="bin\Debug\net8.0-windows\IG.isl" />
+	  <None Include="bin\Debug\net8.0-windows\LucidDream.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Metro.isl" />
+	  <None Include="bin\Debug\net8.0-windows\ModClay.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Nautilus.isl" />
+	  <None Include="bin\Debug\net8.0-windows\NoirModerne.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Office2007Black.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Office2007Blue.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Office2007Silver.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Office2010Black.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Office2010Blue.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Office2010Silver.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Office2013 - Dark Gray.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Office2013 - Light Gray.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Office2013 - White.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Outlook2013 - Dark Gray.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Outlook2013 - LightGray.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Outlook2013 - White.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Pear.isl" />
+	  <None Include="bin\Debug\net8.0-windows\RedPlanet.isl" />
+	  <None Include="bin\Debug\net8.0-windows\RubberBlack.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Trendy.isl" />
+	  <None Include="bin\Debug\net8.0-windows\VS2008.isl" />
+	  <None Include="bin\Debug\net8.0-windows\VS2010.isl" />
+	  <None Include="bin\Debug\net8.0-windows\VS2013 - Blue.isl" />
+	  <None Include="bin\Debug\net8.0-windows\VS2013 - Dark.isl" />
+	  <None Include="bin\Debug\net8.0-windows\VS2013 - Light.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Windows7.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Windows8-DarkGray-Blue.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Windows8-DarkGray-Green.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Windows8-DarkGray-Pink.isl" />
+	  <None Include="bin\Debug\net8.0-windows\Windows8-DarkGray-Yellow.isl" />
+	  <None Include="bin\Release\net8.0-windows\Aero.isl" />
+	  <None Include="bin\Release\net8.0-windows\Chameleon.isl" />
+	  <None Include="bin\Release\net8.0-windows\Claymation.isl" />
+	  <None Include="bin\Release\net8.0-windows\Excel2013 - Dark Gray.isl" />
+	  <None Include="bin\Release\net8.0-windows\Excel2013 - Light Gray.isl" />
+	  <None Include="bin\Release\net8.0-windows\Excel2013 - White.isl" />
+	  <None Include="bin\Release\net8.0-windows\GrapeTomato.isl" />
+	  <None Include="bin\Release\net8.0-windows\IG.isl" />
+	  <None Include="bin\Release\net8.0-windows\LucidDream.isl" />
+	  <None Include="bin\Release\net8.0-windows\Metro.isl" />
+	  <None Include="bin\Release\net8.0-windows\ModClay.isl" />
+	  <None Include="bin\Release\net8.0-windows\Nautilus.isl" />
+	  <None Include="bin\Release\net8.0-windows\NoirModerne.isl" />
+	  <None Include="bin\Release\net8.0-windows\Office2007Black.isl" />
+	  <None Include="bin\Release\net8.0-windows\Office2007Blue.isl" />
+	  <None Include="bin\Release\net8.0-windows\Office2007Silver.isl" />
+	  <None Include="bin\Release\net8.0-windows\Office2010Black.isl" />
+	  <None Include="bin\Release\net8.0-windows\Office2010Blue.isl" />
+	  <None Include="bin\Release\net8.0-windows\Office2010Silver.isl" />
+	  <None Include="bin\Release\net8.0-windows\Office2013 - Dark Gray.isl" />
+	  <None Include="bin\Release\net8.0-windows\Office2013 - Light Gray.isl" />
+	  <None Include="bin\Release\net8.0-windows\Office2013 - White.isl" />
+	  <None Include="bin\Release\net8.0-windows\Outlook2013 - Dark Gray.isl" />
+	  <None Include="bin\Release\net8.0-windows\Outlook2013 - LightGray.isl" />
+	  <None Include="bin\Release\net8.0-windows\Outlook2013 - White.isl" />
+	  <None Include="bin\Release\net8.0-windows\Pear.isl" />
+	  <None Include="bin\Release\net8.0-windows\RedPlanet.isl" />
+	  <None Include="bin\Release\net8.0-windows\RubberBlack.isl" />
+	  <None Include="bin\Release\net8.0-windows\Trendy.isl" />
+	  <None Include="bin\Release\net8.0-windows\VS2008.isl" />
+	  <None Include="bin\Release\net8.0-windows\VS2010.isl" />
+	  <None Include="bin\Release\net8.0-windows\VS2013 - Blue.isl" />
+	  <None Include="bin\Release\net8.0-windows\VS2013 - Dark.isl" />
+	  <None Include="bin\Release\net8.0-windows\VS2013 - Light.isl" />
+	  <None Include="bin\Release\net8.0-windows\Windows7.isl" />
+	  <None Include="bin\Release\net8.0-windows\Windows8-DarkGray-Green.isl" />
+	  <None Include="bin\Release\net8.0-windows\Windows8-DarkGray-Pink.isl" />
+	  <None Include="bin\Release\net8.0-windows\Windows8-DarkGray-Yellow.isl" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Infragistics.WinForms" Version="22.2.16" />
 		<PackageReference Include="Infragistics.WinForms.AppStylistSupport" Version="22.2.16" />
 		<PackageReference Include="Infragistics.WinForms.DataSource" Version="22.2.16" />

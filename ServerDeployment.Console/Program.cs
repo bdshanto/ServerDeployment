@@ -17,8 +17,11 @@ namespace ServerDeployment.Console
             AppUtility.ConnectionString = conString;
 
             ApplicationConfiguration.Initialize();
-            
-             Application.Run(new MainForm());
+
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Infragistics.Win.AppStyling.StyleManager.Load("Aero.isl");
+            Application.Run(new MainForm());
         }
     }
 }

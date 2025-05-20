@@ -2,18 +2,11 @@
 using Infragistics.Win.UltraWinGrid;
 using Microsoft.Web.Administration;
 using ServerDeployment.Console.Helpers;
-using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Net.NetworkInformation;
-using System.Security.Policy;
 using System.Text.Json;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using ColumnStyle = Infragistics.Win.UltraWinGrid.ColumnStyle;
+
 
 namespace ServerDeployment.Console.Forms
 {
@@ -51,13 +44,15 @@ namespace ServerDeployment.Console.Forms
 
         private void InitializeUltraGrid()
         {
-            ultraGrid.Font = new Font("Arial", 12);
+            
 
             // Create schema once
             sitesDataTable = CreateSitesDataTable();
 
             // Bind empty schema
             ultraGrid.DataSource = sitesDataTable;
+            ultraGrid.UseAppStyling = true;
+            ultraGrid.DisplayLayout.BorderStyle = UIElementBorderStyle.Solid;
 
             // Customize columns once after binding
             CustomizeUltraGridColumns();
@@ -94,7 +89,7 @@ namespace ServerDeployment.Console.Forms
             band.Columns["Select"].Header.Caption = "Select";
             band.Columns["Select"].Width = 80;
             band.Columns["Select"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.CheckBox;
-            band.Columns["Select"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.AllowEdit;
+            band.Columns["Select"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.AllowEdit; 
 
             band.Columns["Name"].Header.Caption = "Site";
             band.Columns["Name"].Width = 150;
@@ -108,10 +103,7 @@ namespace ServerDeployment.Console.Forms
             band.Columns["State"].Width = 100;
             band.Columns["State"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
 
-            // Selection settings
-            ultraGrid.DisplayLayout.Override.SelectTypeRow = Infragistics.Win.UltraWinGrid.SelectType.Extended;
-            ultraGrid.DisplayLayout.Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
-            ultraGrid.DisplayLayout.Override.RowSelectors = Infragistics.Win.DefaultableBoolean.False;
+          
 
         }
         private List<IISSiteInfo> GetIISSites()
@@ -570,11 +562,11 @@ namespace ServerDeployment.Console.Forms
                         CopyDirectory(sourceReportsViewer, destReportsViewer);
                 }
 
-                MessageBox.Show("Copy completed successfully.");
+                lblMsg.Text = "Copy completed successfully.";
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error during copy: {ex.Message}");
+                lblMsg.Text = $"Error during copy: {ex.Message}";
             }
 
         }
@@ -607,7 +599,7 @@ namespace ServerDeployment.Console.Forms
         {
             using var folderDialog = new FolderBrowserDialog
             {
-                Description = "Select Site Root Directory"
+                Description = "Select Site Root Directory",
             };
 
             if (folderDialog.ShowDialog() == DialogResult.OK)
@@ -775,6 +767,27 @@ namespace ServerDeployment.Console.Forms
             ultraGrid.DisplayLayout.Override.HeaderAppearance.ForeColor = Color.Black; // Set header text color
             ultraGrid.DisplayLayout.Override.HeaderAppearance.BackColor = Color.LightGray; // Set header background color for all columns
 
+
+
+            // Selection settings
+            ultraGrid.DisplayLayout.Override.SelectTypeRow = Infragistics.Win.UltraWinGrid.SelectType.Extended;
+            ultraGrid.DisplayLayout.Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
+            ultraGrid.DisplayLayout.Override.RowSelectors = Infragistics.Win.DefaultableBoolean.False;
+
+
+            // Set the row height to a larger value (default ~20)
+            ultraGrid.DisplayLayout.Override.RowSizing = RowSizing.Fixed;
+
+            ultraGrid.DisplayLayout.Override.HeaderAppearance.FontData.Name = "Segoe UI";
+            ultraGrid.DisplayLayout.Override.HeaderAppearance.FontData.SizeInPoints = 11;
+            ultraGrid.DisplayLayout.Override.HeaderAppearance.FontData.Bold = Infragistics.Win.DefaultableBoolean.True;
+
+            ultraGrid.DisplayLayout.Override.RowAppearance.FontData.Name = "Segoe UI";
+            ultraGrid.DisplayLayout.Override.RowAppearance.FontData.SizeInPoints = 10;
+            ultraGrid.DisplayLayout.Override.RowAppearance.FontData.Italic = Infragistics.Win.DefaultableBoolean.False;
+
+
+
         }
 
         private void btnPublish_Click(object sender, EventArgs e)
@@ -842,9 +855,9 @@ namespace ServerDeployment.Console.Forms
 
             if (folderDialog.ShowDialog() == DialogResult.OK)
             {
-                backendPath = folderDialog.SelectedPath;
-                txtFrontend.Text = backendPath;
-                txtFrontend.Text = backendPath;
+                frontendPath = folderDialog.SelectedPath;
+                txtFrontend.Text = frontendPath;
+                txtFrontend.Text = frontendPath;
 
                 ButtonsSwitch(true);
 
@@ -860,9 +873,9 @@ namespace ServerDeployment.Console.Forms
 
             if (folderDialog.ShowDialog() == DialogResult.OK)
             {
-                backendPath = folderDialog.SelectedPath;
-                txtReport.Text = backendPath;
-                reportPath = backendPath;
+                reportPath = folderDialog.SelectedPath;
+                txtReport.Text = reportPath;
+                reportPath = reportPath ;
 
                 ButtonsSwitch(true);
 

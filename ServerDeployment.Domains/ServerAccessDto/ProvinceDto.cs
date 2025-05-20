@@ -8,7 +8,7 @@ namespace ARAKDataSetup.Domains.ServerAccessDto;
 /// </summary>
 public class ProvinceDto
 {
-    [Key] 
+    [Key]
     public int PROVINCE_ID { get; set; } = 0;
     public int COUNTRY_ID { get; set; }
     public string PROVINCE_CODE { get; set; }
@@ -17,7 +17,7 @@ public class ProvinceDto
 
     public static ProvinceDto GetDto(string province)
     {
-      return   new ProvinceDto()
+        return new ProvinceDto()
         {
             PROVINCE_NAME = province,
             PROVINCE_CODE = "00",

@@ -10,5 +10,6 @@ public class CountryDto
     [Key]
     public int COUNTRY_ID { get; set; }
     public string Country_CODE { get; set; }
-    public string COUNTRY_NAME { get; set; }public bool IS_ACTIVE { get; set; } = true;
+    public string COUNTRY_NAME { get; set; }
+    public bool IS_ACTIVE { get; set; } = true;
 }

@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using ARAKDataSetup.Domains.Utility;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ARAKDataSetup.Domains.Utility;
-using ARAKDataSetup.Domains.ViewModels;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ARAKDataSetup.Domains.ServerAccessDto
 {

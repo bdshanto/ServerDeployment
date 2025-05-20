@@ -1,7 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using ARAKDataSetup.Domains.Utility;
 
 namespace ARAKDataSetup.Domains.ServerAccessDto;
 public class PatientDto
@@ -58,19 +55,19 @@ public class PatientDto
     public void GetDoB(string petDob)
     {
         var dob = string.Empty;
-       /* try
-        {
-            if (AppUtility.HasStrValue(petDob))
-            {
-                PATIENT_DOB = Convert.ToDateTime(petDob);
-                return;
-            }
-        }
-        catch (Exception ex)
-        {*/
-            dob = petDob;
+        /* try
+         {
+             if (AppUtility.HasStrValue(petDob))
+             {
+                 PATIENT_DOB = Convert.ToDateTime(petDob);
+                 return;
+             }
+         }
+         catch (Exception ex)
+         {*/
+        dob = petDob;
 
-       /* }*/
+        /* }*/
         dob = dob.Trim();
 
         if (dob.ToLowerInvariant() == "-".ToLowerInvariant())

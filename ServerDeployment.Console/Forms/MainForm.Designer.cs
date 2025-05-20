@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             Infragistics.Win.Appearance appearance11 = new Infragistics.Win.Appearance();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             btnReloadSites = new Button();
             btnBackup = new Button();
             btnStopIIS = new Button();
@@ -312,7 +313,9 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1200, 1172);
             Controls.Add(ultraPanel1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "MainForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Main Form";
             ((System.ComponentModel.ISupportInitialize)ultraGrid).EndInit();
             ultraPanel1.ClientArea.ResumeLayout(false);

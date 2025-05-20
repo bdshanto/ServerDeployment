@@ -1,9 +1,6 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Data;
-using System.Linq;
 using System.Reflection;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace ARAKDataSetup.Domains.Utility
@@ -37,7 +34,7 @@ namespace ARAKDataSetup.Domains.Utility
                 throw null;
             }
         }
-        
+
         #region Has no string 
 
         public static bool HasNoStr(string strVal)
@@ -99,13 +96,13 @@ namespace ARAKDataSetup.Domains.Utility
             var data = regex.Replace(str.Trim(), " ");
             return data;
         }
-        
+
         // trim all string and double space using regEX
         public static string TrimAllSpaceStr(string str)
         {
             if (HasNoStr(str)) return string.Empty;
             // TrimAllSpaceStr, -, & , ., /, \, (, )
-          var regex = new Regex(@"[\s\-\&\.\,\/\\\(\)]+");
+            var regex = new Regex(@"[\s\-\&\.\,\/\\\(\)]+");
             var data = regex.Replace(str.Trim(), "");
             return data;
         }
