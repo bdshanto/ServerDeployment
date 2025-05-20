@@ -157,7 +157,7 @@
             // 
             // ultraGrid
             // 
-            ultraGrid.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            ultraGrid.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             ultraGrid.DisplayLayout.AutoFitStyle = Infragistics.Win.UltraWinGrid.AutoFitStyle.ResizeAllColumns;
             ultraGrid.Font = new Font("Segoe UI", 9F);
             ultraGrid.Location = new Point(34, 84);

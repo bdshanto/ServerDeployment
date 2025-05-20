@@ -717,7 +717,7 @@ namespace ServerDeployment.Console.Forms
 
             band.Columns["State"].Header.Caption = "Status";
             band.Columns["State"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
-            SetColumnWidthsByPercent();
+            //             SetColumnWidthsByPercent();
 
             ultraGrid.DisplayLayout.Override.SelectTypeRow = Infragistics.Win.UltraWinGrid.SelectType.Extended;
             ultraGrid.DisplayLayout.Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
