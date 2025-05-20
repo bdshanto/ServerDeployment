@@ -29,8 +29,7 @@ namespace ServerDeployment.Console.Forms
 
         public DeploymentForm()
         {
-            InitializeComponent();
-
+            InitializeComponent(); 
             ProgressUpdated += MainForm_ProgressUpdated;
 
             ButtonsSwitch(false);

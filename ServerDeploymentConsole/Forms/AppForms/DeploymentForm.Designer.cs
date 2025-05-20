@@ -307,16 +307,16 @@
             btnBackend.UseVisualStyleBackColor = true;
             btnBackend.Click += btnSetSiteRoot_Click;
             // 
-            // MainForm
+            // DeploymentForm
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleMode = AutoScaleMode.None;
             ClientSize = new Size(1200, 1172);
             Controls.Add(ultraPanel1);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            Name = "MainForm";
+            Name = "DeploymentForm";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Main Form";
+            Text = "Deployment Form";
             ((System.ComponentModel.ISupportInitialize)ultraGrid).EndInit();
             ultraPanel1.ClientArea.ResumeLayout(false);
             ultraPanel1.ClientArea.PerformLayout();

@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWindowsForms>true</UseWindowsForms>
+		<ImplicitUsings>enable</ImplicitUsings>
+
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+
+		<RootNamespace>ServerDeployment.Console</RootNamespace>
+
+	</PropertyGroup>
+ 
+
+	<ItemGroup>
+		<PackageReference Include="Infragistics.WinForms" Version="22.2.16" />
+		<PackageReference Include="Infragistics.WinForms.AppStylistSupport" Version="22.2.16" />
+		<PackageReference Include="Infragistics.WinForms.DataSource" Version="22.2.16" />
+		<PackageReference Include="Infragistics.WinForms.IO" Version="22.2.16" />
+		<PackageReference Include="Infragistics.WinForms.Misc" Version="22.2.16" />
+		<PackageReference Include="Infragistics.WinForms.Shared" Version="22.2.16" />
+		<PackageReference Include="Infragistics.WinForms.WinGrid" Version="22.2.16" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Management.Infrastructure" Version="2.0.0" />
+		<PackageReference Include="Microsoft.Web.Administration" Version="11.1.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ServerDeployment.Applications\ServerDeployment.Applications.csproj" />
+		<ProjectReference Include="..\ServerDeployment.Domains\ServerDeployment.Domains.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Models\" />
+	  <Folder Include="Utility\" />
+	</ItemGroup>
+
+</Project>
