@@ -123,11 +123,12 @@
             // 
             // txtSiteRoot
             // 
-            txtSiteRoot.Location = new Point(1201, 40);
+            txtSiteRoot.Location = new Point(351, 474);
             txtSiteRoot.Name = "txtSiteRoot";
+            txtSiteRoot.ReadOnly = true;
             txtSiteRoot.Size = new Size(927, 31);
             txtSiteRoot.TabIndex = 3;
-            txtSiteRoot.ReadOnly = true;
+            // 
             // btnCopyContent
             // 
             btnCopyContent.Location = new Point(1183, 844);
@@ -141,7 +142,7 @@
             // btnBackupPath
             // 
             btnBackupPath.Font = new Font("Segoe UI", 12F);
-            btnBackupPath.Location = new Point(974, 86);
+            btnBackupPath.Location = new Point(124, 529);
             btnBackupPath.Name = "btnBackupPath";
             btnBackupPath.Size = new Size(151, 50);
             btnBackupPath.TabIndex = 1;
@@ -151,9 +152,10 @@
             // 
             // ultraGrid
             // 
-            ultraGrid.Location = new Point(116, 30);
+            ultraGrid.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            ultraGrid.Location = new Point(444, 24);
             ultraGrid.Name = "ultraGrid";
-            ultraGrid.Size = new Size(806, 375);
+            ultraGrid.Size = new Size(536, 375);
             ultraGrid.TabIndex = 4;
             ultraGrid.Text = "Web Sites";
             // 
@@ -180,7 +182,7 @@
             ultraPanel1.ClientArea.Controls.Add(btnStartIIS);
             ultraPanel1.Location = new Point(12, 12);
             ultraPanel1.Name = "ultraPanel1";
-            ultraPanel1.Size = new Size(2568, 1543);
+            ultraPanel1.Size = new Size(2298, 1543);
             ultraPanel1.TabIndex = 5;
             // 
             // lblMsg
@@ -218,16 +220,16 @@
             // 
             // txtBackupPath
             // 
-            txtBackupPath.Location = new Point(1201, 96);
+            txtBackupPath.Location = new Point(351, 539);
             txtBackupPath.Name = "txtBackupPath";
+            txtBackupPath.ReadOnly = true;
             txtBackupPath.Size = new Size(927, 31);
             txtBackupPath.TabIndex = 3;
-            txtBackupPath.ReadOnly = true;
             // 
             // btnSetSiteRoot
             // 
             btnSetSiteRoot.Font = new Font("Segoe UI", 12F);
-            btnSetSiteRoot.Location = new Point(974, 21);
+            btnSetSiteRoot.Location = new Point(124, 464);
             btnSetSiteRoot.Name = "btnSetSiteRoot";
             btnSetSiteRoot.Size = new Size(151, 50);
             btnSetSiteRoot.TabIndex = 1;
@@ -239,7 +241,7 @@
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(2592, 1567);
+            ClientSize = new Size(2322, 1567);
             Controls.Add(ultraPanel1);
             Name = "MainForm";
             Text = "MainForm";
