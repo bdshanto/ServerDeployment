@@ -1,4 +1,5 @@
-﻿using ServerDeployment.Console.Helpers;
+﻿using Microsoft.Web.Administration;
+using ServerDeployment.Console.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Security.Policy;
 using System.Text.Json;
 using System.Windows.Forms;
 
@@ -347,20 +349,61 @@ namespace ServerDeployment.Console.Forms
         }
 
         // Ping the site folder as hostname or IP (simplified)
-        private async Task PingSiteAsync(string siteFolderName)
+        private async Task PingSiteAsync(string siteName)
         {
-            // For demonstration, treat siteFolderName as hostname (user can adjust as needed)
-            var ping = new Ping();
-            try
+            string hostHeader = "";
+            string ip = "";
+            int port = 0;
+
+            using (ServerManager iisManager = new ServerManager())
             {
-                var reply = await ping.SendPingAsync(siteFolderName, 2000);
-                string status = reply.Status == IPStatus.Success ? "Online" : "Offline";
-                UpdateSiteStatus(siteFolderName, status);
+                var site = iisManager.Sites[siteName];
+                if (site != null)
+                {
+                    foreach (var binding in site.Bindings)
+                    {
+                        ip = binding.EndPoint?.Address.ToString() ?? "";
+                        port = binding.EndPoint?.Port ?? 0;
+                        hostHeader = binding.Host;
+
+                        // Use first valid binding
+                        break;
+                    }
+                }
             }
-            catch
+
+            string pingTarget = "127.0.0.1";
+
+            // Determine ping target
+            if (!string.IsNullOrEmpty(hostHeader) && hostHeader != "*" && hostHeader != "0.0.0.0")
             {
-                UpdateSiteStatus(siteFolderName, "Offline");
+                pingTarget = hostHeader;
             }
+            else if (!string.IsNullOrEmpty(ip) && ip != "0.0.0.0" && ip != "::")
+            {
+                pingTarget = ip;
+            }
+
+            if (pingTarget != null)
+            {
+                var ping = new Ping();
+                try
+                {
+                    var reply = await ping.SendPingAsync($@"{pingTarget}:{port}", 2000);
+                    string status = reply.Status == IPStatus.Success ? "Online" : "Offline";
+                    UpdateSiteStatus(siteName, status);
+                }
+                catch(Exception ex)
+                {
+                    UpdateSiteStatus(siteName, "Offline");
+                }
+            }
+            else
+            {
+                // Cannot ping unknown or invalid address
+                UpdateSiteStatus(siteName, "Unknown");
+            }
+
         }
 
         private void UpdateSiteStatus(string siteFolderName, string status)
@@ -417,23 +460,23 @@ namespace ServerDeployment.Console.Forms
                 MessageBox.Show("No sites found.");
                 return;
             }
-/*
-            using var sourceDialog = new FolderBrowserDialog
-            {
-                Description = "Select Source Directory"
-            };
-            if (sourceDialog.ShowDialog() != DialogResult.OK)
-                return;*/
+            /*
+                        using var sourceDialog = new FolderBrowserDialog
+                        {
+                            Description = "Select Source Directory"
+                        };
+                        if (sourceDialog.ShowDialog() != DialogResult.OK)
+                            return;*/
 
             // string sourceRoot = sourceDialog.SelectedPath;
 
-            
+
 
             try
             {
                 foreach (var site in sites)
                 {
-                    string sourceRoot =  siteBackupDirectory[site.Name];
+                    string sourceRoot = siteBackupDirectory[site.Name];
                     var destRoot = site.PhysicalPath;
 
                     // Copy web.config from source root
@@ -484,7 +527,7 @@ namespace ServerDeployment.Console.Forms
             }
             foreach (var site in selected)
             {
-                await PingSiteAsync(site.PhysicalPath);
+                await PingSiteAsync(site.Name);
             }
             MessageBox.Show("Ping completed.");
         }
