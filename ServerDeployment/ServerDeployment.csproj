@@ -6,12 +6,16 @@
 		<Nullable>enable</Nullable>
 		<UseWindowsForms>true</UseWindowsForms>
 		<ImplicitUsings>enable</ImplicitUsings>
+ 
+	</PropertyGroup> 
 
-		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 
-		<RootNamespace>ServerDeployment.Console</RootNamespace>
-
-	</PropertyGroup>
+	<ItemGroup>
+	  <EmbeddedResource Include="StyleLibraries\FlatNature.isl" />
+	  <EmbeddedResource Include="StyleLibraries\Ocean_blue3_pill.isl" />
+	  <EmbeddedResource Include="StyleLibraries\TheBlues.isl" />
+	  <EmbeddedResource Include="StyleLibraries\Theme-01.isl" />
+	</ItemGroup>
  
 
 	<ItemGroup>

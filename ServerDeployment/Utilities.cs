@@ -38,9 +38,9 @@ namespace ServerDeployment.Console
         /// </summary>
         /// <param name="resourceName">Name of the resource.</param>
         /// <returns></returns>
-        internal static Stream GetEmbeddedResourceStream(string resourceName)
+        internal static System.IO.Stream GetEmbeddedResourceStream(string resourceName)
         {
-            Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
+            System.IO.Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
             Debug.Assert(stream != null, "Unable to locate embedded resource.", "Resource name: {0}", resourceName);
             return stream;
         }
