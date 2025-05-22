@@ -15,4 +15,13 @@
         PetMatrixBackendAPI,
         ReportsViewer
     }
+    public enum ProgressType
+    {
+        Backup,
+        Report,
+        Frontend,
+        Backend,
+        AppSettings,
+
+    }
 }

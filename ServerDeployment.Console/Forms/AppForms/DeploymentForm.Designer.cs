@@ -393,9 +393,9 @@
         private TextBox txtReport;
         private Button btnReport;
         private Infragistics.Win.Misc.UltraLabel ultraLabel2;
-        private ProgressBar progressBarBackup;
         private Panel panel2;
         private Panel panel1;
+        private ProgressBar progressBarBackup;
         private ProgressBar progressBarReport;
         private ProgressBar progressBarFrontend;
         private ProgressBar progressBarBackend;

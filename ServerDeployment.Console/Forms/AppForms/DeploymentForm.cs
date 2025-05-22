@@ -15,10 +15,10 @@ namespace ServerDeployment.Console.Forms.AppForms
     {
         private DataTable _sitesDataTable;
 
-        private string _backendPath = "";
-        private string _frontendPath = "";
-        private string _reportPath = "";
-        private string _backupPath = "";
+        private string _backendPath = @"";
+        private string _frontendPath = @"";
+        private string _reportPath = @"";
+        private string _backupPath = @"";
 
         private readonly Dictionary<string, string> _siteBackupDirectory = new();
 
@@ -31,7 +31,7 @@ namespace ServerDeployment.Console.Forms.AppForms
         public DeploymentForm()
         {
             InitializeComponent();
-            ProgressUpdated += MainForm_ProgressUpdated;
+            ProgressUpdated += DeploymentForm_ProgressUpdated;
 
             ButtonsSwitch(false);
             InitializeUltraGrid();
@@ -86,20 +86,20 @@ namespace ServerDeployment.Console.Forms.AppForms
             // Customize columns after binding
             var band = ultraGrid.DisplayLayout.Bands[0];
 
-            band.Columns["Select"].Header.Caption = "Select";
+            band.Columns["Select"].Header.Caption = @"Select";
             band.Columns["Select"].Width = 80;
             band.Columns["Select"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.CheckBox;
             band.Columns["Select"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.AllowEdit;
 
-            band.Columns["Name"].Header.Caption = "Site";
+            band.Columns["Name"].Header.Caption = @"Site";
             band.Columns["Name"].Width = 150;
             band.Columns["Name"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
 
-            band.Columns["PhysicalPath"].Header.Caption = "Site Folder";
+            band.Columns["PhysicalPath"].Header.Caption = @"Site Folder";
             band.Columns["PhysicalPath"].Width = 400;
             band.Columns["PhysicalPath"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
 
-            band.Columns["State"].Header.Caption = "Status";
+            band.Columns["State"].Header.Caption = @"Status";
             band.Columns["State"].Width = 100;
             band.Columns["State"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
 
@@ -111,11 +111,11 @@ namespace ServerDeployment.Console.Forms.AppForms
             var sites = new List<IISSiteInfo>();
 
             // PowerShell script to get Name, PhysicalPath, and State of IIS sites as JSON
-            string script = @"Import-Module WebAdministration;  Get-Website | Select-Object Name, PhysicalPath, State | ConvertTo-Json ";
+            string script = @"Import-Module WebAdministration;  Get-Website | Select-Object Name, PhysicalPath, State | ConvertTo-Json @";
 
             var psi = new ProcessStartInfo
             {
-                FileName = "powershell.exe",
+                FileName = @"powershell.exe",
                 Arguments = $"-NoProfile -Command \"{script}\"",
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
@@ -152,7 +152,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             }
             catch (System.Exception ex)
             {
-                MessageBox.Show("Failed to get IIS sites: " + ex.Message);
+                MessageBox.Show("Failed to get IIS sites: @" + ex.Message);
             }
 
             return sites;
@@ -200,7 +200,7 @@ namespace ServerDeployment.Console.Forms.AppForms
                 currentSite++;
                 try
                 {
-                    OnProgressUpdated($"Backing up site '{site.Name}' ({currentSite} of {totalSites})...", (currentSite * 100) / totalSites);
+                    OnProgressUpdated($"Backing up site '{site.Name}' ({currentSite} of {totalSites})...", (currentSite * 100) / totalSites, ProgressType.Backup);
 
                     string sourceDir = site.PhysicalPath;
                     string backupDir = Path.Combine(_backupPath, $"{site.Name}_backup_{DateTime.Now:yyyyMMddHHmmss}");
@@ -219,7 +219,7 @@ namespace ServerDeployment.Console.Forms.AppForms
                     OnProgressUpdated($"Failed to backup site '{site.Name}': {ex.Message}");
                 }
             }
-            OnProgressUpdated("Backup completed.", 100);
+            OnProgressUpdated("Backup completed.", 100, ProgressType.Backup);
         }
         private void CopySiteContent(string sourceRoot, string destinationSiteFolder, DeployEnum copyTo)
         {
@@ -286,7 +286,7 @@ namespace ServerDeployment.Console.Forms.AppForms
                     RedirectStandardError = true,
                     UseShellExecute = false,
                     CreateNoWindow = true,
-                    Verb = "runas" // run as admin
+                    Verb = @"runas" // run as admin
                 };
                 using var proc = Process.Start(psi);
                 proc.WaitForExit();
@@ -295,12 +295,12 @@ namespace ServerDeployment.Console.Forms.AppForms
                 string err = proc.StandardError.ReadToEnd();
                 if (!string.IsNullOrEmpty(err))
                 {
-                    MessageBox.Show("Error running appcmd: " + err);
+                    MessageBox.Show("Error running appcmd: @" + err);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to run appcmd: " + ex.Message);
+                MessageBox.Show("Failed to run appcmd: @" + ex.Message);
             }
         }
 
@@ -314,7 +314,7 @@ namespace ServerDeployment.Console.Forms.AppForms
                 lblMsg.BackColor = Color.Red;
                 return;
             }
-            var confirm = MessageBox.Show(@"Are you sure you want to delete all files in selected site folders? This cannot be undone!", "Confirm Delete", MessageBoxButtons.YesNo);
+            var confirm = MessageBox.Show(@"Are you sure you want to delete all files in selected site folders? This cannot be undone!", @"Confirm Delete", MessageBoxButtons.YesNo);
             if (confirm != DialogResult.Yes) return;
 
             foreach (var site in selected)
@@ -353,8 +353,8 @@ namespace ServerDeployment.Console.Forms.AppForms
 
             foreach (var dir in Directory.GetDirectories(folder))
             {
-                // Skip deleting "Documents" folder if at root
-                if (isRoot && string.Equals(new DirectoryInfo(dir).Name, "Documents", StringComparison.OrdinalIgnoreCase))
+                // Skip deleting @"Documents" folder if at root
+                if (isRoot && string.Equals(new DirectoryInfo(dir).Name, @"Documents", StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
@@ -375,8 +375,8 @@ namespace ServerDeployment.Console.Forms.AppForms
         // Ping the site folder as hostname or IP (simplified)
         private async Task PingSiteAsync(string siteName)
         {
-            string hostHeader = "";
-            string ip = "";
+            string hostHeader = @"";
+            string ip = @"";
             int port = 0;
 
             using (ServerManager iisManager = new ServerManager())
@@ -386,7 +386,7 @@ namespace ServerDeployment.Console.Forms.AppForms
                 {
                     foreach (var binding in site.Bindings)
                     {
-                        ip = binding.EndPoint?.Address.ToString() ?? "";
+                        ip = binding.EndPoint?.Address.ToString() ?? @"";
                         port = binding.EndPoint?.Port ?? 0;
                         hostHeader = binding.Host;
 
@@ -396,14 +396,14 @@ namespace ServerDeployment.Console.Forms.AppForms
                 }
             }
 
-            string pingTarget = "127.0.0.1";
+            string pingTarget = @"127.0.0.1";
 
             // Determine ping target
-            if (!string.IsNullOrEmpty(hostHeader) && hostHeader != "*" && hostHeader != "0.0.0.0")
+            if (!string.IsNullOrEmpty(hostHeader) && hostHeader != @"*" && hostHeader != @"0.0.0.0")
             {
                 pingTarget = hostHeader;
             }
-            else if (!string.IsNullOrEmpty(ip) && ip != "0.0.0.0" && ip != "::")
+            else if (!string.IsNullOrEmpty(ip) && ip != @"0.0.0.0" && ip != @"::")
             {
                 pingTarget = ip;
             }
@@ -414,18 +414,18 @@ namespace ServerDeployment.Console.Forms.AppForms
                 try
                 {
                     var reply = await ping.SendPingAsync($@"{pingTarget}:{port}", 2000);
-                    string status = reply.Status == IPStatus.Success ? "Online" : "Offline";
+                    string status = reply.Status == IPStatus.Success ? @"Online" : @"Offline";
                     UpdateSiteStatus(siteName, status);
                 }
                 catch (Exception ex)
                 {
-                    UpdateSiteStatus(siteName, "Offline");
+                    UpdateSiteStatus(siteName, @"Offline");
                 }
             }
             else
             {
                 // Cannot ping unknown or invalid address
-                UpdateSiteStatus(siteName, "Unknown");
+                UpdateSiteStatus(siteName, @"Unknown");
             }
 
         }
@@ -452,10 +452,10 @@ namespace ServerDeployment.Console.Forms.AppForms
 
         private void btnStopIIS_Click(object sender, EventArgs e)
         {
-            StopIIS();
+            StopIis();
         }
 
-        private void StopIIS()
+        private void StopIis()
         {
             var selected = GetSelectedSites();
             if (selected.Count == 0)
@@ -473,10 +473,10 @@ namespace ServerDeployment.Console.Forms.AppForms
 
         private void btnStartIIS_Click(object sender, EventArgs e)
         {
-            StartIIS();
+            StartIis();
         }
 
-        private void StartIIS()
+        private void StartIis()
         {
             var selected = GetSelectedSites();
             if (selected.Count == 0)
@@ -515,46 +515,49 @@ namespace ServerDeployment.Console.Forms.AppForms
 
             try
             {
+                int totalSites = sites.Count;
+                int currentSite = 0;
                 foreach (var site in sites)
                 {
+                    OnProgressUpdated($"Updating '{site.Name}' configurations, ({currentSite} of {totalSites})...", (currentSite * 100) / totalSites, ProgressType.AppSettings);
                     string sourceRoot = _siteBackupDirectory[site.Name];
                     var destRoot = site.PhysicalPath;
 
                     // Copy Frontend web.config from Existing source to root
-                    string frontendWebConfig = Path.Combine(sourceRoot, "web.config");
+                    string frontendWebConfig = Path.Combine(sourceRoot, @"web.config");
                     if (File.Exists(frontendWebConfig))
                     {
-                        string destWebConfig = Path.Combine(destRoot, "web.config");
+                        string destWebConfig = Path.Combine(destRoot, @"web.config");
                         File.Copy(frontendWebConfig, destWebConfig, overwrite: true);
                     }
 
                     // Copy appsettings.json from Existing directory  PetMatrixBackendAPI
-                    string backendAppSettings = Path.Combine(sourceRoot, "PetMatrixBackendAPI", "appsettings.json");
+                    string backendAppSettings = Path.Combine(sourceRoot, @"PetMatrixBackendAPI", @"appsettings.json");
                     if (File.Exists(backendAppSettings))
                     {
-                        string destApiFolder = Path.Combine(destRoot, "PetMatrixBackendAPI");
+                        string destApiFolder = Path.Combine(destRoot, @"PetMatrixBackendAPI");
                         Directory.CreateDirectory(destApiFolder);
-                        string destAppSettings = Path.Combine(destApiFolder, "appsettings.json");
+                        string destAppSettings = Path.Combine(destApiFolder, @"appsettings.json");
                         File.Copy(backendAppSettings, destAppSettings, overwrite: true);
                     }
 
                     // Copy web.config from Existing directory to PetMatrixBackendAPI
-                    string backendWebConfig = Path.Combine(sourceRoot, "PetMatrixBackendAPI", "web.config");
+                    string backendWebConfig = Path.Combine(sourceRoot, @"PetMatrixBackendAPI", @"web.config");
                     if (File.Exists(backendWebConfig))
                     {
-                        string destApiFolder = Path.Combine(destRoot, "PetMatrixBackendAPI");
+                        string destApiFolder = Path.Combine(destRoot, @"PetMatrixBackendAPI");
                         Directory.CreateDirectory(destApiFolder);
-                        string destAppSettings = Path.Combine(destApiFolder, "web.config");
+                        string destAppSettings = Path.Combine(destApiFolder, @"web.config");
                         File.Copy(backendWebConfig, destAppSettings, overwrite: true);
                     }
 
                     // Copy ReportsViewer web.config
-                    string reportsViewerWebConfig = Path.Combine(sourceRoot, "ReportsViewer", "Web.config");
+                    string reportsViewerWebConfig = Path.Combine(sourceRoot, @"ReportsViewer", @"Web.config");
                     if (File.Exists(reportsViewerWebConfig))
                     {
-                        string destApiFolder = Path.Combine(destRoot, "ReportsViewer");
+                        string destApiFolder = Path.Combine(destRoot, @"ReportsViewer");
                         Directory.CreateDirectory(destApiFolder);
-                        string destAppSettings = Path.Combine(destApiFolder, "Web.config");
+                        string destAppSettings = Path.Combine(destApiFolder, @"Web.config");
                         File.Copy(reportsViewerWebConfig, destAppSettings, overwrite: true);
                     }
 
@@ -583,7 +586,8 @@ namespace ServerDeployment.Console.Forms.AppForms
             var selected = GetSelectedSites();
             if (selected.Count == 0)
             {
-                MessageBox.Show("Select site(s) to ping.");
+                lblMsg.Text = @"Select site(s) to ping.";
+                lblMsg.BackColor = Color.Red;
                 return;
             }
             foreach (var site in selected)
@@ -598,7 +602,7 @@ namespace ServerDeployment.Console.Forms.AppForms
         {
             using var folderDialog = new FolderBrowserDialog
             {
-                Description = "Select Site Root Directory",
+                Description = @"Select Site Root Directory",
             };
 
             if (folderDialog.ShowDialog() == DialogResult.OK)
@@ -652,7 +656,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             }
             catch (Exception ex)
             {
-                lblMsg.Text = @"Error copying content: " + ex.Message;
+                lblMsg.Text = @"Error copying content: @" + ex.Message;
                 lblMsg.BackColor = Color.Green;
 
                 SLogger.WriteLog(ex);
@@ -665,7 +669,7 @@ namespace ServerDeployment.Console.Forms.AppForms
 
         private void BackupPath()
         {
-            using var fbd = new FolderBrowserDialog { Description = "Select Backup Destination Folder" };
+            using var fbd = new FolderBrowserDialog { Description = @"Select Backup Destination Folder" };
             if (fbd.ShowDialog() != DialogResult.OK) return;
 
             _backupPath = fbd.SelectedPath;
@@ -745,17 +749,17 @@ namespace ServerDeployment.Console.Forms.AppForms
         {
             var band = ultraGrid.DisplayLayout.Bands[0];
 
-            band.Columns["Select"].Header.Caption = "Select";
+            band.Columns["Select"].Header.Caption = @"Select";
             band.Columns["Select"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.CheckBox;
             band.Columns["Select"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.AllowEdit;
 
-            band.Columns["Name"].Header.Caption = "Name";
+            band.Columns["Name"].Header.Caption = @"Name";
             band.Columns["Name"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
 
-            band.Columns["PhysicalPath"].Header.Caption = "Site Folder";
+            band.Columns["PhysicalPath"].Header.Caption = @"Site Folder";
             band.Columns["PhysicalPath"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
 
-            band.Columns["State"].Header.Caption = "Status";
+            band.Columns["State"].Header.Caption = @"Status";
             band.Columns["State"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
 
             // Set Header Font (size, style, color)
@@ -790,11 +794,11 @@ namespace ServerDeployment.Console.Forms.AppForms
             // Set the row height to a larger value (default ~20)
             ultraGrid.DisplayLayout.Override.RowSizing = RowSizing.Fixed;
 
-            ultraGrid.DisplayLayout.Override.HeaderAppearance.FontData.Name = "Segoe UI";
+            ultraGrid.DisplayLayout.Override.HeaderAppearance.FontData.Name = @"Segoe UI";
             ultraGrid.DisplayLayout.Override.HeaderAppearance.FontData.SizeInPoints = 11;
             ultraGrid.DisplayLayout.Override.HeaderAppearance.FontData.Bold = Infragistics.Win.DefaultableBoolean.True;
 
-            ultraGrid.DisplayLayout.Override.RowAppearance.FontData.Name = "Segoe UI";
+            ultraGrid.DisplayLayout.Override.RowAppearance.FontData.Name = @"Segoe UI";
             ultraGrid.DisplayLayout.Override.RowAppearance.FontData.SizeInPoints = 10;
             ultraGrid.DisplayLayout.Override.RowAppearance.FontData.Italic = Infragistics.Win.DefaultableBoolean.False;
 
@@ -808,7 +812,7 @@ namespace ServerDeployment.Console.Forms.AppForms
 
             if (HasNoStr(_backendPath) || HasNoStr(_backupPath))
             {
-                lblMsg.Text = "Please set both Site Root and Backup Path before publishing.";
+                lblMsg.Text = @"Please set both Site Root and Backup Path before publishing.";
                 lblMsg.BackColor = Color.Red;
                 return;
             }
@@ -827,34 +831,48 @@ namespace ServerDeployment.Console.Forms.AppForms
         }
 
 
-        private void OnProgressUpdated(string message, int? percent = null)
+
+        private void OnProgressUpdated(string message, int? percent = null, ProgressType progressFor = ProgressType.Backup)
         {
-            if (ProgressUpdated != null)
-            {
-                ProgressUpdated(this, new ProgressEventArgs(message, percent));
-            }
+            ProgressUpdated?.Invoke(this, new ProgressEventArgs(message, percent, progressFor));
         }
 
-        private void MainForm_ProgressUpdated(object? sender, ProgressEventArgs e)
+        private void DeploymentForm_ProgressUpdated(object? sender, ProgressEventArgs e)
         {
             if (InvokeRequired)
             {
-                Invoke(new Action(() => UpdateProgressUI(e)));
+                Invoke(new Action(() => UpdateProgressUi(e)));
             }
             else
             {
-                UpdateProgressUI(e);
+                UpdateProgressUi(e);
             }
         }
 
-        private void UpdateProgressUI(ProgressEventArgs e)
+        private void UpdateProgressUi(ProgressEventArgs e)
         {
             lblMsg.Text = e.Message;
 
-            // Optional: if you have a progress bar, update it here:
             if (e.Percent.HasValue)
             {
-                progressBarBackup.Value = Math.Min(Math.Max(e.Percent.Value, 0), 100);
+                int value = Math.Min(Math.Max(e.Percent.Value, 0), 100);
+
+                switch (e.ProgressFor)
+                {
+                    case ProgressType.Backup:
+                        progressBarBackup.Value = value;
+                        break;
+                    case ProgressType.Report:
+                        progressBarReport.Value = value;
+                        break;
+                    case ProgressType.Frontend:
+                        progressBarFrontend.Value = value;
+                        break;
+                    case ProgressType.Backend:
+                        progressBarBackend.Value = value;
+                        break;
+                        //toDO: ProgressType.AppSettings
+                }
             }
         }
 
@@ -862,7 +880,7 @@ namespace ServerDeployment.Console.Forms.AppForms
         {
             using var folderDialog = new FolderBrowserDialog
             {
-                Description = "Select Site Root Directory"
+                Description = @"Select Frontend Directory"
             };
 
             if (folderDialog.ShowDialog() == DialogResult.OK)
@@ -880,7 +898,7 @@ namespace ServerDeployment.Console.Forms.AppForms
         {
             using var folderDialog = new FolderBrowserDialog
             {
-                Description = "Select Site Root Directory"
+                Description = @"Select Report Directory"
             };
 
             if (folderDialog.ShowDialog() == DialogResult.OK)
@@ -894,6 +912,6 @@ namespace ServerDeployment.Console.Forms.AppForms
             }
         }
 
-        
+
     }
 }
