@@ -236,42 +236,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             else
             {
                 CopyDirectory(sourceRoot, destinationSiteFolder);
-            }
-            /*var frontendSource = new DirectoryInfo(sourceRoot);
-
-            foreach (var file in frontendSource.GetFiles())
-            {
-                string destFile = Path.Combine(destinationSiteFolder, file.Name);
-                file.CopyTo(destFile, true);
-            }
-
-            foreach (var dir in frontendSource.GetDirectories())
-            {
-                // Skip backend and ReportsViewer folders here, they get copied separately
-                if (dir.Name.Equals("PetMatrixBackendAPI", StringComparison.OrdinalIgnoreCase) ||
-                    dir.Name.Equals("ReportsViewer", StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-                CopyDirectory(dir.FullName, Path.Combine(destinationSiteFolder, dir.Name));
-            }
-
-            // Copy backend files to PetMatrixBackendAPI folder inside site folder
-            string backendSourceFolder = Path.Combine(sourceRoot, "PetMatrixBackendAPI");
-            if (Directory.Exists(backendSourceFolder))
-            {
-                string backendDestFolder = Path.Combine(destinationSiteFolder, "PetMatrixBackendAPI");
-                Directory.CreateDirectory(backendDestFolder);
-                CopyDirectory(backendSourceFolder, backendDestFolder);
-            }
-
-            // Copy ReportsViewer folder
-            string reportsViewerSourceFolder = Path.Combine(sourceRoot, "ReportsViewer");
-            if (Directory.Exists(reportsViewerSourceFolder))
-            {
-                string reportsViewerDestFolder = Path.Combine(destinationSiteFolder, "ReportsViewer");
-                CopyDirectory(reportsViewerSourceFolder, reportsViewerDestFolder);
-            }*/
+            } 
         }
 
 
@@ -495,7 +460,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             var selected = GetSelectedSites();
             if (selected.Count == 0)
             {
-                lblMsg.Text = "Please select at least one site.";
+                lblMsg.Text = @"Please select at least one site.";
                 lblMsg.BackColor = Color.Red;
                 return;
             }
@@ -516,7 +481,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             var selected = GetSelectedSites();
             if (selected.Count == 0)
             {
-                lblMsg.Text = "Please select at least one site.";
+                lblMsg.Text = @"Please select at least one site.";
                 lblMsg.BackColor = Color.Red;
                 return;
             }
