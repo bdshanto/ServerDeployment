@@ -236,7 +236,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             else
             {
                 CopyDirectory(sourceRoot, destinationSiteFolder);
-            } 
+            }
         }
 
 
@@ -345,10 +345,10 @@ namespace ServerDeployment.Console.Forms.AppForms
                     File.SetAttributes(file, FileAttributes.Normal);
                     File.Delete(file);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     SLogger.WriteLog(ex);
-                } 
+                }
             }
 
             foreach (var dir in Directory.GetDirectories(folder))
@@ -854,7 +854,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             // Optional: if you have a progress bar, update it here:
             if (e.Percent.HasValue)
             {
-                progressBar1.Value = Math.Min(Math.Max(e.Percent.Value, 0), 100);
+                progressBarBackup.Value = Math.Min(Math.Max(e.Percent.Value, 0), 100);
             }
         }
 
@@ -893,5 +893,7 @@ namespace ServerDeployment.Console.Forms.AppForms
 
             }
         }
+
+        
     }
 }
