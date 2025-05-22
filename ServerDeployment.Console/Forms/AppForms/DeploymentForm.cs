@@ -361,10 +361,14 @@ namespace ServerDeployment.Console.Forms.AppForms
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($@"Error deleting files in {site}: {ex.Message}");
+                    lblMsg.Text = $@"Error deleting files in {site}: {ex.Message}";
+                    lblMsg.BackColor = Color.Red;
+
+                    SLogger.WriteLog(ex);
                 }
             }
-            MessageBox.Show(@"Files deleted.");
+            lblMsg.Text = @"Files deleted.";
+            lblMsg.BackColor = Color.Red;
         }
 
         private void DeleteAllFiles(string folder, bool isRoot = true)
@@ -539,7 +543,8 @@ namespace ServerDeployment.Console.Forms.AppForms
             var sites = GetIISSites();
             if (sites.Count <= 0)
             {
-                MessageBox.Show("No sites found.");
+                lblMsg.Text = @"No sites found.";
+                lblMsg.BackColor = Color.Red;
                 return;
             }
 
@@ -550,36 +555,52 @@ namespace ServerDeployment.Console.Forms.AppForms
                     string sourceRoot = _siteBackupDirectory[site.Name];
                     var destRoot = site.PhysicalPath;
 
-                    // Copy web.config from source root
-                    string sourceWebConfig = Path.Combine(sourceRoot, "web.config");
-                    if (File.Exists(sourceWebConfig))
+                    // Copy Frontend web.config from Existing source to root
+                    string frontendWebConfig = Path.Combine(sourceRoot, "web.config");
+                    if (File.Exists(frontendWebConfig))
                     {
                         string destWebConfig = Path.Combine(destRoot, "web.config");
-                        File.Copy(sourceWebConfig, destWebConfig, overwrite: true);
+                        File.Copy(frontendWebConfig, destWebConfig, overwrite: true);
                     }
 
-                    // Copy appsettings.json from PetMatrixBackendAPI folder
-                    string sourceAppSettings = Path.Combine(sourceRoot, "PetMatrixBackendAPI", "appsettings.json");
-                    if (File.Exists(sourceAppSettings))
+                    // Copy appsettings.json from Existing directory  PetMatrixBackendAPI
+                    string backendAppSettings = Path.Combine(sourceRoot, "PetMatrixBackendAPI", "appsettings.json");
+                    if (File.Exists(backendAppSettings))
                     {
                         string destApiFolder = Path.Combine(destRoot, "PetMatrixBackendAPI");
                         Directory.CreateDirectory(destApiFolder);
                         string destAppSettings = Path.Combine(destApiFolder, "appsettings.json");
-                        File.Copy(sourceAppSettings, destAppSettings, overwrite: true);
+                        File.Copy(backendAppSettings, destAppSettings, overwrite: true);
                     }
 
-                    // Copy ReportsViewer folder
-                    string sourceReportsViewer = Path.Combine(sourceRoot, "ReportsViewer");
-                    string destReportsViewer = Path.Combine(destRoot, "ReportsViewer");
-                    if (Directory.Exists(sourceReportsViewer))
-                        CopyDirectory(sourceReportsViewer, destReportsViewer);
+                    // Copy web.config from Existing directory to PetMatrixBackendAPI
+                    string backendWebConfig = Path.Combine(sourceRoot, "PetMatrixBackendAPI", "web.config");
+                    if (File.Exists(backendWebConfig))
+                    {
+                        string destApiFolder = Path.Combine(destRoot, "PetMatrixBackendAPI");
+                        Directory.CreateDirectory(destApiFolder);
+                        string destAppSettings = Path.Combine(destApiFolder, "web.config");
+                        File.Copy(backendWebConfig, destAppSettings, overwrite: true);
+                    }
+
+                    // Copy ReportsViewer web.config
+                    string reportsViewerWebConfig = Path.Combine(sourceRoot, "ReportsViewer", "");
+                    if (File.Exists(reportsViewerWebConfig))
+                    {
+                        string destApiFolder = Path.Combine(destRoot, "PetMatrixBackendAPI");
+                        Directory.CreateDirectory(destApiFolder);
+                        string destAppSettings = Path.Combine(destApiFolder, "web.config");
+                        File.Copy(reportsViewerWebConfig, destAppSettings, overwrite: true);
+                    }
+
                 }
 
-                lblMsg.Text = "Copy completed successfully.";
+                lblMsg.Text = @"Copy completed successfully.";
             }
             catch (Exception ex)
             {
-                lblMsg.Text = $"Error during copy: {ex.Message}";
+                lblMsg.Text = @$"Error during copy: {ex.Message}";
+                SLogger.WriteLog(ex);
             }
 
         }

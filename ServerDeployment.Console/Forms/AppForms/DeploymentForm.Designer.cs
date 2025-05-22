@@ -132,7 +132,6 @@
             // 
             txtBackend.Location = new Point(248, 579);
             txtBackend.Name = "txtBackend";
-            txtBackend.ReadOnly = true;
             txtBackend.Size = new Size(522, 31);
             txtBackend.TabIndex = 3;
             // 
@@ -254,7 +253,6 @@
             // 
             txtBackup.Location = new Point(248, 523);
             txtBackup.Name = "txtBackup";
-            txtBackup.ReadOnly = true;
             txtBackup.Size = new Size(522, 31);
             txtBackup.TabIndex = 3;
             // 
@@ -262,7 +260,6 @@
             // 
             txtFrontend.Location = new Point(248, 635);
             txtFrontend.Name = "txtFrontend";
-            txtFrontend.ReadOnly = true;
             txtFrontend.Size = new Size(522, 31);
             txtFrontend.TabIndex = 3;
             // 
@@ -270,7 +267,6 @@
             // 
             txtReport.Location = new Point(248, 699);
             txtReport.Name = "txtReport";
-            txtReport.ReadOnly = true;
             txtReport.Size = new Size(522, 31);
             txtReport.TabIndex = 3;
             // 
