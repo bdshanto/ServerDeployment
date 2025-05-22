@@ -1,25 +1,24 @@
-﻿using Infragistics.Win;
-using Infragistics.Win.UltraWinGrid;
-using Microsoft.Web.Administration;
-using ServerDeployment.Helpers;
-using System.Data;
+﻿using System.Data;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
 using System.Text.Json;
+using Infragistics.Win;
+using Infragistics.Win.UltraWinGrid;
+using Microsoft.Web.Administration;
+using ServerDeployment.Helpers;
 
-
-namespace ServerDeployment.Console.Forms
+namespace ServerDeployment.Forms.AppForms
 {
     public partial class DeploymentForm : Form
     {
-        private DataTable sitesDataTable;
+        private DataTable _sitesDataTable;
 
-        private string backendPath = "";
-        private string frontendPath = "";
-        private string reportPath = "";
-        private string backupPath = "";
+        private string _backendPath = "";
+        private string _frontendPath = "";
+        private string _reportPath = "";
+        private string _backupPath = "";
 
-        private Dictionary<string, string> siteBackupDirectory = new();
+        private readonly Dictionary<string, string> _siteBackupDirectory = new();
 
         public delegate void ProgressUpdateHandler(string message);
         // public event ProgressUpdateHandler? ProgressUpdated;
@@ -36,7 +35,7 @@ namespace ServerDeployment.Console.Forms
             InitializeUltraGrid();
             LoadSitesFromIIS();
 
-            lblMsg.Text = "Please set both Site Root and Backup Path before publishing.";
+            lblMsg.Text = @"Please set both Site Root and Backup Path before publishing.";
             lblMsg.ForeColor = Color.Red;
 
         }
@@ -46,10 +45,10 @@ namespace ServerDeployment.Console.Forms
             
 
             // Create schema once
-            sitesDataTable = CreateSitesDataTable();
+            _sitesDataTable = CreateSitesDataTable();
 
             // Bind empty schema
-            ultraGrid.DataSource = sitesDataTable;
+            ultraGrid.DataSource = _sitesDataTable;
             ultraGrid.UseAppStyling = true;
             ultraGrid.DisplayLayout.BorderStyle = UIElementBorderStyle.Solid;
 
@@ -202,16 +201,16 @@ namespace ServerDeployment.Console.Forms
                     OnProgressUpdated($"Backing up site '{site.Name}' ({currentSite} of {totalSites})...", (currentSite * 100) / totalSites);
 
                     string sourceDir = site.PhysicalPath;
-                    string backupDir = Path.Combine(backupPath, $"{site.Name}_backup_{DateTime.Now:yyyyMMddHHmmss}");
+                    string backupDir = Path.Combine(_backupPath, $"{site.Name}_backup_{DateTime.Now:yyyyMMddHHmmss}");
 
                     CopyDirectory(sourceDir, backupDir);
 
-                    if (siteBackupDirectory.ContainsKey(site.Name))
+                    if (_siteBackupDirectory.ContainsKey(site.Name))
                     {
-                        siteBackupDirectory.Remove(site.Name);
+                        _siteBackupDirectory.Remove(site.Name);
                     }
 
-                    siteBackupDirectory.Add(site.Name, backupDir);
+                    _siteBackupDirectory.Add(site.Name, backupDir);
                 }
                 catch (Exception ex)
                 {
@@ -340,7 +339,7 @@ namespace ServerDeployment.Console.Forms
 
             foreach (var site in selected)
             {
-                var folder = Path.Combine(backendPath, site.PhysicalPath);
+                var folder = Path.Combine(_backendPath, site.PhysicalPath);
                 try
                 {
                     DeleteAllFiles(folder);
@@ -533,7 +532,7 @@ namespace ServerDeployment.Console.Forms
             {
                 foreach (var site in sites)
                 {
-                    string sourceRoot = siteBackupDirectory[site.Name];
+                    string sourceRoot = _siteBackupDirectory[site.Name];
                     var destRoot = site.PhysicalPath;
 
                     // Copy web.config from source root
@@ -603,8 +602,8 @@ namespace ServerDeployment.Console.Forms
 
             if (folderDialog.ShowDialog() == DialogResult.OK)
             {
-                backendPath = folderDialog.SelectedPath;
-                txtBackend.Text = backendPath;
+                _backendPath = folderDialog.SelectedPath;
+                txtBackend.Text = _backendPath;
 
                 ButtonsSwitch(true);
 
@@ -630,7 +629,7 @@ namespace ServerDeployment.Console.Forms
 
             try
             {
-                var sourceFolder = backendPath;
+                var sourceFolder = _backendPath;
 
                 foreach (var site in selectedSites)
                 {
@@ -655,7 +654,7 @@ namespace ServerDeployment.Console.Forms
             using var fbd = new FolderBrowserDialog { Description = "Select Backup Destination Folder" };
             if (fbd.ShowDialog() != DialogResult.OK) return;
 
-            backupPath = fbd.SelectedPath;
+            _backupPath = fbd.SelectedPath;
             txtBackup.Text = fbd.SelectedPath;
             ButtonsSwitch(true);
         }
@@ -793,7 +792,7 @@ namespace ServerDeployment.Console.Forms
         {
             ClearLables();
 
-            if (HasNoStr(backendPath) || HasNoStr(backupPath))
+            if (HasNoStr(_backendPath) || HasNoStr(_backupPath))
             {
                 lblMsg.Text = "Please set both Site Root and Backup Path before publishing.";
                 lblMsg.BackColor = Color.Red;
@@ -854,9 +853,9 @@ namespace ServerDeployment.Console.Forms
 
             if (folderDialog.ShowDialog() == DialogResult.OK)
             {
-                frontendPath = folderDialog.SelectedPath;
-                txtFrontend.Text = frontendPath;
-                txtFrontend.Text = frontendPath;
+                _frontendPath = folderDialog.SelectedPath;
+                txtFrontend.Text = _frontendPath;
+                txtFrontend.Text = _frontendPath;
 
                 ButtonsSwitch(true);
 
@@ -872,13 +871,18 @@ namespace ServerDeployment.Console.Forms
 
             if (folderDialog.ShowDialog() == DialogResult.OK)
             {
-                reportPath = folderDialog.SelectedPath;
-                txtReport.Text = reportPath;
-                reportPath = reportPath ;
+                _reportPath = folderDialog.SelectedPath;
+                txtReport.Text = _reportPath;
+                _reportPath = _reportPath ;
 
                 ButtonsSwitch(true);
 
             }
+        }
+
+        protected virtual void OnProgressUpdated(ProgressEventArgs e)
+        {
+            ProgressUpdated?.Invoke(this, e);
         }
     }
 }

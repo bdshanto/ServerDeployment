@@ -1,7 +1,7 @@
 using System.Reflection;
 using ServerDeployment.Console;
-using ServerDeployment.Console.Forms;
 using ServerDeployment.Domains.Utility;
+using ServerDeployment.Forms.AppForms;
 
 namespace ServerDeployment
 {

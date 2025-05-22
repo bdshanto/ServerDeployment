@@ -1,4 +1,4 @@
-﻿namespace ServerDeployment.Console.Forms
+﻿namespace ServerDeployment.Forms.AppForms
 {
     partial class DeploymentForm
     {
