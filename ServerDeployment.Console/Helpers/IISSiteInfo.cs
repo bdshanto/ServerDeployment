@@ -8,4 +8,11 @@
 
         public string State { get; set; }
     }
+
+    public enum DeployEnum
+    {
+        Frontend,
+        PetMatrixBackendAPI,
+        ReportsViewer
+    }
 }

@@ -22,9 +22,17 @@
 		<PackageReference Include="Infragistics.WinForms" Version="22.2.16" />
 		<PackageReference Include="Infragistics.WinForms.AppStylistSupport" Version="22.2.16" />
 		<PackageReference Include="Infragistics.WinForms.DataSource" Version="22.2.16" />
+		<PackageReference Include="Infragistics.WinForms.DataVisualization" Version="22.2.16" />
+		<PackageReference Include="Infragistics.WinForms.Dock" Version="22.2.16" />
 		<PackageReference Include="Infragistics.WinForms.IO" Version="22.2.16" />
+		<PackageReference Include="Infragistics.WinForms.ListView" Version="22.2.16" />
 		<PackageReference Include="Infragistics.WinForms.Misc" Version="22.2.16" />
+		<PackageReference Include="Infragistics.WinForms.RadialMenu" Version="22.2.16" />
+		<PackageReference Include="Infragistics.WinForms.Reports" Version="22.2.16" />
 		<PackageReference Include="Infragistics.WinForms.Shared" Version="22.2.16" />
+		<PackageReference Include="Infragistics.WinForms.StatusBar" Version="22.2.16" />
+		<PackageReference Include="Infragistics.WinForms.TextDocument.CSharp" Version="22.2.16" />
+		<PackageReference Include="Infragistics.WinForms.Toolbars" Version="22.2.16" />
 		<PackageReference Include="Infragistics.WinForms.WinGrid" Version="22.2.16" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Management.Infrastructure" Version="2.0.0" />

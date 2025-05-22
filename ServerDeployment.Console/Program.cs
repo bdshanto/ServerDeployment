@@ -1,6 +1,7 @@
 using System.Reflection;
 using ServerDeployment.Console.Forms.AppForms;
 using ServerDeployment.Domains.Utility;
+using ServerDeployment.Forms;
 
 namespace ServerDeployment.Console
 {
@@ -21,6 +22,7 @@ namespace ServerDeployment.Console
             Infragistics.Win.AppStyling.StyleManager.Load(Utilities.GetEmbeddedResourceStream("ServerDeployment.Console.StyleLibraries.FlatNature.isl"));
 
             Application.Run(new DeploymentForm());
+           // Application.Run(new MainForm());
         }
     }
 }

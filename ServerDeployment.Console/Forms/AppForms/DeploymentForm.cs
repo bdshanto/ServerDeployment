@@ -5,7 +5,9 @@ using System.Text.Json;
 using Infragistics.Win;
 using Infragistics.Win.UltraWinGrid;
 using Microsoft.Web.Administration;
+using ServerDeployment.Applications.Helpers;
 using ServerDeployment.Console.Helpers;
+using ServerDeployment.Domains.Utility;
 
 namespace ServerDeployment.Console.Forms.AppForms
 {
@@ -28,7 +30,7 @@ namespace ServerDeployment.Console.Forms.AppForms
 
         public DeploymentForm()
         {
-            InitializeComponent(); 
+            InitializeComponent();
             ProgressUpdated += MainForm_ProgressUpdated;
 
             ButtonsSwitch(false);
@@ -36,13 +38,13 @@ namespace ServerDeployment.Console.Forms.AppForms
             LoadSitesFromIIS();
 
             lblMsg.Text = @"Please set both Site Root and Backup Path before publishing.";
-            lblMsg.ForeColor = Color.Red;
+            lblMsg.BackColor = Color.Red;
 
         }
 
         private void InitializeUltraGrid()
         {
-            
+
 
             // Create schema once
             _sitesDataTable = CreateSitesDataTable();
@@ -87,7 +89,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             band.Columns["Select"].Header.Caption = "Select";
             band.Columns["Select"].Width = 80;
             band.Columns["Select"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.CheckBox;
-            band.Columns["Select"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.AllowEdit; 
+            band.Columns["Select"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.AllowEdit;
 
             band.Columns["Name"].Header.Caption = "Site";
             band.Columns["Name"].Width = 150;
@@ -101,7 +103,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             band.Columns["State"].Width = 100;
             band.Columns["State"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
 
-          
+
 
         }
         private List<IISSiteInfo> GetIISSites()
@@ -186,7 +188,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             if (selectedSites.Count <= 0)
             {
                 lblMsg.Text = @"Please select at least one site to backup.";
-                lblMsg.ForeColor = Color.Red;
+                lblMsg.BackColor = Color.Red;
                 return;
             }
 
@@ -219,10 +221,23 @@ namespace ServerDeployment.Console.Forms.AppForms
             }
             OnProgressUpdated("Backup completed.", 100);
         }
-        private void CopySiteContent(string sourceRoot, string destinationSiteFolder)
+        private void CopySiteContent(string sourceRoot, string destinationSiteFolder, DeployEnum copyTo)
         {
-            // Copy frontend files/folders (everything except PetMatrixBackendAPI and ReportsViewer) directly to site root
-            var frontendSource = new DirectoryInfo(sourceRoot);
+            if (copyTo == DeployEnum.PetMatrixBackendAPI)
+            {
+                destinationSiteFolder = Path.Combine(destinationSiteFolder, nameof(DeployEnum.PetMatrixBackendAPI));
+                CopyDirectory(sourceRoot, destinationSiteFolder);
+            }
+            else if (copyTo == DeployEnum.ReportsViewer)
+            {
+                destinationSiteFolder = Path.Combine(destinationSiteFolder, nameof(DeployEnum.ReportsViewer));
+                CopyDirectory(sourceRoot, destinationSiteFolder);
+            }
+            else
+            {
+                CopyDirectory(sourceRoot, destinationSiteFolder);
+            }
+            /*var frontendSource = new DirectoryInfo(sourceRoot);
 
             foreach (var file in frontendSource.GetFiles())
             {
@@ -256,7 +271,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             {
                 string reportsViewerDestFolder = Path.Combine(destinationSiteFolder, "ReportsViewer");
                 CopyDirectory(reportsViewerSourceFolder, reportsViewerDestFolder);
-            }
+            }*/
         }
 
 
@@ -331,7 +346,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             if (selected.Count == 0)
             {
                 lblMsg.Text = @"Please select at least one site.";
-                lblMsg.ForeColor = Color.Red;
+                lblMsg.BackColor = Color.Red;
                 return;
             }
             var confirm = MessageBox.Show(@"Are you sure you want to delete all files in selected site folders? This cannot be undone!", "Confirm Delete", MessageBoxButtons.YesNo);
@@ -477,7 +492,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             if (selected.Count == 0)
             {
                 lblMsg.Text = "Please select at least one site.";
-                lblMsg.ForeColor = Color.Red;
+                lblMsg.BackColor = Color.Red;
                 return;
             }
             foreach (var site in selected)
@@ -498,7 +513,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             if (selected.Count == 0)
             {
                 lblMsg.Text = "Please select at least one site.";
-                lblMsg.ForeColor = Color.Red;
+                lblMsg.BackColor = Color.Red;
                 return;
             }
             foreach (var site in selected)
@@ -620,28 +635,41 @@ namespace ServerDeployment.Console.Forms.AppForms
             var selectedSites = GetSelectedSites();
             if (selectedSites.Count == 0)
             {
-                lblMsg.Text = "Please set both Site Root and Backup Path before publishing.";
+                lblMsg.Text = @"Please set both Site Root and Backup Path before publishing.";
                 lblMsg.BackColor = Color.Red;
                 return;
             }
 
 
-
             try
             {
-                var sourceFolder = _backendPath;
 
                 foreach (var site in selectedSites)
                 {
+                    if (AppUtility.HasAnyStr(_backendPath) && _backendPath.Length > 1)
+                    {
+                        CopySiteContent(_backendPath, site.PhysicalPath, DeployEnum.PetMatrixBackendAPI);
+                    }
 
-                    CopySiteContent(sourceFolder, site.PhysicalPath);
+                    if (AppUtility.HasAnyStr(_frontendPath) && _frontendPath.Length > 1)
+                    {
+                        CopySiteContent(_frontendPath, site.PhysicalPath, DeployEnum.Frontend);
+                    }
 
+                    if (AppUtility.HasAnyStr(_reportPath) && _reportPath.Length > 1)
+                    {
+                        CopySiteContent(_reportPath, site.PhysicalPath, DeployEnum.ReportsViewer);
+                    }
                 }
-                MessageBox.Show("Content copied successfully.");
+                lblMsg.Text = @"Content copied successfully.";
+                lblMsg.BackColor = Color.Green;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error copying content: " + ex.Message);
+                lblMsg.Text = @"Error copying content: " + ex.Message;
+                lblMsg.BackColor = Color.Green;
+
+                SLogger.WriteLog(ex);
             }
         }
         private void btnBackupPath_Click(object sender, EventArgs e)
@@ -664,38 +692,38 @@ namespace ServerDeployment.Console.Forms.AppForms
 
             if (!HasNoStr(txtBackup.Text) && txtBackup.Text.Length > 0)
             {
-                btnBackupPath.ForeColor = Color.Green;
+                btnBackupPath.BackColor = Color.Green;
             }
             else
             {
-                btnBackupPath.ForeColor = Color.Red;
+                btnBackupPath.BackColor = Color.Red;
             }
 
             if (!HasNoStr(txtBackend.Text) && txtBackend.Text.Length > 0)
             {
-                btnBackend.ForeColor = Color.Green;
+                btnBackend.BackColor = Color.Green;
             }
             else
             {
-                btnBackend.ForeColor = Color.Red;
+                btnBackend.BackColor = Color.Red;
             }
 
             if (!HasNoStr(txtFrontend.Text) && txtFrontend.Text.Length > 0)
             {
-                btnFrontend.ForeColor = Color.Green;
+                btnFrontend.BackColor = Color.Green;
             }
             else
             {
-                btnFrontend.ForeColor = Color.Red;
+                btnFrontend.BackColor = Color.Red;
             }
 
             if (!HasNoStr(txtReport.Text) && txtReport.Text.Length > 0)
             {
-                btnReport.ForeColor = Color.Green;
+                btnReport.BackColor = Color.Green;
             }
             else
             {
-                btnReport.ForeColor = Color.Red;
+                btnReport.BackColor = Color.Red;
             }
 
 
@@ -747,12 +775,12 @@ namespace ServerDeployment.Console.Forms.AppForms
             // Set Header Font (size, style, color)
             band.Columns["Name"].Header.Appearance.FontData.SizeInPoints = 13; // Font size
             band.Columns["Name"].Header.Appearance.FontData.Bold = Infragistics.Win.DefaultableBoolean.True; // Bold
-            band.Columns["Name"].Header.Appearance.ForeColor = Color.Black; // Text color (black to match white theme)
+            band.Columns["Name"].Header.Appearance.BackColor = Color.Black; // Text color (black to match white theme)
             band.Columns["Name"].Header.Appearance.BackColor = Color.LightGray; // Light gray background for header
 
             band.Columns["State"].Header.Appearance.FontData.SizeInPoints = 13; // Font size
             band.Columns["State"].Header.Appearance.FontData.Bold = Infragistics.Win.DefaultableBoolean.True; // Bold
-            band.Columns["State"].Header.Appearance.ForeColor = Color.Black; // Text color
+            band.Columns["State"].Header.Appearance.BackColor = Color.Black; // Text color
             band.Columns["State"].Header.Appearance.BackColor = Color.LightGray; // Light gray background for header
 
             // Optionally, align header text
@@ -762,7 +790,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             // General header customizations for all columns
             ultraGrid.DisplayLayout.Override.HeaderAppearance.FontData.SizeInPoints = 13; // Set header font size for all columns
             ultraGrid.DisplayLayout.Override.HeaderAppearance.FontData.Bold = Infragistics.Win.DefaultableBoolean.True; // Set all headers to bold
-            ultraGrid.DisplayLayout.Override.HeaderAppearance.ForeColor = Color.Black; // Set header text color
+            ultraGrid.DisplayLayout.Override.HeaderAppearance.BackColor = Color.Black; // Set header text color
             ultraGrid.DisplayLayout.Override.HeaderAppearance.BackColor = Color.LightGray; // Set header background color for all columns
 
 
@@ -873,7 +901,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             {
                 _reportPath = folderDialog.SelectedPath;
                 txtReport.Text = _reportPath;
-                _reportPath = _reportPath ;
+                _reportPath = _reportPath;
 
                 ButtonsSwitch(true);
 
