@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.34916.146
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerDeployment", "ServerDeployment\ServerDeployment.csproj", "{B41ECC60-215D-4EDD-864D-7DC6B4C00AAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerDeployment.Console", "ServerDeployment.Console\ServerDeployment.Console.csproj", "{B41ECC60-215D-4EDD-864D-7DC6B4C00AAF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerDeployment.Applications", "ServerDeployment.Applications\ServerDeployment.Applications.csproj", "{BBD04BA7-31B3-4CD8-81C7-7EFA69B1988C}"
 EndProject

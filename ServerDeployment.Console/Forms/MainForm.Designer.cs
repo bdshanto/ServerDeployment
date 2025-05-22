@@ -30,16 +30,83 @@
         {
             components = new System.ComponentModel.Container();
             appStylistRuntime1 = new Infragistics.Win.AppStyling.Runtime.AppStylistRuntime(components);
+            ultraToolbarsManager1 = new Infragistics.Win.UltraWinToolbars.UltraToolbarsManager(components);
+            _MainForm_Toolbars_Dock_Area_Left = new Infragistics.Win.UltraWinToolbars.UltraToolbarsDockArea();
+            _MainForm_Toolbars_Dock_Area_Right = new Infragistics.Win.UltraWinToolbars.UltraToolbarsDockArea();
+            _MainForm_Toolbars_Dock_Area_Top = new Infragistics.Win.UltraWinToolbars.UltraToolbarsDockArea();
+            _MainForm_Toolbars_Dock_Area_Bottom = new Infragistics.Win.UltraWinToolbars.UltraToolbarsDockArea();
+            ((System.ComponentModel.ISupportInitialize)ultraToolbarsManager1).BeginInit();
             SuspendLayout();
+            // 
+            // ultraToolbarsManager1
+            // 
+            ultraToolbarsManager1.DesignerFlags = 1;
+            ultraToolbarsManager1.DockWithinContainer = this;
+            ultraToolbarsManager1.DockWithinContainerBaseType = typeof(System.Windows.Forms.Form);
+            ultraToolbarsManager1.SettingsKey = "MainForm.ultraToolbarsManager1";
+            // 
+            // _MainForm_Toolbars_Dock_Area_Left
+            // 
+            _MainForm_Toolbars_Dock_Area_Left.AccessibleRole = System.Windows.Forms.AccessibleRole.Grouping;
+            _MainForm_Toolbars_Dock_Area_Left.BackColor = System.Drawing.SystemColors.Control;
+            _MainForm_Toolbars_Dock_Area_Left.DockedPosition = Infragistics.Win.UltraWinToolbars.DockedPosition.Left;
+            _MainForm_Toolbars_Dock_Area_Left.ForeColor = System.Drawing.SystemColors.ControlText;
+            _MainForm_Toolbars_Dock_Area_Left.Location = new System.Drawing.Point(0, 0);
+            _MainForm_Toolbars_Dock_Area_Left.Name = "_MainForm_Toolbars_Dock_Area_Left";
+            _MainForm_Toolbars_Dock_Area_Left.Size = new System.Drawing.Size(0, 1172);
+            _MainForm_Toolbars_Dock_Area_Left.ToolbarsManager = ultraToolbarsManager1;
+            // 
+            // _MainForm_Toolbars_Dock_Area_Right
+            // 
+            _MainForm_Toolbars_Dock_Area_Right.AccessibleRole = System.Windows.Forms.AccessibleRole.Grouping;
+            _MainForm_Toolbars_Dock_Area_Right.BackColor = System.Drawing.SystemColors.Control;
+            _MainForm_Toolbars_Dock_Area_Right.DockedPosition = Infragistics.Win.UltraWinToolbars.DockedPosition.Right;
+            _MainForm_Toolbars_Dock_Area_Right.ForeColor = System.Drawing.SystemColors.ControlText;
+            _MainForm_Toolbars_Dock_Area_Right.Location = new System.Drawing.Point(1200, 0);
+            _MainForm_Toolbars_Dock_Area_Right.Name = "_MainForm_Toolbars_Dock_Area_Right";
+            _MainForm_Toolbars_Dock_Area_Right.Size = new System.Drawing.Size(0, 1172);
+            _MainForm_Toolbars_Dock_Area_Right.ToolbarsManager = ultraToolbarsManager1;
+            // 
+            // _MainForm_Toolbars_Dock_Area_Top
+            // 
+            _MainForm_Toolbars_Dock_Area_Top.AccessibleRole = System.Windows.Forms.AccessibleRole.Grouping;
+            _MainForm_Toolbars_Dock_Area_Top.BackColor = System.Drawing.SystemColors.Control;
+            _MainForm_Toolbars_Dock_Area_Top.DockedPosition = Infragistics.Win.UltraWinToolbars.DockedPosition.Top;
+            _MainForm_Toolbars_Dock_Area_Top.ForeColor = System.Drawing.SystemColors.ControlText;
+            _MainForm_Toolbars_Dock_Area_Top.Location = new System.Drawing.Point(0, 0);
+            _MainForm_Toolbars_Dock_Area_Top.Name = "_MainForm_Toolbars_Dock_Area_Top";
+            _MainForm_Toolbars_Dock_Area_Top.Size = new System.Drawing.Size(1200, 0);
+            _MainForm_Toolbars_Dock_Area_Top.ToolbarsManager = ultraToolbarsManager1;
+            // 
+            // _MainForm_Toolbars_Dock_Area_Bottom
+            // 
+            _MainForm_Toolbars_Dock_Area_Bottom.AccessibleRole = System.Windows.Forms.AccessibleRole.Grouping;
+            _MainForm_Toolbars_Dock_Area_Bottom.BackColor = System.Drawing.SystemColors.Control;
+            _MainForm_Toolbars_Dock_Area_Bottom.DockedPosition = Infragistics.Win.UltraWinToolbars.DockedPosition.Bottom;
+            _MainForm_Toolbars_Dock_Area_Bottom.ForeColor = System.Drawing.SystemColors.ControlText;
+            _MainForm_Toolbars_Dock_Area_Bottom.Location = new System.Drawing.Point(0, 1172);
+            _MainForm_Toolbars_Dock_Area_Bottom.Name = "_MainForm_Toolbars_Dock_Area_Bottom";
+            _MainForm_Toolbars_Dock_Area_Bottom.Size = new System.Drawing.Size(1200, 0);
+            _MainForm_Toolbars_Dock_Area_Bottom.ToolbarsManager = ultraToolbarsManager1;
             // 
             // MainForm
             // 
-            AutoScaleMode = AutoScaleMode.None;
-            ClientSize = new Size(1200, 1172);
-            Name = "MainForm";
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            ClientSize = new System.Drawing.Size(1200, 1172);
+            Controls.Add(_MainForm_Toolbars_Dock_Area_Left);
+            Controls.Add(_MainForm_Toolbars_Dock_Area_Right);
+            Controls.Add(_MainForm_Toolbars_Dock_Area_Bottom);
+            Controls.Add(_MainForm_Toolbars_Dock_Area_Top);
             Text = "MainForm";
+            ((System.ComponentModel.ISupportInitialize)ultraToolbarsManager1).EndInit();
             ResumeLayout(false);
         }
+
+        private Infragistics.Win.UltraWinToolbars.UltraToolbarsManager ultraToolbarsManager1;
+        private Infragistics.Win.UltraWinToolbars.UltraToolbarsDockArea _MainForm_Toolbars_Dock_Area_Left;
+        private Infragistics.Win.UltraWinToolbars.UltraToolbarsDockArea _MainForm_Toolbars_Dock_Area_Right;
+        private Infragistics.Win.UltraWinToolbars.UltraToolbarsDockArea _MainForm_Toolbars_Dock_Area_Top;
+        private Infragistics.Win.UltraWinToolbars.UltraToolbarsDockArea _MainForm_Toolbars_Dock_Area_Bottom;
 
         #endregion
 
