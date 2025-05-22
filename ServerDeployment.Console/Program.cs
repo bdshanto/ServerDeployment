@@ -19,7 +19,7 @@ namespace ServerDeployment
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false); 
 
-            Infragistics.Win.AppStyling.StyleManager.Load(Utilities.GetEmbeddedResourceStream("ServerDeployment.StyleLibraries.FlatNature.isl"));
+            Infragistics.Win.AppStyling.StyleManager.Load(Utilities.GetEmbeddedResourceStream("ServerDeployment.Console.StyleLibraries.FlatNature.isl"));
 
             Application.Run(new DeploymentForm());
         }
