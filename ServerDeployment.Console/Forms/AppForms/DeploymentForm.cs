@@ -185,7 +185,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             var selectedSites = GetSelectedSites();
             if (selectedSites.Count <= 0)
             {
-                lblMsg.Text = "Please select at least one site to backup.";
+                lblMsg.Text = @"Please select at least one site to backup.";
                 lblMsg.ForeColor = Color.Red;
                 return;
             }
@@ -330,11 +330,11 @@ namespace ServerDeployment.Console.Forms.AppForms
             List<IISSiteInfo> selected = GetSelectedSites();
             if (selected.Count == 0)
             {
-                lblMsg.Text = "Please select at least one site.";
+                lblMsg.Text = @"Please select at least one site.";
                 lblMsg.ForeColor = Color.Red;
                 return;
             }
-            var confirm = MessageBox.Show("Are you sure you want to delete all files in selected site folders? This cannot be undone!", "Confirm Delete", MessageBoxButtons.YesNo);
+            var confirm = MessageBox.Show(@"Are you sure you want to delete all files in selected site folders? This cannot be undone!", "Confirm Delete", MessageBoxButtons.YesNo);
             if (confirm != DialogResult.Yes) return;
 
             foreach (var site in selected)
@@ -346,10 +346,10 @@ namespace ServerDeployment.Console.Forms.AppForms
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error deleting files in {site}: {ex.Message}");
+                    MessageBox.Show($@"Error deleting files in {site}: {ex.Message}");
                 }
             }
-            MessageBox.Show("Files deleted.");
+            MessageBox.Show(@"Files deleted.");
         }
 
         private void DeleteAllFiles(string folder, bool isRoot = true)
