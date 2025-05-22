@@ -380,10 +380,10 @@ namespace ServerDeployment.Console.Forms.AppForms
                     File.SetAttributes(file, FileAttributes.Normal);
                     File.Delete(file);
                 }
-                catch
+                catch(Exception ex)
                 {
-
-                }
+                    SLogger.WriteLog(ex);
+                } 
             }
 
             foreach (var dir in Directory.GetDirectories(folder))
@@ -584,12 +584,12 @@ namespace ServerDeployment.Console.Forms.AppForms
                     }
 
                     // Copy ReportsViewer web.config
-                    string reportsViewerWebConfig = Path.Combine(sourceRoot, "ReportsViewer", "");
+                    string reportsViewerWebConfig = Path.Combine(sourceRoot, "ReportsViewer", "Web.config");
                     if (File.Exists(reportsViewerWebConfig))
                     {
-                        string destApiFolder = Path.Combine(destRoot, "PetMatrixBackendAPI");
+                        string destApiFolder = Path.Combine(destRoot, "ReportsViewer");
                         Directory.CreateDirectory(destApiFolder);
-                        string destAppSettings = Path.Combine(destApiFolder, "web.config");
+                        string destAppSettings = Path.Combine(destApiFolder, "Web.config");
                         File.Copy(reportsViewerWebConfig, destAppSettings, overwrite: true);
                     }
 
