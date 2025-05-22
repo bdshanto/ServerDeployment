@@ -879,10 +879,5 @@ namespace ServerDeployment.Forms.AppForms
 
             }
         }
-
-        protected virtual void OnProgressUpdated(ProgressEventArgs e)
-        {
-            ProgressUpdated?.Invoke(this, e);
-        }
     }
 }
