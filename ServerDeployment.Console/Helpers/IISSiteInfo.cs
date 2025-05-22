@@ -1,4 +1,4 @@
-﻿namespace ServerDeployment.Helpers
+﻿namespace ServerDeployment.Console.Helpers
 {
     public class IISSiteInfo
     {

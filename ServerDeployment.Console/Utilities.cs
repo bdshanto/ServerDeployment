@@ -5,7 +5,7 @@ using System.Resources;
 using System.Reflection;
 using System.Diagnostics;
 
-namespace ServerDeployment
+namespace ServerDeployment.Console
 {
     internal static class Utilities
     {

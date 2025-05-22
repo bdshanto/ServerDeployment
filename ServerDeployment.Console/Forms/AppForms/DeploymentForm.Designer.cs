@@ -1,4 +1,4 @@
-﻿namespace ServerDeployment.Forms.AppForms
+﻿namespace ServerDeployment.Console.Forms.AppForms
 {
     partial class DeploymentForm
     {
@@ -246,7 +246,7 @@
             ultraLabel1.Font = new Font("Comic Sans MS", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             ultraLabel1.Location = new Point(9, 1111);
             ultraLabel1.Name = "ultraLabel1";
-            ultraLabel1.Size = new Size(299, 34);
+            ultraLabel1.Size = new Size(412, 34);
             ultraLabel1.TabIndex = 5;
             ultraLabel1.Text = "MD HASIBUL ISLAM SHANTO";
             // 
@@ -309,7 +309,6 @@
             // 
             // DeploymentForm
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.None;
             ClientSize = new Size(1200, 1172);
             Controls.Add(ultraPanel1);

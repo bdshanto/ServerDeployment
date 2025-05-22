@@ -1,8 +1,8 @@
-using System.Reflection; 
+using System.Reflection;
+using ServerDeployment.Console.Forms.AppForms;
 using ServerDeployment.Domains.Utility;
-using ServerDeployment.Forms.AppForms;
 
-namespace ServerDeployment
+namespace ServerDeployment.Console
 {
     internal static class Program
     {

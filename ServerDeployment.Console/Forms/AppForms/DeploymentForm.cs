@@ -5,9 +5,9 @@ using System.Text.Json;
 using Infragistics.Win;
 using Infragistics.Win.UltraWinGrid;
 using Microsoft.Web.Administration;
-using ServerDeployment.Helpers;
+using ServerDeployment.Console.Helpers;
 
-namespace ServerDeployment.Forms.AppForms
+namespace ServerDeployment.Console.Forms.AppForms
 {
     public partial class DeploymentForm : Form
     {
