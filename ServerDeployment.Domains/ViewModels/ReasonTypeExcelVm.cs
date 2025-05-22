@@ -1,4 +1,4 @@
-﻿namespace ARAKDataSetup.Domains.ViewModels;
+﻿namespace ServerDeployment.Domains.ViewModels;
 
 public class ReasonTypeExcelVm
 {

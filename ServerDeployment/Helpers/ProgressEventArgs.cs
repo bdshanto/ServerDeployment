@@ -1,4 +1,4 @@
-﻿namespace ServerDeployment.Console.Helpers;
+﻿namespace ServerDeployment.Helpers;
 
 public class ProgressEventArgs : EventArgs
 {

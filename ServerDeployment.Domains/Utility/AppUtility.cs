@@ -3,7 +3,7 @@ using System.Data;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace ARAKDataSetup.Domains.Utility
+namespace ServerDeployment.Domains.Utility
 {
     public static class AppUtility
     {

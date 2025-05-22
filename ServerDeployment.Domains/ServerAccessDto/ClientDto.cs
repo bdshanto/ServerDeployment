@@ -1,7 +1,7 @@
-﻿using ARAKDataSetup.Domains.Utility;
+﻿using ServerDeployment.Domains.Utility;
 using System.ComponentModel.DataAnnotations;
 
-namespace ARAKDataSetup.Domains.ServerAccessDto
+namespace ServerDeployment.Domains.ServerAccessDto
 {
     /*
     <FNAME_NLS, nvarchar(100),>

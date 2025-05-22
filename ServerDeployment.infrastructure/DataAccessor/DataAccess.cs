@@ -1,4 +1,4 @@
-﻿using ARAKDataSetup.Domains.Utility;
+﻿using ServerDeployment.Domains.Utility;
 using ServerDeployment.infrastructure.Contracts.IDataAccessor;
 using System.Collections;
 using System.ComponentModel.DataAnnotations;

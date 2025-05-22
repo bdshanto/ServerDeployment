@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ARAKDataSetup.Domains.ServerAccessDto;
+namespace ServerDeployment.Domains.ServerAccessDto;
 
 /// <summary>
 /// USER_ID	USER_UID

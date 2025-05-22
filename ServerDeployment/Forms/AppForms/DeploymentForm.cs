@@ -1,7 +1,7 @@
 ﻿using Infragistics.Win;
 using Infragistics.Win.UltraWinGrid;
 using Microsoft.Web.Administration;
-using ServerDeployment.Console.Helpers;
+using ServerDeployment.Helpers;
 using System.Data;
 using System.Diagnostics;
 using System.Net.NetworkInformation;

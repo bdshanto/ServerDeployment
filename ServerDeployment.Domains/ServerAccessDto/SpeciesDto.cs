@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ARAKDataSetup.Domains.ServerAccessDto;
+namespace ServerDeployment.Domains.ServerAccessDto;
 
 /// <summary>
 /// SPECIES_ID	SPECIES_UID	SPECIES_TEXT	SPECIES_NAME	SPECIES_DESC	WEIGHT	MEASURE	INCREMENT	IS_CAT	IS_DOG	IS_ACTIVE	ORG_ID	CREATED_BY	CREATED_ON	LAST_MODIFIED_BY	LAST_MODIFIED_ON

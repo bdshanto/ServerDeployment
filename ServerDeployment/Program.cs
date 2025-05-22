@@ -1,8 +1,9 @@
 using System.Reflection;
-using ARAKDataSetup.Domains.Utility;
-using ServerDeployment.Console.Forms; 
+using ServerDeployment.Console;
+using ServerDeployment.Console.Forms;
+using ServerDeployment.Domains.Utility;
 
-namespace ServerDeployment.Console
+namespace ServerDeployment
 {
     internal static class Program
     {
