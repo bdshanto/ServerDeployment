@@ -23,7 +23,9 @@ namespace ServerDeployment.Console.Forms.AppForms
 
         private readonly Dictionary<string, string> _siteBackupDirectory = new();
 
-        public delegate void ProgressUpdateHandler(string message);
+        public delegate void StatusUpdateHandler(string message, Color color);
+        public event StatusUpdateHandler? StatusUpdated;
+
 
 
         private readonly List<string> _expectedReportViewerFilesAndFolders = new List<string>
@@ -47,7 +49,7 @@ namespace ServerDeployment.Console.Forms.AppForms
 
         private readonly List<object> _expectedFrontendFilesAndFolders = new List<object>
         {
-            "index.html",  
+            "index.html",
             "assets", // folder
             new Regex(@"^main\.[a-z0-9]+\.bundle\.js$", RegexOptions.IgnoreCase),
             new Regex(@"^main-[a-z0-9]+\.css$", RegexOptions.IgnoreCase),
@@ -82,13 +84,14 @@ namespace ServerDeployment.Console.Forms.AppForms
         {
             InitializeComponent();
             ProgressUpdated += DeploymentForm_ProgressUpdated;
+            StatusUpdated += DeploymentForm_StatusUpdated;
 
             ButtonsSwitch(false);
             InitializeUltraGrid();
             LoadSitesFromIIS();
 
-            lblMsg.Text = @"Please set both Site Root and Backup Path before publishing.";
-            lblMsg.BackColor = Color.Red;
+            StatusUpdated?.Invoke("Please set both Site Root and Backup Path before publishing.", Color.Red);
+
 
         }
 
@@ -237,8 +240,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             var selectedSites = GetSelectedSites();
             if (selectedSites.Count <= 0)
             {
-                lblMsg.Text = @"Please select at least one site to backup.";
-                lblMsg.BackColor = Color.Red;
+                StatusUpdated?.Invoke("Please select at least one site to backup.", Color.Red);
                 return;
             }
 
@@ -271,6 +273,8 @@ namespace ServerDeployment.Console.Forms.AppForms
             }
             OnProgressUpdated("Backup completed.", 100, ProgressType.Backup);
         }
+
+
         private void CopySiteContent(string sourceRoot, string destinationSiteFolder, DeployEnum copyTo)
         {
             if (copyTo == DeployEnum.PetMatrixBackendAPI)
@@ -360,8 +364,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             List<IISSiteInfo> selected = GetSelectedSites();
             if (selected.Count == 0)
             {
-                lblMsg.Text = @"Please select at least one site.";
-                lblMsg.BackColor = Color.Red;
+                StatusUpdated?.Invoke("Please select at least one site.", Color.Red);
                 return;
             }
             var confirm = MessageBox.Show(@"Are you sure you want to delete all files in selected site folders? This cannot be undone!", @"Confirm Delete", MessageBoxButtons.YesNo);
@@ -376,14 +379,12 @@ namespace ServerDeployment.Console.Forms.AppForms
                 }
                 catch (Exception ex)
                 {
-                    lblMsg.Text = $@"Error deleting files in {site}: {ex.Message}";
-                    lblMsg.BackColor = Color.Red;
+                    StatusUpdated?.Invoke($@"Error deleting files in {site}: {ex.Message}", Color.Red);
 
                     SLogger.WriteLog(ex);
                 }
             }
-            lblMsg.Text = @"Files deleted.";
-            lblMsg.BackColor = Color.Red;
+            StatusUpdated?.Invoke(@"Files deleted.", Color.Red);
         }
 
         private void DeleteAllFiles(string folder, bool isRoot = true)
@@ -614,10 +615,11 @@ namespace ServerDeployment.Console.Forms.AppForms
                 }
 
                 lblMsg.Text = @"Copy completed successfully.";
+                StatusUpdated?.Invoke(@"Copy completed successfully.", Color.Green);
             }
             catch (Exception ex)
             {
-                lblMsg.Text = @$"Error during copy: {ex.Message}";
+                StatusUpdated?.Invoke(@$"Error during copy: {ex.Message}", Color.Red);
                 SLogger.WriteLog(ex);
             }
 
@@ -657,7 +659,7 @@ namespace ServerDeployment.Console.Forms.AppForms
 
             if (folderDialog.ShowDialog() == DialogResult.OK)
             {
-                _backendPath = folderDialog.SelectedPath;
+
 
                 string selectedPath = folderDialog.SelectedPath;
                 var fileSystemEntries = Directory.EnumerateFileSystemEntries(selectedPath)
@@ -692,14 +694,15 @@ namespace ServerDeployment.Console.Forms.AppForms
                     lblMsg.BackColor = Color.Green;
                     lblMsg.Text = "✅ All backend deployment files are present.";
 
+                    _backendPath = folderDialog.SelectedPath;
                     txtBackend.Text = _backendPath;
 
                     ButtonsSwitch(true);
                 }
                 else
                 {
-                    lblMsg.BackColor = Color.Red;
-                    lblMsg.Text = "❌ Missing backend files/folders:\n" + string.Join("\n", missingItems);
+                    StatusUpdated?.Invoke(@"❌Missing files or folders:\n" + string.Join("\n", missingItems), Color.Red);
+
                 }
 
             }
@@ -709,49 +712,55 @@ namespace ServerDeployment.Console.Forms.AppForms
         {
             CopyContent();
         }
-
         private void CopyContent()
         {
             var selectedSites = GetSelectedSites();
             if (selectedSites.Count == 0)
             {
-                lblMsg.Text = @"Please set both Site Root and Backup Path before publishing.";
-                lblMsg.BackColor = Color.Red;
+                SetStatus("Please set both Site Root and Backup Path before publishing.", Color.Red);
                 return;
             }
 
+            var pathMap = new List<(string Path, DeployEnum Type)>
+            {
+                (_backendPath, DeployEnum.PetMatrixBackendAPI),
+                (_frontendPath, DeployEnum.Frontend),
+                (_reportPath, DeployEnum.ReportsViewer)
+            };
+
+            if (pathMap.All(p => AppUtility.HasNoStr(p.Path)))
+            {
+                SetStatus("Please set at least one path to copy content.", Color.Red);
+                return;
+            }
 
             try
             {
-
                 foreach (var site in selectedSites)
                 {
-                    if (AppUtility.HasAnyStr(_backendPath) && _backendPath.Length > 1)
+                    foreach (var (sourcePath, deployType) in pathMap)
                     {
-                        CopySiteContent(_backendPath, site.PhysicalPath, DeployEnum.PetMatrixBackendAPI);
-                    }
-
-                    if (AppUtility.HasAnyStr(_frontendPath) && _frontendPath.Length > 1)
-                    {
-                        CopySiteContent(_frontendPath, site.PhysicalPath, DeployEnum.Frontend);
-                    }
-
-                    if (AppUtility.HasAnyStr(_reportPath) && _reportPath.Length > 1)
-                    {
-                        CopySiteContent(_reportPath, site.PhysicalPath, DeployEnum.ReportsViewer);
+                        string source = AppUtility.HasAnyStr(sourcePath) ? sourcePath : site.PhysicalPath;
+                        CopySiteContent(source, site.PhysicalPath, deployType);
                     }
                 }
-                lblMsg.Text = @"Content copied successfully.";
-                lblMsg.BackColor = Color.Green;
+
+                SetStatus("Content copied successfully.", Color.Green);
             }
             catch (Exception ex)
             {
-                lblMsg.Text = @"Error copying content: @" + ex.Message;
-                lblMsg.BackColor = Color.Green;
-
+                SetStatus("Error copying content: " + ex.Message, Color.Red);
                 SLogger.WriteLog(ex);
             }
         }
+
+        // Helper method to set label status
+        private void SetStatus(string message, Color color)
+        {
+            lblMsg.Text = message;
+            lblMsg.BackColor = color;
+        }
+
         private void btnBackupPath_Click(object sender, EventArgs e)
         {
             BackupPath();
@@ -938,6 +947,17 @@ namespace ServerDeployment.Console.Forms.AppForms
                 UpdateProgressUi(e);
             }
         }
+        private void DeploymentForm_StatusUpdated(string message, Color color)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(() => SetStatus(message, color));
+            }
+            else
+            {
+                SetStatus(message, color);
+            }
+        }
 
         private void UpdateProgressUi(ProgressEventArgs e)
         {
@@ -975,8 +995,8 @@ namespace ServerDeployment.Console.Forms.AppForms
 
             if (folderDialog.ShowDialog() == DialogResult.OK)
             {
-                _frontendPath = folderDialog.SelectedPath;
-               
+
+
 
                 string selectedPath = folderDialog.SelectedPath;
 
@@ -1014,21 +1034,21 @@ namespace ServerDeployment.Console.Forms.AppForms
                         missingItems.Add(expected is string ? (string)expected : expected.ToString());
                     }
 
-                    if(!found) break;
+                    if (!found) break;
                 }
                 if (missingItems.Count == 0)
                 {
-                    lblMsg.BackColor = System.Drawing.Color.Green;
-                    lblMsg.Text = @"All required files and folders are present.";
 
+                    StatusUpdated?.Invoke(@"All required files and folders are present.", Color.Green);
+
+                    _frontendPath = folderDialog.SelectedPath;
                     txtFrontend.Text = _frontendPath;
 
                     ButtonsSwitch(true);
                 }
                 else
                 {
-                    lblMsg.BackColor = System.Drawing.Color.Red;
-                    lblMsg.Text = @"Missing files or folders:\n" + string.Join("\n", missingItems);
+                    StatusUpdated?.Invoke(@"Missing files or folders:\n" + string.Join("\n", missingItems), Color.Red);
                 }
 
             }
@@ -1043,8 +1063,6 @@ namespace ServerDeployment.Console.Forms.AppForms
 
             if (folderDialog.ShowDialog() == DialogResult.OK)
             {
-              
-
                 var missingItems = new List<string>();
                 foreach (var item in _expectedReportViewerFilesAndFolders)
                 {
@@ -1063,14 +1081,13 @@ namespace ServerDeployment.Console.Forms.AppForms
                 {
                     _reportPath = folderDialog.SelectedPath;
                     txtReport.Text = _reportPath;
-                    // Set the label to green and show success message
-                    lblMsg.BackColor = Color.Green;
-                    lblMsg.Text = @"All required report files and folders are present.";
+                    
+                    StatusUpdated?.Invoke(@"All required report files and folders are present.", Color.Green);
+
                 }
                 else
                 {
-                    lblMsg.BackColor = Color.Red;
-                    lblMsg.Text = @"Missing files or folders:\n" + string.Join("\n", missingItems);
+                    StatusUpdated?.Invoke(@"Missing files or folders:\n" + string.Join("\n", missingItems), Color.Red);
                 }
 
                 ButtonsSwitch(true);
