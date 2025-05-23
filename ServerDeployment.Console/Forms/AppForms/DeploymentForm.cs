@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Net.NetworkInformation;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Infragistics.Win;
 using Infragistics.Win.UltraWinGrid;
 using Microsoft.Web.Administration;
@@ -23,7 +24,42 @@ namespace ServerDeployment.Console.Forms.AppForms
         private readonly Dictionary<string, string> _siteBackupDirectory = new();
 
         public delegate void ProgressUpdateHandler(string message);
-        // public event ProgressUpdateHandler? ProgressUpdated;
+
+
+        private readonly List<string> _expectedReportViewerFilesAndFolders = new List<string>
+        {
+            "bin",
+            "Content",
+            "fonts",
+            "Scripts",
+            "SqlServerTypes",
+            "About.aspx",
+            "Bundle.config",
+            "Contact.aspx",
+            "Default.aspx",
+            "favicon.ico",
+            "Global.asax",
+            "ReportViewer.aspx",
+            "Site.Master",
+            "Site.Mobile.Master",
+            "ViewSwitcher.ascx"
+        };
+
+        private readonly List<object> _expectedFrontendFilesAndFolders = new List<object>
+        {
+            "index.html",
+            "favicon.ico",
+            "robots.txt",
+            "web.config",
+            "humans.txt",
+            "assets", // folder
+            new Regex(@"^main\.[a-z0-9]+\.bundle\.js$", RegexOptions.IgnoreCase),
+            new Regex(@"^main-[a-z0-9]+\.css$", RegexOptions.IgnoreCase),
+            new Regex(@"^polyfills\.[a-z0-9]+\.bundle\.js$", RegexOptions.IgnoreCase),
+            new Regex(@"^vendors~main\.[a-z0-9]+\.chunk\.js$", RegexOptions.IgnoreCase),
+            new Regex(@"^vendors~main-[a-z0-9]+\.css$", RegexOptions.IgnoreCase),
+            new Regex(@"^vendors~polyfills\.[a-z0-9]+\.chunk\.js$", RegexOptions.IgnoreCase)
+        };
 
         public event EventHandler<ProgressEventArgs>? ProgressUpdated;
 
@@ -880,7 +916,7 @@ namespace ServerDeployment.Console.Forms.AppForms
         {
             using var folderDialog = new FolderBrowserDialog
             {
-                Description = @"Select Frontend Directory"
+                Description = @"Select Angular Build Folder"
             };
 
             if (folderDialog.ShowDialog() == DialogResult.OK)
@@ -890,6 +926,53 @@ namespace ServerDeployment.Console.Forms.AppForms
                 txtFrontend.Text = _frontendPath;
 
                 ButtonsSwitch(true);
+
+                string selectedPath = folderDialog.SelectedPath;
+
+                // Get all files and folders names in the root of selected path
+                var fileSystemEntries = Directory.EnumerateFileSystemEntries(selectedPath)
+                    .Select(Path.GetFileName)
+                    .ToList();
+
+                var missingItems = new List<string>();
+                foreach (var expected in _expectedFrontendFilesAndFolders)
+                {
+                    bool found = false;
+
+                    if (expected is string s)
+                    {
+                        if (s.Equals("assets", StringComparison.OrdinalIgnoreCase))
+                        {
+                            // Check folder existence
+                            string assetsPath = Path.Combine(selectedPath, "assets");
+                            found = Directory.Exists(assetsPath);
+                        }
+                        else
+                        {
+                            // Check exact file
+                            found = fileSystemEntries.Any(f => f.Equals(s, StringComparison.OrdinalIgnoreCase));
+                        }
+                    }
+                    else if (expected is Regex regex)
+                    {
+                        found = fileSystemEntries.Any(f => regex.IsMatch(f));
+                    }
+
+                    /*if (!found)
+                    {
+                        missingItems.Add(expected is string ? (string)expected : expected.ToString());
+                    }*/
+                }
+                if (missingItems.Count == 0)
+                {
+                    lblMsg.BackColor = System.Drawing.Color.Green;
+                    lblMsg.Text = @"All required files and folders are present.";
+                }
+                else
+                {
+                    lblMsg.BackColor = System.Drawing.Color.Red;
+                    lblMsg.Text = @"Missing files or folders:\n" + string.Join("\n", missingItems);
+                }
 
             }
         }
@@ -905,12 +988,37 @@ namespace ServerDeployment.Console.Forms.AppForms
             {
                 _reportPath = folderDialog.SelectedPath;
                 txtReport.Text = _reportPath;
-                _reportPath = _reportPath;
+
+                var missingItems = new List<string>();
+                foreach (var item in _expectedReportViewerFilesAndFolders)
+                {
+                    string fullPath = Path.Combine(_reportPath, item);
+                    if (item.Contains(".") && !File.Exists(fullPath)) // file check
+                    {
+                        missingItems.Add(item);
+                    }
+                    else if (!item.Contains(".") && !Directory.Exists(fullPath)) // folder check
+                    {
+                        missingItems.Add(item);
+                    }
+                }
+
+                if (missingItems.Count == 0)
+                {
+                    lblMsg.BackColor = Color.Green;
+                    lblMsg.Text = "All required report files and folders are present.";
+                }
+                else
+                {
+                    lblMsg.BackColor = Color.Red;
+                    lblMsg.Text = "Missing files or folders:\n" + string.Join("\n", missingItems);
+                }
 
                 ButtonsSwitch(true);
-
             }
         }
+
+
 
 
     }
