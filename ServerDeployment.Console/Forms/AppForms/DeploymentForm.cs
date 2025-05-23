@@ -88,7 +88,7 @@ namespace ServerDeployment.Console.Forms.AppForms
 
             ButtonsSwitch(false);
             InitializeUltraGrid();
-            LoadSitesFromIIS();
+            LoadSitesFromIis();
 
             StatusUpdated?.Invoke("Please set both Site Root and Backup Path before publishing.", Color.Red);
 
@@ -114,12 +114,13 @@ namespace ServerDeployment.Console.Forms.AppForms
         }
 
 
-        private void LoadSitesFromIIS()
+        private void LoadSitesFromIis()
         {
-            var selectedSites = GetSelectedSites();
 
-            var sites = GetIISSites();
-            var dt = CreateSitesDataTable();
+            List<IISSiteInfo> sites = GetIISSites();
+            DataTable dt = CreateSitesDataTable();
+
+            List<IISSiteInfo> selectedSites = GetSelectedSites();
 
             foreach (var site in sites)
             {
@@ -164,7 +165,9 @@ namespace ServerDeployment.Console.Forms.AppForms
             var sites = new List<IISSiteInfo>();
 
             // PowerShell script to get Name, PhysicalPath, and State of IIS sites as JSON
-            string script = @"Import-Module WebAdministration;  Get-Website | Select-Object Name, PhysicalPath, State | ConvertTo-Json @";
+            //            string script = @"Import-Module WebAdministration;  Get-Website | Select-Object Name, PhysicalPath, State | ConvertTo-Json @";
+            string script = @"Import-Module WebAdministration; Get-Website | Select-Object Name, PhysicalPath, State | ConvertTo-Json -Depth 3";
+
 
             var psi = new ProcessStartInfo
             {
@@ -519,7 +522,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             {
                 StopSite(site.Name);
             }
-            LoadSitesFromIIS();
+            LoadSitesFromIis();
         }
 
         private void btnStartIIS_Click(object sender, EventArgs e)
@@ -540,7 +543,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             {
                 StartSite(site.Name);
             }
-            LoadSitesFromIIS();
+            LoadSitesFromIis();
         }
 
         private void btnDeleteFiles_Click(object sender, EventArgs e)
@@ -626,7 +629,7 @@ namespace ServerDeployment.Console.Forms.AppForms
         }
         private void btnReloadSites_Click(object sender, EventArgs e)
         {
-            LoadSitesFromIIS();
+            LoadSitesFromIis();
         }
         private async void btnPingSite_Click(object sender, EventArgs e)
         {
@@ -740,7 +743,7 @@ namespace ServerDeployment.Console.Forms.AppForms
                 {
                     foreach (var (sourcePath, deployType) in pathMap)
                     {
-                        string source = AppUtility.HasAnyStr(sourcePath) ? sourcePath : site.PhysicalPath;
+                        string source = (AppUtility.HasAnyStr(sourcePath) && sourcePath.Length > 0) ? sourcePath : site.PhysicalPath;
                         CopySiteContent(source, site.PhysicalPath, deployType);
                     }
                 }
@@ -1081,7 +1084,7 @@ namespace ServerDeployment.Console.Forms.AppForms
                 {
                     _reportPath = folderDialog.SelectedPath;
                     txtReport.Text = _reportPath;
-                    
+
                     StatusUpdated?.Invoke(@"All required report files and folders are present.", Color.Green);
 
                 }
