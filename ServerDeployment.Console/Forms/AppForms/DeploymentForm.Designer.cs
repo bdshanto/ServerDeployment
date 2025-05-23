@@ -42,9 +42,13 @@
             btnBackupPath = new Button();
             ultraGrid = new Infragistics.Win.UltraWinGrid.UltraGrid();
             ultraPanel1 = new Infragistics.Win.Misc.UltraPanel();
+            ultraLabel1 = new Infragistics.Win.Misc.UltraLabel();
             panel2 = new Panel();
             panel1 = new Panel();
             lblMsg = new Label();
+            progressBarReport = new ProgressBar();
+            progressBarFrontend = new ProgressBar();
+            progressBarBackend = new ProgressBar();
             progressBarBackup = new ProgressBar();
             btnPublish = new Infragistics.Win.Misc.UltraButton();
             txtBackup = new TextBox();
@@ -54,10 +58,6 @@
             btnReport = new Button();
             btnFrontend = new Button();
             ultraLabel2 = new Infragistics.Win.Misc.UltraLabel();
-            ultraLabel1 = new Infragistics.Win.Misc.UltraLabel();
-            progressBarBackend = new ProgressBar();
-            progressBarFrontend = new ProgressBar();
-            progressBarReport = new ProgressBar();
             ((System.ComponentModel.ISupportInitialize)ultraGrid).BeginInit();
             ultraPanel1.ClientArea.SuspendLayout();
             ultraPanel1.SuspendLayout();
@@ -67,7 +67,7 @@
             // 
             // btnReloadSites
             // 
-            btnReloadSites.Location = new Point(32, 348);
+            btnReloadSites.Location = new Point(26, 220);
             btnReloadSites.Name = "btnReloadSites";
             btnReloadSites.Size = new Size(171, 50);
             btnReloadSites.TabIndex = 1;
@@ -77,7 +77,7 @@
             // 
             // btnBackup
             // 
-            btnBackup.Location = new Point(225, 348);
+            btnBackup.Location = new Point(219, 220);
             btnBackup.Name = "btnBackup";
             btnBackup.Size = new Size(171, 50);
             btnBackup.TabIndex = 2;
@@ -87,7 +87,7 @@
             // 
             // btnStopIIS
             // 
-            btnStopIIS.Location = new Point(421, 348);
+            btnStopIIS.Location = new Point(415, 220);
             btnStopIIS.Name = "btnStopIIS";
             btnStopIIS.Size = new Size(171, 50);
             btnStopIIS.TabIndex = 2;
@@ -97,7 +97,7 @@
             // 
             // btnStartIIS
             // 
-            btnStartIIS.Location = new Point(421, 404);
+            btnStartIIS.Location = new Point(415, 276);
             btnStartIIS.Name = "btnStartIIS";
             btnStartIIS.Size = new Size(171, 50);
             btnStartIIS.TabIndex = 2;
@@ -107,7 +107,7 @@
             // 
             // btnDeleteFiles
             // 
-            btnDeleteFiles.Location = new Point(610, 348);
+            btnDeleteFiles.Location = new Point(604, 220);
             btnDeleteFiles.Name = "btnDeleteFiles";
             btnDeleteFiles.Size = new Size(171, 50);
             btnDeleteFiles.TabIndex = 2;
@@ -117,7 +117,7 @@
             // 
             // btnCopyAppSettings
             // 
-            btnCopyAppSettings.Location = new Point(225, 404);
+            btnCopyAppSettings.Location = new Point(219, 276);
             btnCopyAppSettings.Name = "btnCopyAppSettings";
             btnCopyAppSettings.Size = new Size(171, 50);
             btnCopyAppSettings.TabIndex = 2;
@@ -127,7 +127,7 @@
             // 
             // btnPingSite
             // 
-            btnPingSite.Location = new Point(610, 404);
+            btnPingSite.Location = new Point(604, 276);
             btnPingSite.Name = "btnPingSite";
             btnPingSite.Size = new Size(171, 50);
             btnPingSite.TabIndex = 2;
@@ -137,14 +137,14 @@
             // 
             // txtBackend
             // 
-            txtBackend.Location = new Point(180, 142);
+            txtBackend.Location = new Point(186, 72);
             txtBackend.Name = "txtBackend";
             txtBackend.Size = new Size(522, 31);
             txtBackend.TabIndex = 3;
             // 
             // btnCopyContent
             // 
-            btnCopyContent.Location = new Point(32, 404);
+            btnCopyContent.Location = new Point(26, 276);
             btnCopyContent.Name = "btnCopyContent";
             btnCopyContent.Size = new Size(171, 50);
             btnCopyContent.TabIndex = 2;
@@ -155,7 +155,7 @@
             // btnBackupPath
             // 
             btnBackupPath.Font = new Font("Segoe UI", 12F);
-            btnBackupPath.Location = new Point(3, 76);
+            btnBackupPath.Location = new Point(9, 6);
             btnBackupPath.Name = "btnBackupPath";
             btnBackupPath.Size = new Size(171, 50);
             btnBackupPath.TabIndex = 1;
@@ -170,7 +170,7 @@
             ultraGrid.Font = new Font("Segoe UI", 9F);
             ultraGrid.Location = new Point(3, 18);
             ultraGrid.Name = "ultraGrid";
-            ultraGrid.Size = new Size(1284, 400);
+            ultraGrid.Size = new Size(1022, 400);
             ultraGrid.TabIndex = 4;
             ultraGrid.Text = "Web Sites";
             // 
@@ -180,14 +180,23 @@
             // 
             // ultraPanel1.ClientArea
             // 
+            ultraPanel1.ClientArea.Controls.Add(ultraLabel1);
             ultraPanel1.ClientArea.Controls.Add(panel2);
             ultraPanel1.ClientArea.Controls.Add(panel1);
             ultraPanel1.ClientArea.Controls.Add(ultraLabel2);
-            ultraPanel1.ClientArea.Controls.Add(ultraLabel1);
             ultraPanel1.Location = new Point(12, 12);
             ultraPanel1.Name = "ultraPanel1";
-            ultraPanel1.Size = new Size(1316, 1166);
+            ultraPanel1.Size = new Size(1054, 870);
             ultraPanel1.TabIndex = 5;
+            // 
+            // ultraLabel1
+            // 
+            ultraLabel1.Font = new Font("Comic Sans MS", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            ultraLabel1.Location = new Point(3, 7);
+            ultraLabel1.Name = "ultraLabel1";
+            ultraLabel1.Size = new Size(293, 34);
+            ultraLabel1.TabIndex = 5;
+            ultraLabel1.Text = "MD HASIBUL ISLAM SHANTO";
             // 
             // panel2
             // 
@@ -195,7 +204,7 @@
             panel2.Controls.Add(ultraGrid);
             panel2.Location = new Point(9, 47);
             panel2.Name = "panel2";
-            panel2.Size = new Size(1290, 421);
+            panel2.Size = new Size(1028, 421);
             panel2.TabIndex = 11;
             // 
             // panel1
@@ -225,21 +234,42 @@
             panel1.Controls.Add(btnPingSite);
             panel1.Location = new Point(9, 474);
             panel1.Name = "panel1";
-            panel1.Size = new Size(1268, 649);
+            panel1.Size = new Size(1006, 393);
             panel1.TabIndex = 10;
             // 
             // lblMsg
             // 
             lblMsg.AutoSize = true;
             lblMsg.Font = new Font("Segoe UI Semibold", 16F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            lblMsg.Location = new Point(304, 527);
+            lblMsg.Location = new Point(75, 336);
             lblMsg.Name = "lblMsg";
             lblMsg.Size = new Size(0, 45);
             lblMsg.TabIndex = 7;
             // 
+            // progressBarReport
+            // 
+            progressBarReport.Location = new Point(726, 183);
+            progressBarReport.Name = "progressBarReport";
+            progressBarReport.Size = new Size(178, 31);
+            progressBarReport.TabIndex = 9;
+            // 
+            // progressBarFrontend
+            // 
+            progressBarFrontend.Location = new Point(726, 128);
+            progressBarFrontend.Name = "progressBarFrontend";
+            progressBarFrontend.Size = new Size(178, 31);
+            progressBarFrontend.TabIndex = 9;
+            // 
+            // progressBarBackend
+            // 
+            progressBarBackend.Location = new Point(726, 72);
+            progressBarBackend.Name = "progressBarBackend";
+            progressBarBackend.Size = new Size(178, 31);
+            progressBarBackend.TabIndex = 9;
+            // 
             // progressBarBackup
             // 
-            progressBarBackup.Location = new Point(720, 86);
+            progressBarBackup.Location = new Point(726, 16);
             progressBarBackup.Name = "progressBarBackup";
             progressBarBackup.Size = new Size(178, 31);
             progressBarBackup.TabIndex = 9;
@@ -252,7 +282,7 @@
             appearance11.BackGradientStyle = Infragistics.Win.GradientStyle.Vertical;
             appearance11.ForeColor = Color.FromArgb(0, 192, 0);
             btnPublish.HotTrackAppearance = appearance11;
-            btnPublish.Location = new Point(855, 348);
+            btnPublish.Location = new Point(781, 236);
             btnPublish.Name = "btnPublish";
             btnPublish.Size = new Size(208, 80);
             btnPublish.TabIndex = 6;
@@ -261,21 +291,21 @@
             // 
             // txtBackup
             // 
-            txtBackup.Location = new Point(180, 86);
+            txtBackup.Location = new Point(186, 16);
             txtBackup.Name = "txtBackup";
             txtBackup.Size = new Size(522, 31);
             txtBackup.TabIndex = 3;
             // 
             // txtFrontend
             // 
-            txtFrontend.Location = new Point(180, 198);
+            txtFrontend.Location = new Point(186, 128);
             txtFrontend.Name = "txtFrontend";
             txtFrontend.Size = new Size(522, 31);
             txtFrontend.TabIndex = 3;
             // 
             // txtReport
             // 
-            txtReport.Location = new Point(180, 253);
+            txtReport.Location = new Point(186, 183);
             txtReport.Name = "txtReport";
             txtReport.Size = new Size(522, 31);
             txtReport.TabIndex = 3;
@@ -283,7 +313,7 @@
             // btnBackend
             // 
             btnBackend.Font = new Font("Segoe UI", 12F);
-            btnBackend.Location = new Point(3, 130);
+            btnBackend.Location = new Point(9, 60);
             btnBackend.Name = "btnBackend";
             btnBackend.Size = new Size(171, 50);
             btnBackend.TabIndex = 1;
@@ -294,7 +324,7 @@
             // btnReport
             // 
             btnReport.Font = new Font("Segoe UI", 12F);
-            btnReport.Location = new Point(3, 241);
+            btnReport.Location = new Point(9, 171);
             btnReport.Name = "btnReport";
             btnReport.Size = new Size(171, 50);
             btnReport.TabIndex = 1;
@@ -305,7 +335,7 @@
             // btnFrontend
             // 
             btnFrontend.Font = new Font("Segoe UI", 12F);
-            btnFrontend.Location = new Point(3, 186);
+            btnFrontend.Location = new Point(9, 116);
             btnFrontend.Name = "btnFrontend";
             btnFrontend.Size = new Size(171, 50);
             btnFrontend.TabIndex = 1;
@@ -316,50 +346,22 @@
             // ultraLabel2
             // 
             ultraLabel2.Font = new Font("Segoe UI Variable Text", 18F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            ultraLabel2.Location = new Point(481, 3);
+            ultraLabel2.Location = new Point(481, -4);
             ultraLabel2.Name = "ultraLabel2";
             ultraLabel2.Size = new Size(341, 56);
             ultraLabel2.TabIndex = 8;
             ultraLabel2.Text = "PETMATRIX";
             // 
-            // ultraLabel1
-            // 
-            ultraLabel1.Font = new Font("Comic Sans MS", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            ultraLabel1.Location = new Point(481, 1129);
-            ultraLabel1.Name = "ultraLabel1";
-            ultraLabel1.Size = new Size(412, 34);
-            ultraLabel1.TabIndex = 5;
-            ultraLabel1.Text = "MD HASIBUL ISLAM SHANTO";
-            // 
-            // progressBarBackend
-            // 
-            progressBarBackend.Location = new Point(720, 142);
-            progressBarBackend.Name = "progressBarBackend";
-            progressBarBackend.Size = new Size(178, 31);
-            progressBarBackend.TabIndex = 9;
-            // 
-            // progressBarFrontend
-            // 
-            progressBarFrontend.Location = new Point(720, 198);
-            progressBarFrontend.Name = "progressBarFrontend";
-            progressBarFrontend.Size = new Size(178, 31);
-            progressBarFrontend.TabIndex = 9;
-            // 
-            // progressBarReport
-            // 
-            progressBarReport.Location = new Point(720, 253);
-            progressBarReport.Name = "progressBarReport";
-            progressBarReport.Size = new Size(178, 31);
-            progressBarReport.TabIndex = 9;
-            // 
             // DeploymentForm
             // 
-            AutoScaleMode = AutoScaleMode.None;
-            ClientSize = new Size(1340, 1200);
+            AutoScaleDimensions = new SizeF(144F, 144F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+            AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            ClientSize = new Size(1078, 894);
             Controls.Add(ultraPanel1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "DeploymentForm";
-            StartPosition = FormStartPosition.CenterScreen;
+            StartPosition = FormStartPosition.Manual;
             Text = "Deployment Form";
             ((System.ComponentModel.ISupportInitialize)ultraGrid).EndInit();
             ultraPanel1.ClientArea.ResumeLayout(false);
