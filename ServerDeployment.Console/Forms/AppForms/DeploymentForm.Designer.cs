@@ -289,7 +289,7 @@
             btnBackend.TabIndex = 1;
             btnBackend.Text = "Backend";
             btnBackend.UseVisualStyleBackColor = true;
-            btnBackend.Click += btnSetSiteRoot_Click;
+            btnBackend.Click += btnBackend_Click;
             // 
             // btnReport
             // 

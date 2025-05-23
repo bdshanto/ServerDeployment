@@ -47,11 +47,7 @@ namespace ServerDeployment.Console.Forms.AppForms
 
         private readonly List<object> _expectedFrontendFilesAndFolders = new List<object>
         {
-            "index.html",
-            "favicon.ico",
-            "robots.txt",
-            "web.config",
-            "humans.txt",
+            "index.html",  
             "assets", // folder
             new Regex(@"^main\.[a-z0-9]+\.bundle\.js$", RegexOptions.IgnoreCase),
             new Regex(@"^main-[a-z0-9]+\.css$", RegexOptions.IgnoreCase),
@@ -59,6 +55,24 @@ namespace ServerDeployment.Console.Forms.AppForms
             new Regex(@"^vendors~main\.[a-z0-9]+\.chunk\.js$", RegexOptions.IgnoreCase),
             new Regex(@"^vendors~main-[a-z0-9]+\.css$", RegexOptions.IgnoreCase),
             new Regex(@"^vendors~polyfills\.[a-z0-9]+\.chunk\.js$", RegexOptions.IgnoreCase)
+        };
+        private readonly List<object> expectedBackendFiles = new List<object>
+        {
+            "Documents",
+            "runtimes",
+            "appsettings.json",
+            "efpt.config.json",
+            "EPPlus.dll",
+            "libman.json",
+            "web.config",
+            "PetMatrix.API.dll",
+            "PetMatrix.API.exe",
+            "PetMatrix.API.runtimeconfig.json",
+            new Regex(@"^Microsoft\..+\.dll$"),
+            new Regex(@"^System\..+\.dll$"),
+            new Regex(@"^Newtonsoft\.Json\.dll$"),
+            new Regex(@"^PetMatrix\..+\.dll$"),
+            new Regex(@"^PetMatrix\..+\.pdb$")
         };
 
         public event EventHandler<ProgressEventArgs>? ProgressUpdated;
@@ -634,19 +648,59 @@ namespace ServerDeployment.Console.Forms.AppForms
 
 
 
-        private void btnSetSiteRoot_Click(object sender, EventArgs e)
+        private void btnBackend_Click(object sender, EventArgs e)
         {
             using var folderDialog = new FolderBrowserDialog
             {
-                Description = @"Select Site Root Directory",
+                Description = @"Select Backend Deployment Folder"
             };
 
             if (folderDialog.ShowDialog() == DialogResult.OK)
             {
                 _backendPath = folderDialog.SelectedPath;
-                txtBackend.Text = _backendPath;
 
-                ButtonsSwitch(true);
+                string selectedPath = folderDialog.SelectedPath;
+                var fileSystemEntries = Directory.EnumerateFileSystemEntries(selectedPath)
+                    .Select(Path.GetFileName)
+                    .ToList();
+
+                var missingItems = new List<string>();
+
+                foreach (var expected in expectedBackendFiles)
+                {
+                    bool found = false;
+
+                    if (expected is string s)
+                    {
+                        string fullPath = Path.Combine(selectedPath, s);
+                        if (Directory.Exists(fullPath))
+                            found = true;
+                        else if (File.Exists(fullPath))
+                            found = true;
+                    }
+                    else if (expected is Regex regex)
+                    {
+                        found = fileSystemEntries.Any(f => regex.IsMatch(f));
+                    }
+
+                    if (!found)
+                        missingItems.Add(expected is string str ? str : expected.ToString());
+                }
+
+                if (missingItems.Count == 0)
+                {
+                    lblMsg.BackColor = Color.Green;
+                    lblMsg.Text = "✅ All backend deployment files are present.";
+
+                    txtBackend.Text = _backendPath;
+
+                    ButtonsSwitch(true);
+                }
+                else
+                {
+                    lblMsg.BackColor = Color.Red;
+                    lblMsg.Text = "❌ Missing backend files/folders:\n" + string.Join("\n", missingItems);
+                }
 
             }
         }
@@ -922,10 +976,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             if (folderDialog.ShowDialog() == DialogResult.OK)
             {
                 _frontendPath = folderDialog.SelectedPath;
-                txtFrontend.Text = _frontendPath;
-                txtFrontend.Text = _frontendPath;
-
-                ButtonsSwitch(true);
+               
 
                 string selectedPath = folderDialog.SelectedPath;
 
@@ -939,9 +990,9 @@ namespace ServerDeployment.Console.Forms.AppForms
                 {
                     bool found = false;
 
-                    if (expected is string s)
+                    if (expected is string str)
                     {
-                        if (s.Equals("assets", StringComparison.OrdinalIgnoreCase))
+                        if (str.Equals("assets", StringComparison.OrdinalIgnoreCase))
                         {
                             // Check folder existence
                             string assetsPath = Path.Combine(selectedPath, "assets");
@@ -950,7 +1001,7 @@ namespace ServerDeployment.Console.Forms.AppForms
                         else
                         {
                             // Check exact file
-                            found = fileSystemEntries.Any(f => f.Equals(s, StringComparison.OrdinalIgnoreCase));
+                            found = fileSystemEntries.Any(f => f.Equals(str, StringComparison.OrdinalIgnoreCase));
                         }
                     }
                     else if (expected is Regex regex)
@@ -958,15 +1009,21 @@ namespace ServerDeployment.Console.Forms.AppForms
                         found = fileSystemEntries.Any(f => regex.IsMatch(f));
                     }
 
-                    /*if (!found)
+                    if (!found)
                     {
                         missingItems.Add(expected is string ? (string)expected : expected.ToString());
-                    }*/
+                    }
+
+                    if(!found) break;
                 }
                 if (missingItems.Count == 0)
                 {
                     lblMsg.BackColor = System.Drawing.Color.Green;
                     lblMsg.Text = @"All required files and folders are present.";
+
+                    txtFrontend.Text = _frontendPath;
+
+                    ButtonsSwitch(true);
                 }
                 else
                 {
@@ -986,13 +1043,12 @@ namespace ServerDeployment.Console.Forms.AppForms
 
             if (folderDialog.ShowDialog() == DialogResult.OK)
             {
-                _reportPath = folderDialog.SelectedPath;
-                txtReport.Text = _reportPath;
+              
 
                 var missingItems = new List<string>();
                 foreach (var item in _expectedReportViewerFilesAndFolders)
                 {
-                    string fullPath = Path.Combine(_reportPath, item);
+                    string fullPath = Path.Combine(folderDialog.SelectedPath, item);
                     if (item.Contains(".") && !File.Exists(fullPath)) // file check
                     {
                         missingItems.Add(item);
@@ -1005,13 +1061,16 @@ namespace ServerDeployment.Console.Forms.AppForms
 
                 if (missingItems.Count == 0)
                 {
+                    _reportPath = folderDialog.SelectedPath;
+                    txtReport.Text = _reportPath;
+                    // Set the label to green and show success message
                     lblMsg.BackColor = Color.Green;
-                    lblMsg.Text = "All required report files and folders are present.";
+                    lblMsg.Text = @"All required report files and folders are present.";
                 }
                 else
                 {
                     lblMsg.BackColor = Color.Red;
-                    lblMsg.Text = "Missing files or folders:\n" + string.Join("\n", missingItems);
+                    lblMsg.Text = @"Missing files or folders:\n" + string.Join("\n", missingItems);
                 }
 
                 ButtonsSwitch(true);
