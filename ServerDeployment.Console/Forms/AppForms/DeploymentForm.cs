@@ -16,10 +16,10 @@ namespace ServerDeployment.Console.Forms.AppForms
     {
         private DataTable _sitesDataTable;
 
-        private string _backendPath = @"";
-        private string _frontendPath = @"";
+        private string _backendPath = @"D:\Workspace\Office\ARAK\Resources\Publish";
+        private string _frontendPath = @"D:\Workspace\Office\ARAK\Resources\Publish\ARAK-Frontend";
         private string _reportPath = @"";
-        private string _backupPath = @"";
+        private string _backupPath = @"D:\Workspace\Office\ARAK\Resources\Publish\ARAK-Backend";
 
         private readonly Dictionary<string, string> _siteBackupDirectory = new();
 
@@ -86,7 +86,8 @@ namespace ServerDeployment.Console.Forms.AppForms
             ProgressUpdated += DeploymentForm_ProgressUpdated;
             StatusUpdated += DeploymentForm_StatusUpdated;
 
-            ButtonsSwitch(false);
+
+            ButtonsSwitch(true);
             InitializeUltraGrid();
             LoadSitesFromIis();
 
@@ -131,8 +132,11 @@ namespace ServerDeployment.Console.Forms.AppForms
                     isSelected = selected.Select;
                 }
 
-
-                dt.Rows.Add(isSelected, site.Name, site.PhysicalPath, site.State);
+                var contentSize = string.Empty;
+               
+                    contentSize = AppUtility.GetDirectorySize(site.PhysicalPath);
+               
+                dt.Rows.Add(isSelected, site.Name, site.PhysicalPath, contentSize, site.State);
             }
             // Bind the DataTable to ultraGrid
             ultraGrid.DataSource = dt;
@@ -140,22 +144,22 @@ namespace ServerDeployment.Console.Forms.AppForms
             // Customize columns after binding
             var band = ultraGrid.DisplayLayout.Bands[0];
 
-            band.Columns["Select"].Header.Caption = @"Select";
-            band.Columns["Select"].Width = 80;
-            band.Columns["Select"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.CheckBox;
-            band.Columns["Select"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.AllowEdit;
+            band.Columns[nameof(IISSiteInfo.Select)].Header.Caption = nameof(IISSiteInfo.Select);
+            band.Columns[nameof(IISSiteInfo.Select)].Width = 80;
+            band.Columns[nameof(IISSiteInfo.Select)].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.CheckBox;
+            band.Columns[nameof(IISSiteInfo.Select)].CellActivation = Infragistics.Win.UltraWinGrid.Activation.AllowEdit;
 
-            band.Columns["Name"].Header.Caption = @"Site";
-            band.Columns["Name"].Width = 150;
-            band.Columns["Name"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
+            band.Columns[nameof(IISSiteInfo.Name)].Header.Caption = @"Site";
+            band.Columns[nameof(IISSiteInfo.Name)].Width = 150;
+            band.Columns[nameof(IISSiteInfo.Name)].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
 
-            band.Columns["PhysicalPath"].Header.Caption = @"Site Folder";
-            band.Columns["PhysicalPath"].Width = 400;
-            band.Columns["PhysicalPath"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
+            band.Columns[nameof(IISSiteInfo.PhysicalPath)].Header.Caption = @"Site Folder";
+            band.Columns[nameof(IISSiteInfo.PhysicalPath)].Width = 400;
+            band.Columns[nameof(IISSiteInfo.PhysicalPath)].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
 
-            band.Columns["State"].Header.Caption = @"Status";
-            band.Columns["State"].Width = 100;
-            band.Columns["State"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
+            band.Columns[nameof(IISSiteInfo.State)].Header.Caption = @"Status";
+            band.Columns[nameof(IISSiteInfo.State)].Width = 100;
+            band.Columns[nameof(IISSiteInfo.State)].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
 
 
 
@@ -221,15 +225,18 @@ namespace ServerDeployment.Console.Forms.AppForms
             foreach (UltraGridRow row in ultraGrid.Rows)
             {
                 // Check if the checkbox cell is true (checked)
-                if (row.Cells["Select"].Value is bool isChecked && isChecked)
+                if (row.Cells[nameof(IISSiteInfo.Select)].Value is bool isChecked && isChecked)
                 {
-                    selected.Add(new IISSiteInfo
+                    var site = new IISSiteInfo
                     {
-                        Name = row.Cells["Name"].Value?.ToString() ?? string.Empty,
-                        PhysicalPath = row.Cells["PhysicalPath"].Value?.ToString() ?? string.Empty,
-                        State = row.Cells["State"].Value?.ToString() ?? string.Empty,
+                        Name = row.Cells[nameof(IISSiteInfo.Name)].Value?.ToString() ?? string.Empty,
+                        PhysicalPath = row.Cells[nameof(IISSiteInfo.PhysicalPath)].Value?.ToString() ?? string.Empty,
+                        State = row.Cells[nameof(IISSiteInfo.State)].Value?.ToString() ?? string.Empty,
                         Select = isChecked
-                    });
+                    };
+                    site.ContentSize = AppUtility.GetDirectorySize(site.PhysicalPath);
+
+                    selected.Add(site);
                 }
             }
 
@@ -489,9 +496,9 @@ namespace ServerDeployment.Console.Forms.AppForms
 
             foreach (UltraGridRow row in ultraGrid.Rows)
             {
-                if (row.Cells["PhysicalPath"].Value?.ToString() == siteFolderName)
+                if (row.Cells[nameof(IISSiteInfo.PhysicalPath)].Value?.ToString() == siteFolderName)
                 {
-                    row.Cells["State"].Value = status;
+                    row.Cells[nameof(IISSiteInfo.State)].Value = status;
                     break;  // Exit after updating first match
                 }
             }
@@ -781,6 +788,9 @@ namespace ServerDeployment.Console.Forms.AppForms
 
         private void ButtonsSwitch(bool value)
         {
+            txtBackup.Text = _backupPath;
+            txtFrontend.Text = _frontendPath;
+            txtBackend.Text = _backendPath;
 
             if (!HasNoStr(txtBackup.Text) && txtBackup.Text.Length > 0)
             {
@@ -840,10 +850,11 @@ namespace ServerDeployment.Console.Forms.AppForms
         private DataTable CreateSitesDataTable()
         {
             DataTable dt = new DataTable();
-            dt.Columns.Add("Select", typeof(bool));      // checkbox column
-            dt.Columns.Add("Name", typeof(string));
-            dt.Columns.Add("PhysicalPath", typeof(string));
-            dt.Columns.Add("State", typeof(string));
+            dt.Columns.Add(nameof(IISSiteInfo.Select), typeof(bool));      // checkbox column
+            dt.Columns.Add(nameof(IISSiteInfo.Name), typeof(string));
+            dt.Columns.Add(nameof(IISSiteInfo.PhysicalPath), typeof(string));
+            dt.Columns.Add(nameof(IISSiteInfo.ContentSize), typeof(string));
+            dt.Columns.Add(nameof(IISSiteInfo.State), typeof(string));
             return dt;
         }
 
@@ -851,33 +862,36 @@ namespace ServerDeployment.Console.Forms.AppForms
         {
             var band = ultraGrid.DisplayLayout.Bands[0];
 
-            band.Columns["Select"].Header.Caption = @"Select";
-            band.Columns["Select"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.CheckBox;
-            band.Columns["Select"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.AllowEdit;
+            band.Columns[nameof(IISSiteInfo.Select)].Header.Caption = nameof(IISSiteInfo.Select);
+            band.Columns[nameof(IISSiteInfo.Select)].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.CheckBox;
+            band.Columns[nameof(IISSiteInfo.Select)].CellActivation = Infragistics.Win.UltraWinGrid.Activation.AllowEdit;
 
-            band.Columns["Name"].Header.Caption = @"Name";
-            band.Columns["Name"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
+            band.Columns[nameof(IISSiteInfo.Name)].Header.Caption = nameof(IISSiteInfo.Name);
+            band.Columns[nameof(IISSiteInfo.Name)].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
 
-            band.Columns["PhysicalPath"].Header.Caption = @"Site Folder";
-            band.Columns["PhysicalPath"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
+            band.Columns[nameof(IISSiteInfo.PhysicalPath)].Header.Caption = @"Site Folder";
+            band.Columns[nameof(IISSiteInfo.PhysicalPath)].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
 
-            band.Columns["State"].Header.Caption = @"Status";
-            band.Columns["State"].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
+            band.Columns[nameof(IISSiteInfo.ContentSize)].Header.Caption = @"Content Size";
+            band.Columns[nameof(IISSiteInfo.ContentSize)].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
+
+            band.Columns[nameof(IISSiteInfo.State)].Header.Caption = @"Status";
+            band.Columns[nameof(IISSiteInfo.State)].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
 
             // Set Header Font (size, style, color)
-            band.Columns["Name"].Header.Appearance.FontData.SizeInPoints = 13; // Font size
-            band.Columns["Name"].Header.Appearance.FontData.Bold = Infragistics.Win.DefaultableBoolean.True; // Bold
-            band.Columns["Name"].Header.Appearance.BackColor = Color.Black; // Text color (black to match white theme)
-            band.Columns["Name"].Header.Appearance.BackColor = Color.LightGray; // Light gray background for header
+            band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.FontData.SizeInPoints = 13; // Font size
+            band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.FontData.Bold = Infragistics.Win.DefaultableBoolean.True; // Bold
+            band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.BackColor = Color.Black; // Text color (black to match white theme)
+            band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.BackColor = Color.LightGray; // Light gray background for header
 
-            band.Columns["State"].Header.Appearance.FontData.SizeInPoints = 13; // Font size
-            band.Columns["State"].Header.Appearance.FontData.Bold = Infragistics.Win.DefaultableBoolean.True; // Bold
-            band.Columns["State"].Header.Appearance.BackColor = Color.Black; // Text color
-            band.Columns["State"].Header.Appearance.BackColor = Color.LightGray; // Light gray background for header
+            band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.FontData.SizeInPoints = 13; // Font size
+            band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.FontData.Bold = Infragistics.Win.DefaultableBoolean.True; // Bold
+            band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.BackColor = Color.Black; // Text color
+            band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.BackColor = Color.LightGray; // Light gray background for header
 
             // Optionally, align header text
-            band.Columns["Name"].Header.Appearance.TextHAlign = Infragistics.Win.HAlign.Center; // Center alignment
-            band.Columns["State"].Header.Appearance.TextHAlign = Infragistics.Win.HAlign.Center; // Center alignment
+            band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.TextHAlign = Infragistics.Win.HAlign.Center; // Center alignment
+            band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.TextHAlign = Infragistics.Win.HAlign.Center; // Center alignment
 
             // General header customizations for all columns
             ultraGrid.DisplayLayout.Override.HeaderAppearance.FontData.SizeInPoints = 13; // Set header font size for all columns

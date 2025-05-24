@@ -234,7 +234,7 @@
             panel1.Controls.Add(btnPingSite);
             panel1.Location = new Point(9, 474);
             panel1.Name = "panel1";
-            panel1.Size = new Size(1006, 393);
+            panel1.Size = new Size(1025, 393);
             panel1.TabIndex = 10;
             // 
             // lblMsg
@@ -284,7 +284,7 @@
             btnPublish.HotTrackAppearance = appearance11;
             btnPublish.Location = new Point(781, 236);
             btnPublish.Name = "btnPublish";
-            btnPublish.Size = new Size(208, 80);
+            btnPublish.Size = new Size(208, 129);
             btnPublish.TabIndex = 6;
             btnPublish.Text = "Publish";
             btnPublish.Click += btnPublish_Click;

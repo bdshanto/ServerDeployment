@@ -151,6 +151,46 @@ namespace ServerDeployment.Domains.Utility
             return !HasNoStrValue(str);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="folderPath"></param>
+        /// <returns></returns>
+        public static string GetDirectorySize(string folderPath)
+        {
+            decimal size = 0;
+
+            // Get all files in the folder and add their sizes
+            string[] files = Directory.GetFiles(folderPath, "*", SearchOption.AllDirectories);
+            foreach (var file in files)
+            {
+                try
+                {
+                    FileInfo fi = new FileInfo(file);
+                    size += fi.Length;
+                }
+                catch
+                {
+                    // Handle files that might be inaccessible (e.g., permissions)
+                }
+            }
+
+            var dSize = FormatSize(size);
+            return dSize;
+        }
+
+        private static string FormatSize(decimal bytes)
+        {
+            string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+            decimal len = bytes;
+            int order = 0;
+            while (len >= 1024 && order < sizes.Length - 1)
+            {
+                order++;
+                len /= 1024;
+            }
+            return $"{len:0.##} {sizes[order]}";
+        }
 
         #region Database Helper
 
