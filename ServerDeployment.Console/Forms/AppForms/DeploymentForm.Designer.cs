@@ -36,7 +36,6 @@
             btnStartIIS = new Button();
             btnDeleteFiles = new Button();
             btnCopyAppSettings = new Button();
-            btnPingSite = new Button();
             txtBackend = new TextBox();
             btnCopyContent = new Button();
             btnBackupPath = new Button();
@@ -124,16 +123,6 @@
             btnCopyAppSettings.Text = "btnCopyAppSettings";
             btnCopyAppSettings.UseVisualStyleBackColor = true;
             btnCopyAppSettings.Click += btnCopyAppSettings_Click;
-            // 
-            // btnPingSite
-            // 
-            btnPingSite.Location = new Point(604, 276);
-            btnPingSite.Name = "btnPingSite";
-            btnPingSite.Size = new Size(171, 50);
-            btnPingSite.TabIndex = 2;
-            btnPingSite.Text = "btnPingSite";
-            btnPingSite.UseVisualStyleBackColor = true;
-            btnPingSite.Click += btnPingSite_Click;
             // 
             // txtBackend
             // 
@@ -231,7 +220,6 @@
             panel1.Controls.Add(txtBackend);
             panel1.Controls.Add(btnReport);
             panel1.Controls.Add(btnFrontend);
-            panel1.Controls.Add(btnPingSite);
             panel1.Location = new Point(9, 474);
             panel1.Name = "panel1";
             panel1.Size = new Size(1025, 393);
@@ -379,7 +367,6 @@
         private Button btnStartIIS;
         private Button btnDeleteFiles;
         private Button btnCopyAppSettings;
-        private Button btnPingSite;
         private TextBox txtBackend;
         private Button btnCopyContent;
         private Button btnBackupPath;

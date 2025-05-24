@@ -1,15 +1,16 @@
-﻿using System.Data;
-using System.Diagnostics;
-using System.Net.NetworkInformation;
-using System.Text.Json;
-using System.Text.RegularExpressions;
-using Infragistics.Win;
+﻿using Infragistics.Win;
 using Infragistics.Win.UltraWinGrid;
 using Microsoft.Web.Administration;
 using ServerDeployment.Applications.Helpers;
 using ServerDeployment.Console.Helpers;
 using ServerDeployment.Domains.Utility;
+using System.Data;
+using System.Diagnostics;
+using System.Net.NetworkInformation;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using Application = System.Windows.Forms.Application;
+using ColumnStyle = Infragistics.Win.UltraWinGrid.ColumnStyle;
 
 namespace ServerDeployment.Console.Forms.AppForms
 {
@@ -25,8 +26,8 @@ namespace ServerDeployment.Console.Forms.AppForms
         private readonly Dictionary<string, string> _siteBackupDirectory = new();
 
         public delegate void StatusUpdateHandler(string message, Color color);
-        public event StatusUpdateHandler? StatusUpdated;
 
+        public event StatusUpdateHandler? StatusUpdated;
 
 
         private readonly List<string> _expectedReportViewerFilesAndFolders = new List<string>
@@ -59,6 +60,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             new Regex(@"^vendors~main-[a-z0-9]+\.css$", RegexOptions.IgnoreCase),
             new Regex(@"^vendors~polyfills\.[a-z0-9]+\.chunk\.js$", RegexOptions.IgnoreCase)
         };
+
         private readonly List<object> expectedBackendFiles = new List<object>
         {
             "Documents",
@@ -93,14 +95,10 @@ namespace ServerDeployment.Console.Forms.AppForms
             LoadSitesFromIis();
 
             StatusUpdated?.Invoke("Please set both Site Root and Backup Path before publishing.", Color.Red);
-
-
         }
 
         private void InitializeUltraGrid()
         {
-
-
             // Create schema once
             _sitesDataTable = CreateSitesDataTable();
 
@@ -111,14 +109,86 @@ namespace ServerDeployment.Console.Forms.AppForms
 
             // Customize columns once after binding
             CustomizeUltraGridColumns();
-
-
         }
 
+        private async Task LoadSitesFromIisAsync()
+        {
+            List<IISSiteInfo> sites = GetIISSites();
+            DataTable dt = CreateSitesDataTable();
 
+            List<IISSiteInfo> selectedSites = GetSelectedSites();
+
+            // For better performance, calculate sizes asynchronously in parallel
+            var sizeTasks = sites.Select(site => Task.Run(() =>
+            {
+                string sizeStr = string.Empty;
+                try
+                {
+                    sizeStr = AppUtility.GetDirectorySize(site.PhysicalPath);
+                }
+                catch
+                {
+                    sizeStr = "N/A";
+                }
+                return (Site: site, Size: sizeStr);
+            })).ToArray();
+
+            var results = await Task.WhenAll(sizeTasks);
+
+            foreach (var result in results)
+            {
+                var site = result.Site;
+                string contentSize = result.Size;
+
+                bool isSelected = false;
+                var selected = selectedSites.FirstOrDefault(c => c.Name.Equals(site.Name));
+                if (selected != null)
+                {
+                    isSelected = selected.Select;
+                }
+
+                dt.Rows.Add(isSelected, site.Name, site.PhysicalPath, contentSize, site.State);
+            }
+
+            // Bind to UI thread
+            if (ultraGrid.InvokeRequired)
+            {
+                ultraGrid.Invoke(new Action(() =>
+                {
+                    BindAndCustomizeGrid(dt);
+                }));
+            }
+            else
+            {
+                BindAndCustomizeGrid(dt);
+            }
+        }
+
+        private void BindAndCustomizeGrid(DataTable dt)
+        {
+            ultraGrid.DataSource = dt;
+
+            var band = ultraGrid.DisplayLayout.Bands[0];
+
+            band.Columns[nameof(IISSiteInfo.Select)].Header.Caption = nameof(IISSiteInfo.Select);
+            band.Columns[nameof(IISSiteInfo.Select)].Width = 80;
+            band.Columns[nameof(IISSiteInfo.Select)].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.CheckBox;
+            band.Columns[nameof(IISSiteInfo.Select)].CellActivation = Infragistics.Win.UltraWinGrid.Activation.AllowEdit;
+
+            band.Columns[nameof(IISSiteInfo.Name)].Header.Caption = @"Site";
+            band.Columns[nameof(IISSiteInfo.Name)].Width = 150;
+            band.Columns[nameof(IISSiteInfo.Name)].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
+
+            band.Columns[nameof(IISSiteInfo.PhysicalPath)].Header.Caption = @"Site Folder";
+            band.Columns[nameof(IISSiteInfo.PhysicalPath)].Width = 400;
+            band.Columns[nameof(IISSiteInfo.PhysicalPath)].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
+
+            band.Columns[nameof(IISSiteInfo.State)].Header.Caption = @"Status";
+            band.Columns[nameof(IISSiteInfo.State)].Width = 100;
+            band.Columns[nameof(IISSiteInfo.State)].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
+        }
         private void LoadSitesFromIis()
         {
-
             List<IISSiteInfo> sites = GetIISSites();
             DataTable dt = CreateSitesDataTable();
 
@@ -139,6 +209,7 @@ namespace ServerDeployment.Console.Forms.AppForms
 
                 dt.Rows.Add(isSelected, site.Name, site.PhysicalPath, contentSize, site.State);
             }
+
             // Bind the DataTable to ultraGrid
             ultraGrid.DataSource = dt;
 
@@ -161,10 +232,8 @@ namespace ServerDeployment.Console.Forms.AppForms
             band.Columns[nameof(IISSiteInfo.State)].Header.Caption = @"Status";
             band.Columns[nameof(IISSiteInfo.State)].Width = 100;
             band.Columns[nameof(IISSiteInfo.State)].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
-
-
-
         }
+
         private List<IISSiteInfo> GetIISSites()
         {
             var sites = new List<IISSiteInfo>();
@@ -193,7 +262,6 @@ namespace ServerDeployment.Console.Forms.AppForms
 
                     if (!string.IsNullOrWhiteSpace(output))
                     {
-
                         var option = new JsonSerializerOptions
                         {
                             PropertyNameCaseInsensitive = true,
@@ -252,6 +320,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             if (selectedSites.Count <= 0)
             {
                 StatusUpdated?.Invoke("Please select at least one site to backup.", Color.Red);
+
                 return;
             }
 
@@ -282,11 +351,42 @@ namespace ServerDeployment.Console.Forms.AppForms
                     OnProgressUpdated($"Failed to backup site '{site.Name}': {ex.Message}");
                 }
             }
+
             OnProgressUpdated("Backup completed.", 100, ProgressType.Backup);
         }
 
+        private void CopyDirectory(string sourceDir, string destDir, Action onFileCopied)
+        {
+            var dir = new DirectoryInfo(sourceDir);
+            if (!dir.Exists)
+            {
+                SLogger.WriteLog($"{nameof(CopyDirectory)}: Source directory does not exist: {sourceDir}");
+                StatusUpdated?.Invoke($"Source directory does not exist: {sourceDir}", Color.Red);
+                return;
+            }
 
+            Directory.CreateDirectory(destDir);
 
+            foreach (var file in dir.GetFiles())
+            {
+                try
+                {
+                    string destFile = Path.Combine(destDir, file.Name);
+                    file.CopyTo(destFile, true);
+                    onFileCopied?.Invoke(); // report file copied
+                }
+                catch (Exception ex)
+                {
+                    StatusUpdated?.Invoke($"Failed to copy file: {file.Name}. Error: {ex.Message}", Color.Red);
+                    SLogger.WriteLog(ex);
+                }
+            }
+
+            foreach (var subDir in dir.GetDirectories())
+            {
+                CopyDirectory(subDir.FullName, Path.Combine(destDir, subDir.Name), onFileCopied);
+            }
+        }
 
         private void CopyDirectory(string sourceDir, string destDir)
         {
@@ -297,6 +397,7 @@ namespace ServerDeployment.Console.Forms.AppForms
                 StatusUpdated?.Invoke($"Source directory does not exist: {sourceDir}", Color.Red);
                 throw new DirectoryNotFoundException($"Source directory does not exist: {sourceDir}");
             }
+
             Directory.CreateDirectory(destDir);
 
             foreach (var file in dir.GetFiles())
@@ -351,8 +452,6 @@ namespace ServerDeployment.Console.Forms.AppForms
                 string err = proc.StandardError.ReadToEnd();
                 if (!string.IsNullOrEmpty(err))
                 {
-
-
                     StatusUpdated?.Invoke("Error running appcmd: @" + err, Color.Black);
                 }
             }
@@ -366,17 +465,22 @@ namespace ServerDeployment.Console.Forms.AppForms
         // Delete all files in selected site folders (with confirmation)
         private void DeleteFilesInSites()
         {
-            List<IISSiteInfo> selected = GetSelectedSites();
-            if (selected.Count == 0)
+            List<IISSiteInfo> selectedSites = GetSelectedSites();
+            if (selectedSites.Count == 0)
             {
                 StatusUpdated?.Invoke("Please select at least one site.", Color.Red);
                 return;
             }
+
             var confirm = MessageBox.Show(@"Are you sure you want to delete all files in selected site folders? This cannot be undone!", @"Confirm Delete", MessageBoxButtons.YesNo);
             if (confirm != DialogResult.Yes) return;
 
-            foreach (var site in selected)
+            int totalSites = selectedSites.Count;
+            int currentSite = 0;
+
+            foreach (var site in selectedSites)
             {
+                OnProgressUpdated($"Deleting up site '{site.Name}' ({currentSite} of {totalSites})...", (currentSite * 100) / totalSites, ProgressType.Delete);
                 var folder = Path.Combine(_backendPath, site.PhysicalPath);
                 try
                 {
@@ -389,6 +493,7 @@ namespace ServerDeployment.Console.Forms.AppForms
                     SLogger.WriteLog(ex);
                 }
             }
+
             StatusUpdated?.Invoke(@"Files deleted.", Color.Red);
         }
 
@@ -414,7 +519,6 @@ namespace ServerDeployment.Console.Forms.AppForms
                     {
                         StatusUpdated?.Invoke($"Failed to delete file (locked?): {Path.GetFileName(file)}", Color.Red);
                     }
-
                 }
             }
 
@@ -463,6 +567,7 @@ namespace ServerDeployment.Console.Forms.AppForms
                     return false;
                 }
             }
+
             return false;
         }
 
@@ -522,33 +627,152 @@ namespace ServerDeployment.Console.Forms.AppForms
                 // Cannot ping unknown or invalid address
                 UpdateSiteStatus(siteName, @"Unknown");
             }
-
         }
 
         private void UpdateSiteStatus(string siteFolderName, string status)
         {
-
             foreach (UltraGridRow row in ultraGrid.Rows)
             {
                 if (row.Cells[nameof(IISSiteInfo.PhysicalPath)].Value?.ToString() == siteFolderName)
                 {
                     row.Cells[nameof(IISSiteInfo.State)].Value = status;
-                    break;  // Exit after updating first match
+                    break; // Exit after updating first match
                 }
             }
         }
 
         // UI button click events
 
-        private void btnBackup_Click(object sender, EventArgs e)
+        private async void btnBackup_Click(object sender, EventArgs e)
         {
-            BackupSelectedSites();
+            // BackupSelectedSites();
+
+            await BackupSelectedSitesAsync();
+        }
+        private async Task BackupSelectedSitesAsync()
+        {
+            ClearLables();
+
+            var selectedSites = GetSelectedSites();
+            if (selectedSites.Count <= 0)
+            {
+                StatusUpdated?.Invoke("Please select at least one site to backup.", Color.Red);
+                progressBarBackup.Visible = false;
+                return;
+            }
+
+            int totalFiles = CountFilesInSites(selectedSites);
+            if (totalFiles == 0)
+            {
+                StatusUpdated?.Invoke("No files to backup.", Color.Red);
+                progressBarBackend.Visible = false;
+                return;
+            }
+
+
+            btnBackup.Enabled = false;
+            progressBarBackend.Minimum = 0;
+            progressBarBackend.Maximum = 100;
+            progressBarBackend.Value = 0;
+            progressBarBackend.Visible = true;
+
+            int copiedFiles = 0;
+            object lockObj = new object();
+
+            await Task.Run(() =>
+            {
+                foreach (var site in selectedSites)
+                {
+                    try
+                    {
+                        string sourceDir = site.PhysicalPath;
+                        string backupDir = Path.Combine(_backupPath, $"{site.Name}_backup_{DateTime.Now:yyyyMMddHHmmss}");
+
+                        // Pass callback to increment copied files and update progress
+                        CopyDirectory(sourceDir, backupDir, () =>
+                        {
+                            lock (lockObj)
+                            {
+                                copiedFiles++;
+                                int progressPercent = (copiedFiles * 100) / totalFiles;
+                                this.Invoke(new Action(() =>
+                                {
+                                    progressBarBackend.Value = progressPercent;
+                                    btnBackup.Text = $"Backing up... {progressPercent}%";
+                                    StatusUpdated?.Invoke($"Backing up... {progressPercent}%", Color.Black);
+                                }));
+                            }
+                        });
+
+                        lock (_siteBackupDirectory)
+                        {
+                            if (_siteBackupDirectory.ContainsKey(site.Name))
+                                _siteBackupDirectory.Remove(site.Name);
+                            _siteBackupDirectory.Add(site.Name, backupDir);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        this.Invoke(new Action(() =>
+                        {
+                            StatusUpdated?.Invoke($"Failed to backup site '{site.Name}': {ex.Message}", Color.Red);
+                        }));
+                    }
+                }
+            });
+
+            this.Invoke(new Action(() =>
+            {
+                progressBarBackend.Value = 100;
+                btnBackup.Text = "Backup Completed";
+                btnBackup.Enabled = true;
+                StatusUpdated?.Invoke("Backup completed.", Color.Green);
+                progressBarBackend.Visible = false;
+            }));
+        }
+        private async void btnStopIIS_Click(object sender, EventArgs e)
+        {
+            await StopIisAsync();
+        }
+        private async Task StopIisAsync()
+        {
+            var selected = GetSelectedSites();
+            if (selected.Count == 0)
+            {
+                SetStatus("Please select at least one site.", Color.Red);
+                return;
+            }
+
+            foreach (var site in selected)
+            {
+                await StopSiteAsync(site.Name);
+            }
+
+            await LoadSitesFromIisAsync();
         }
 
-        private void btnStopIIS_Click(object sender, EventArgs e)
+        private Task StopSiteAsync(string siteFolderName)
         {
-            StopIis();
+            return Task.Run(() =>
+            {
+                RunAppCmd($"stop site \"{siteFolderName}\"");
+            });
         }
+
+
+        private int CountFilesInSites(List<IISSiteInfo> sites)
+        {
+            int totalFiles = 0;
+            foreach (var site in sites)
+            {
+                if (Directory.Exists(site.PhysicalPath))
+                {
+                    totalFiles += Directory.GetFiles(site.PhysicalPath, "*", SearchOption.AllDirectories).Length;
+                }
+            }
+            return totalFiles;
+        }
+
 
         private void StopIis()
         {
@@ -559,45 +783,194 @@ namespace ServerDeployment.Console.Forms.AppForms
                 lblMsg.BackColor = Color.Red;
                 return;
             }
+
             foreach (var site in selected)
             {
                 StopSite(site.Name);
             }
+
             LoadSitesFromIis();
         }
 
-        private void btnStartIIS_Click(object sender, EventArgs e)
+        private async void btnStartIIS_Click(object sender, EventArgs e)
         {
-            StartIis();
+            await StartIisAsync();
         }
 
-        private void StartIis()
+        private async Task StartIisAsync()
         {
             var selected = GetSelectedSites();
             if (selected.Count == 0)
             {
-                lblMsg.Text = @"Please select at least one site.";
-                lblMsg.BackColor = Color.Red;
+                SetStatus("Please select at least one site.", Color.Red);
                 return;
             }
-            foreach (var site in selected)
+
+            // Run IIS start on background thread to avoid blocking UI
+            await Task.Run(() =>
             {
-                StartSite(site.Name);
+                foreach (var site in selected)
+                {
+                    StartSite(site.Name);
+                }
+            });
+
+            // Refresh sites on UI thread after start
+            await LoadSitesFromIisAsync();
+        }
+        private async void btnDeleteFiles_Click(object sender, EventArgs e)
+        {
+            await DeleteFilesInSitesAsync();
+        }
+        private async Task DeleteFilesInSitesAsync()
+        {
+            var selectedSites = GetSelectedSites();
+            if (selectedSites.Count == 0)
+            {
+                StatusUpdated?.Invoke("Please select at least one site.", Color.Red);
+                return;
             }
-            LoadSitesFromIis();
+
+            var confirm = MessageBox.Show(
+                "Are you sure you want to delete all files in selected site folders? This cannot be undone!",
+                "Confirm Delete",
+                MessageBoxButtons.YesNo);
+
+            if (confirm != DialogResult.Yes)
+                return;
+
+            int totalSites = selectedSites.Count;
+            int currentSite = 0;
+
+            btnDeleteFiles.Enabled = false;
+
+            await Task.Run(() =>
+            {
+                foreach (var site in selectedSites)
+                {
+                    currentSite++;
+                    string folder = Path.Combine(_backendPath, site.PhysicalPath);
+
+                    this.Invoke(() =>
+                    {
+                        OnProgressUpdated($"Deleting site '{site.Name}' ({currentSite} of {totalSites})...",
+                            (currentSite * 100) / totalSites,
+                            ProgressType.Delete);
+                    });
+                    try
+                    {
+                        DeleteAllFiles(folder);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.Invoke(() =>
+                        {
+                            StatusUpdated?.Invoke($"Error deleting files in {site.Name}: {ex.Message}", Color.Red);
+                        });
+                        SLogger.WriteLog(ex);
+                    }
+                }
+            });
+
+            btnDeleteFiles.Enabled = true;
+
+            StatusUpdated?.Invoke("Files deleted.", Color.Black);
         }
 
-        private void btnDeleteFiles_Click(object sender, EventArgs e)
+        private async void btnCopyAppSettings_Click(object sender, EventArgs e)
         {
-            DeleteFilesInSites();
+            await CopyAppSettingsAsync();
         }
 
-        private void btnCopyAppSettings_Click(object sender, EventArgs e)
+        private async Task CopyAppSettingsAsync()
         {
+            var sites = GetIISSites();
+            if (sites.Count <= 0)
+            {
+                SetStatus("No sites found.", Color.Red);
+                return;
+            }
 
-            CopyAppSettings();
+            btnCopyAppSettings.Enabled = false;
+
+            int totalSites = sites.Count;
+            int currentSite = 0;
+
+            try
+            {
+                foreach (var site in sites)
+                {
+                    currentSite++;
+
+                    string progressMessage = $"Updating '{site.Name}' configurations, ({currentSite} of {totalSites})...";
+                    int progressPercent = (currentSite * 100) / totalSites;
+
+                    // Report progress on UI thread
+                    this.Invoke(() => OnProgressUpdated(progressMessage, progressPercent, ProgressType.AppSettings));
+
+                    string sourceRoot;
+                    if (!_siteBackupDirectory.TryGetValue(site.Name, out sourceRoot))
+                    {
+                        StatusUpdated?.Invoke($"Backup directory not found for site {site.Name}.", Color.Red);
+                        continue; // Skip this site but continue with others
+                    }
+
+                    var destRoot = site.PhysicalPath;
+
+                    await Task.Run(() =>
+                    {
+                        // Frontend web.config
+                        string frontendWebConfig = Path.Combine(sourceRoot, "web.config");
+                        if (File.Exists(frontendWebConfig))
+                        {
+                            string destWebConfig = Path.Combine(destRoot, "web.config");
+                            File.Copy(frontendWebConfig, destWebConfig, true);
+                        }
+
+                        // Backend appsettings.json
+                        string backendAppSettings = Path.Combine(sourceRoot, "PetMatrixBackendAPI", "appsettings.json");
+                        if (File.Exists(backendAppSettings))
+                        {
+                            string destApiFolder = Path.Combine(destRoot, "PetMatrixBackendAPI");
+                            Directory.CreateDirectory(destApiFolder);
+                            string destAppSettings = Path.Combine(destApiFolder, "appsettings.json");
+                            File.Copy(backendAppSettings, destAppSettings, true);
+                        }
+
+                        // Backend web.config
+                        string backendWebConfig = Path.Combine(sourceRoot, "PetMatrixBackendAPI", "web.config");
+                        if (File.Exists(backendWebConfig))
+                        {
+                            string destApiFolder = Path.Combine(destRoot, "PetMatrixBackendAPI");
+                            Directory.CreateDirectory(destApiFolder);
+                            string destWebConfigDest = Path.Combine(destApiFolder, "web.config");
+                            File.Copy(backendWebConfig, destWebConfigDest, true);
+                        }
+
+                        // ReportsViewer web.config
+                        string reportsViewerWebConfig = Path.Combine(sourceRoot, "ReportsViewer", "Web.config");
+                        if (File.Exists(reportsViewerWebConfig))
+                        {
+                            string destApiFolder = Path.Combine(destRoot, "ReportsViewer");
+                            Directory.CreateDirectory(destApiFolder);
+                            string destWebConfigDest = Path.Combine(destApiFolder, "Web.config");
+                            File.Copy(reportsViewerWebConfig, destWebConfigDest, true);
+                        }
+                    });
+                }
+
+                StatusUpdated?.Invoke("Copy completed successfully.", Color.Green);
+            }
+            catch (Exception ex)
+            {
+                StatusUpdated?.Invoke($"Error during copy: {ex.Message}", Color.Red);
+                SLogger.WriteLog(ex);
+            }
+            finally
+            {
+                btnCopyAppSettings.Enabled = true;
+            }
         }
-
         private void CopyAppSettings()
         {
             var sites = GetIISSites();
@@ -655,10 +1028,8 @@ namespace ServerDeployment.Console.Forms.AppForms
                         string destAppSettings = Path.Combine(destApiFolder, @"Web.config");
                         File.Copy(reportsViewerWebConfig, destAppSettings, overwrite: true);
                     }
-
                 }
 
-                lblMsg.Text = @"Copy completed successfully.";
                 StatusUpdated?.Invoke(@"Copy completed successfully.", Color.Green);
             }
             catch (Exception ex)
@@ -666,30 +1037,11 @@ namespace ServerDeployment.Console.Forms.AppForms
                 StatusUpdated?.Invoke(@$"Error during copy: {ex.Message}", Color.Red);
                 SLogger.WriteLog(ex);
             }
-
         }
+
         private void btnReloadSites_Click(object sender, EventArgs e)
         {
             LoadSitesFromIis();
-        }
-        private async void btnPingSite_Click(object sender, EventArgs e)
-        {
-            await PingSite();
-        }
-
-        private async Task PingSite()
-        {
-            var selected = GetSelectedSites();
-            if (selected.Count == 0)
-            {
-                lblMsg.Text = @"Select site(s) to ping.";
-                lblMsg.BackColor = Color.Red;
-                return;
-            }
-            foreach (var site in selected)
-            {
-                await PingSiteAsync(site.Name);
-            }
         }
 
 
@@ -703,8 +1055,6 @@ namespace ServerDeployment.Console.Forms.AppForms
 
             if (folderDialog.ShowDialog() == DialogResult.OK)
             {
-
-
                 string selectedPath = folderDialog.SelectedPath;
                 var fileSystemEntries = Directory.EnumerateFileSystemEntries(selectedPath)
                     .Select(Path.GetFileName)
@@ -735,8 +1085,7 @@ namespace ServerDeployment.Console.Forms.AppForms
 
                 if (missingItems.Count == 0)
                 {
-                    lblMsg.BackColor = Color.Green;
-                    lblMsg.Text = "✅ All backend deployment files are present.";
+                    StatusUpdated?.Invoke("✅ All backend deployment files are present.", Color.Green);
 
                     _backendPath = folderDialog.SelectedPath;
                     txtBackend.Text = _backendPath;
@@ -746,17 +1095,127 @@ namespace ServerDeployment.Console.Forms.AppForms
                 else
                 {
                     StatusUpdated?.Invoke(@"❌Missing files or folders:\n" + string.Join("\n", missingItems), Color.Red);
-
                 }
-
             }
         }
 
-        private void btnCopyContent_Click(object sender, EventArgs e)
+        private async void btnCopyContent_Click(object sender, EventArgs e)
         {
-            CopyContent();
+            await CopyContentAsync();
         }
+        private async Task CopyContentAsync()
+        {
+            var selectedSites = GetSelectedSites();
+            if (selectedSites.Count == 0)
+            {
+                StatusUpdated?.Invoke("Please set both Site Root and Backup Path before publishing.", Color.Red);
+                return;
+            }
 
+            var pathMap = new List<(string Path, DeployEnum Type)>
+                            {
+                                (_backendPath, DeployEnum.PetMatrixBackendAPI),
+                                (_frontendPath, DeployEnum.Frontend),
+                                (_reportPath, DeployEnum.ReportsViewer)
+                            };
+
+            if (pathMap.All(p => AppUtility.HasNoStr(p.Path)))
+            {
+                StatusUpdated?.Invoke("Please set at least one path to copy content.", Color.Red);
+                return;
+            }
+
+            // Count total files for progress reporting
+            int totalFiles = 0;
+            foreach (var site in selectedSites)
+            {
+                foreach (var p in pathMap)
+                {
+                    string source;
+                    if (AppUtility.HasAnyStr(p.Path))
+                    {
+                        source = p.Path;
+                    }
+                    else
+                    {
+                        string backupDir;
+                        if (!_siteBackupDirectory.TryGetValue(site.Name, out backupDir))
+                        {
+                            StatusUpdated?.Invoke($"Backup path not found for site {site.Name}", Color.Red);
+                            btnCopyContent.Enabled = true;
+                            return;
+                        }
+                        source = GetDefaultSourcePath(p.Type, backupDir);
+                    }
+
+                    if (source != null && Directory.Exists(source))
+                    {
+                        totalFiles += Directory.GetFiles(source, "*", SearchOption.AllDirectories).Length;
+                    }
+                }
+            }
+
+            if (totalFiles == 0)
+            {
+                StatusUpdated?.Invoke("No files to copy.", Color.Red);
+                return;
+            }
+
+            int copiedFiles = 0;
+            object lockObj = new object();
+
+            btnCopyContent.Enabled = false;
+
+            foreach (var site in selectedSites)
+            {
+                foreach (var (configuredPath, deployType) in pathMap)
+                {
+                    string source;
+                    if (AppUtility.HasAnyStr(configuredPath))
+                    {
+                        source = configuredPath;
+                    }
+                    else
+                    {
+                        if (!_siteBackupDirectory.TryGetValue(site.Name, out var siteBackupDir))
+                        {
+                            StatusUpdated?.Invoke($"Backup path not found for site {site.Name}", Color.Red);
+                            btnCopyContent.Enabled = true;
+                            return;
+                        }
+
+                        source = GetDefaultSourcePath(deployType, siteBackupDir);
+                    }
+
+                    string destinationFolder = deployType switch
+                    {
+                        DeployEnum.PetMatrixBackendAPI => Path.Combine(site.PhysicalPath, nameof(DeployEnum.PetMatrixBackendAPI)),
+                        DeployEnum.ReportsViewer => Path.Combine(site.PhysicalPath, nameof(DeployEnum.ReportsViewer)),
+                        _ => site.PhysicalPath,
+                    };
+
+                    await Task.Run(() =>
+                    {
+                        CopyDirectory(source, destinationFolder, () =>
+                        {
+                            lock (lockObj)
+                            {
+                                copiedFiles++;
+                                int percent = (copiedFiles * 100) / totalFiles;
+                                this.Invoke(() =>
+                                {
+                                    StatusUpdated?.Invoke($"Copied {copiedFiles} of {totalFiles} files ({percent}%)", Color.Black);
+                                    // Optionally update a progress bar here
+                                });
+                            }
+                        });
+                    });
+                }
+            }
+
+            StatusUpdated?.Invoke("Content copied successfully.", Color.Green);
+            btnCopyContent.Enabled = true;
+        }
         private void CopyContent()
         {
             var selectedSites = GetSelectedSites();
@@ -767,11 +1226,11 @@ namespace ServerDeployment.Console.Forms.AppForms
             }
 
             var pathMap = new List<(string Path, DeployEnum Type)>
-    {
-        (_backendPath, DeployEnum.PetMatrixBackendAPI),
-        (_frontendPath, DeployEnum.Frontend),
-        (_reportPath, DeployEnum.ReportsViewer)
-    };
+            {
+                (_backendPath, DeployEnum.PetMatrixBackendAPI),
+                (_frontendPath, DeployEnum.Frontend),
+                (_reportPath, DeployEnum.ReportsViewer)
+            };
 
             if (pathMap.All(p => AppUtility.HasNoStr(p.Path)))
             {
@@ -785,7 +1244,6 @@ namespace ServerDeployment.Console.Forms.AppForms
 
                 foreach (var site in selectedSites)
                 {
-                   
 
                     foreach (var (configuredPath, deployType) in pathMap)
                     {
@@ -801,6 +1259,7 @@ namespace ServerDeployment.Console.Forms.AppForms
                                 StatusUpdated?.Invoke($"Backup path not found for site {site.Name}", Color.Red);
                                 return;
                             }
+
                             source = GetDefaultSourcePath(deployType, siteBackupDir);
                         }
 
@@ -820,7 +1279,9 @@ namespace ServerDeployment.Console.Forms.AppForms
 
                         CopySiteContent(source, destinationFolder);
                     }
-                };
+                }
+
+                ;
 
                 StatusUpdated?.Invoke("Content copied successfully.", Color.Green);
             }
@@ -835,6 +1296,7 @@ namespace ServerDeployment.Console.Forms.AppForms
                 SLogger.WriteLog(ex);
             }
         }
+
         private void CopySiteContent(string sourceRoot, string destinationFolder)
         {
             if (!Directory.Exists(sourceRoot))
@@ -860,6 +1322,11 @@ namespace ServerDeployment.Console.Forms.AppForms
 
         // Helper method to set label status
         private void SetStatus(string message, Color color)
+        {
+            lblMsg.Text = message;
+            // lblMsg.BackColor = color;
+        }
+        private void SetTitleStatus(string message, Color color)
         {
             lblMsg.Text = message;
             // lblMsg.BackColor = color;
@@ -923,18 +1390,14 @@ namespace ServerDeployment.Console.Forms.AppForms
             }
 
 
-
             btnReloadSites.Enabled = value;
             btnBackup.Enabled = value;
             btnStopIIS.Enabled = value;
             btnStartIIS.Enabled = value;
             btnDeleteFiles.Enabled = value;
             btnCopyAppSettings.Enabled = value;
-            btnPingSite.Enabled = value;
-            btnPingSite.Enabled = value;
             btnCopyContent.Enabled = value;
         }
-
 
 
         private bool HasNoStr(string str)
@@ -945,7 +1408,7 @@ namespace ServerDeployment.Console.Forms.AppForms
         private DataTable CreateSitesDataTable()
         {
             DataTable dt = new DataTable();
-            dt.Columns.Add(nameof(IISSiteInfo.Select), typeof(bool));      // checkbox column
+            dt.Columns.Add(nameof(IISSiteInfo.Select), typeof(bool)); // checkbox column
             dt.Columns.Add(nameof(IISSiteInfo.Name), typeof(string));
             dt.Columns.Add(nameof(IISSiteInfo.PhysicalPath), typeof(string));
             dt.Columns.Add(nameof(IISSiteInfo.ContentSize), typeof(string));
@@ -958,48 +1421,47 @@ namespace ServerDeployment.Console.Forms.AppForms
             var band = ultraGrid.DisplayLayout.Bands[0];
 
             band.Columns[nameof(IISSiteInfo.Select)].Header.Caption = nameof(IISSiteInfo.Select);
-            band.Columns[nameof(IISSiteInfo.Select)].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.CheckBox;
-            band.Columns[nameof(IISSiteInfo.Select)].CellActivation = Infragistics.Win.UltraWinGrid.Activation.AllowEdit;
+            band.Columns[nameof(IISSiteInfo.Select)].Style = ColumnStyle.CheckBox;
+            band.Columns[nameof(IISSiteInfo.Select)].CellActivation = Activation.AllowEdit;
 
             band.Columns[nameof(IISSiteInfo.Name)].Header.Caption = nameof(IISSiteInfo.Name);
-            band.Columns[nameof(IISSiteInfo.Name)].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
+            band.Columns[nameof(IISSiteInfo.Name)].CellActivation = Activation.NoEdit;
 
             band.Columns[nameof(IISSiteInfo.PhysicalPath)].Header.Caption = @"Site Folder";
-            band.Columns[nameof(IISSiteInfo.PhysicalPath)].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
+            band.Columns[nameof(IISSiteInfo.PhysicalPath)].CellActivation = Activation.NoEdit;
 
             band.Columns[nameof(IISSiteInfo.ContentSize)].Header.Caption = @"Content Size";
-            band.Columns[nameof(IISSiteInfo.ContentSize)].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
+            band.Columns[nameof(IISSiteInfo.ContentSize)].CellActivation = Activation.NoEdit;
 
             band.Columns[nameof(IISSiteInfo.State)].Header.Caption = @"Status";
-            band.Columns[nameof(IISSiteInfo.State)].CellActivation = Infragistics.Win.UltraWinGrid.Activation.NoEdit;
+            band.Columns[nameof(IISSiteInfo.State)].CellActivation = Activation.NoEdit;
 
             // Set Header Font (size, style, color)
             band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.FontData.SizeInPoints = 13; // Font size
-            band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.FontData.Bold = Infragistics.Win.DefaultableBoolean.True; // Bold
+            band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.FontData.Bold = DefaultableBoolean.True; // Bold
             band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.BackColor = Color.Black; // Text color (black to match white theme)
             band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.BackColor = Color.LightGray; // Light gray background for header
 
             band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.FontData.SizeInPoints = 13; // Font size
-            band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.FontData.Bold = Infragistics.Win.DefaultableBoolean.True; // Bold
+            band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.FontData.Bold = DefaultableBoolean.True; // Bold
             band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.BackColor = Color.Black; // Text color
             band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.BackColor = Color.LightGray; // Light gray background for header
 
             // Optionally, align header text
-            band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.TextHAlign = Infragistics.Win.HAlign.Center; // Center alignment
-            band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.TextHAlign = Infragistics.Win.HAlign.Center; // Center alignment
+            band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.TextHAlign = HAlign.Center; // Center alignment
+            band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.TextHAlign = HAlign.Center; // Center alignment
 
             // General header customizations for all columns
             ultraGrid.DisplayLayout.Override.HeaderAppearance.FontData.SizeInPoints = 13; // Set header font size for all columns
-            ultraGrid.DisplayLayout.Override.HeaderAppearance.FontData.Bold = Infragistics.Win.DefaultableBoolean.True; // Set all headers to bold
+            ultraGrid.DisplayLayout.Override.HeaderAppearance.FontData.Bold = DefaultableBoolean.True; // Set all headers to bold
             ultraGrid.DisplayLayout.Override.HeaderAppearance.BackColor = Color.Black; // Set header text color
             ultraGrid.DisplayLayout.Override.HeaderAppearance.BackColor = Color.LightGray; // Set header background color for all columns
 
 
-
             // Selection settings
-            ultraGrid.DisplayLayout.Override.SelectTypeRow = Infragistics.Win.UltraWinGrid.SelectType.Extended;
-            ultraGrid.DisplayLayout.Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
-            ultraGrid.DisplayLayout.Override.RowSelectors = Infragistics.Win.DefaultableBoolean.False;
+            ultraGrid.DisplayLayout.Override.SelectTypeRow = SelectType.Extended;
+            ultraGrid.DisplayLayout.Override.AllowAddNew = AllowAddNew.No;
+            ultraGrid.DisplayLayout.Override.RowSelectors = DefaultableBoolean.False;
 
 
             // Set the row height to a larger value (default ~20)
@@ -1007,32 +1469,49 @@ namespace ServerDeployment.Console.Forms.AppForms
 
             ultraGrid.DisplayLayout.Override.HeaderAppearance.FontData.Name = @"Segoe UI";
             ultraGrid.DisplayLayout.Override.HeaderAppearance.FontData.SizeInPoints = 11;
-            ultraGrid.DisplayLayout.Override.HeaderAppearance.FontData.Bold = Infragistics.Win.DefaultableBoolean.True;
+            ultraGrid.DisplayLayout.Override.HeaderAppearance.FontData.Bold = DefaultableBoolean.True;
 
             ultraGrid.DisplayLayout.Override.RowAppearance.FontData.Name = @"Segoe UI";
             ultraGrid.DisplayLayout.Override.RowAppearance.FontData.SizeInPoints = 10;
-            ultraGrid.DisplayLayout.Override.RowAppearance.FontData.Italic = Infragistics.Win.DefaultableBoolean.False;
-
-
-
+            ultraGrid.DisplayLayout.Override.RowAppearance.FontData.Italic = DefaultableBoolean.False;
         }
 
-        private void btnPublish_Click(object sender, EventArgs e)
+        private async void btnPublish_Click(object sender, EventArgs e)
         {
+            // Clear previous messages
             ClearLables();
 
-            if (HasNoStr(_backendPath) || HasNoStr(_backupPath))
+            // Validate paths and at least one path length should be > 0
+            if (AppUtility.HasNoStr(_backendPath)
+                && AppUtility.HasNoStr(_frontendPath)
+                && AppUtility.HasNoStr(_reportPath)
+                )
             {
-                lblMsg.Text = @"Please set both Site Root and Backup Path before publishing.";
-                lblMsg.BackColor = Color.Red;
+                StatusUpdated?.Invoke("Please set at least one path to publish content.", Color.Red);
+                return;
+            }
+            if (AppUtility.HasAnyStr(_backupPath))
+            {
+                StatusUpdated?.Invoke("Please select the backup path", Color.Yellow);
                 return;
             }
 
-            // 1. backup selected sites
-            // BackupSelectedSites();
+            // 1. Backup selected sites
+            await BackupSelectedSitesAsync();
+            if (_siteBackupDirectory.Count == 0)
+            {
+                StatusUpdated?.Invoke("No sites were backed up. Please select sites to backup.", Color.Red);
+                return;
+            }
+            StatusUpdated?.Invoke("Backup completed successfully.", Color.Green);
+
+            // 2. STOP IIS Sites
+
+
+
+
 
         }
-
 
 
         private void ClearLables()
@@ -1040,7 +1519,6 @@ namespace ServerDeployment.Console.Forms.AppForms
             lblMsg.Text = string.Empty;
             lblMsg.BackColor = SystemColors.Control;
         }
-
 
 
         private void OnProgressUpdated(string message, int? percent = null, ProgressType progressFor = ProgressType.Backup)
@@ -1059,6 +1537,7 @@ namespace ServerDeployment.Console.Forms.AppForms
                 UpdateProgressUi(e);
             }
         }
+
         private void DeploymentForm_StatusUpdated(string message, Color color)
         {
             if (InvokeRequired)
@@ -1073,43 +1552,37 @@ namespace ServerDeployment.Console.Forms.AppForms
 
         private void UpdateProgressUi(ProgressEventArgs e)
         {
-            lblMsg.Text = e.Message;
+            StatusUpdated?.Invoke(e.Message, Color.Green);
 
-            if (e.Percent.HasValue)
+            if (!e.Percent.HasValue) return;
+
+            int value = Math.Min(Math.Max(e.Percent.Value, 0), 100);
+
+            switch (e.ProgressFor)
             {
-                int value = Math.Min(Math.Max(e.Percent.Value, 0), 100);
-
-                switch (e.ProgressFor)
-                {
-                    case ProgressType.Backup:
-                        progressBarBackup.Value = value;
-                        break;
-                    case ProgressType.Report:
-                        progressBarReport.Value = value;
-                        break;
-                    case ProgressType.Frontend:
-                        progressBarFrontend.Value = value;
-                        break;
-                    case ProgressType.Backend:
-                        progressBarBackend.Value = value;
-                        break;
-                        //toDO: ProgressType.AppSettings
-                }
+                case ProgressType.Backup:
+                    progressBarBackup.Value = value;
+                    break;
+                case ProgressType.Report:
+                    progressBarReport.Value = value;
+                    break;
+                case ProgressType.Frontend:
+                    progressBarFrontend.Value = value;
+                    break;
+                case ProgressType.Backend:
+                    progressBarBackend.Value = value;
+                    break;
+                    //toDO: ProgressType.AppSettings
             }
         }
 
         private void btnFrontend_Click(object sender, EventArgs e)
         {
-            using var folderDialog = new FolderBrowserDialog
-            {
-                Description = @"Select Angular Build Folder"
-            };
+            using var folderDialog = new FolderBrowserDialog();
+            folderDialog.Description = @"Select Angular Build Folder";
 
             if (folderDialog.ShowDialog() == DialogResult.OK)
             {
-
-
-
                 string selectedPath = folderDialog.SelectedPath;
 
                 // Get all files and folders names in the root of selected path
@@ -1148,9 +1621,9 @@ namespace ServerDeployment.Console.Forms.AppForms
 
                     if (!found) break;
                 }
+
                 if (missingItems.Count == 0)
                 {
-
                     StatusUpdated?.Invoke(@"All required files and folders are present.", Color.Green);
 
                     _frontendPath = folderDialog.SelectedPath;
@@ -1162,7 +1635,6 @@ namespace ServerDeployment.Console.Forms.AppForms
                 {
                     StatusUpdated?.Invoke(@"Missing files or folders:\n" + string.Join("\n", missingItems), Color.Red);
                 }
-
             }
         }
 
@@ -1195,7 +1667,6 @@ namespace ServerDeployment.Console.Forms.AppForms
                     txtReport.Text = _reportPath;
 
                     StatusUpdated?.Invoke(@"All required report files and folders are present.", Color.Green);
-
                 }
                 else
                 {
@@ -1205,9 +1676,5 @@ namespace ServerDeployment.Console.Forms.AppForms
                 ButtonsSwitch(true);
             }
         }
-
-
-
-
     }
 }

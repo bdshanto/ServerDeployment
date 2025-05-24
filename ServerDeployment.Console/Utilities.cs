@@ -1,9 +1,5 @@
-﻿using System;
-using System.Drawing;
-using System.IO;
-using System.Resources;
+﻿using System.Diagnostics;
 using System.Reflection;
-using System.Diagnostics;
 
 namespace ServerDeployment.Console
 {
@@ -47,7 +43,7 @@ namespace ServerDeployment.Console
 
         #endregion //GetEmbeddedResourceStream
 
-     
+
 
         #region GetAssemblyAttribute
 

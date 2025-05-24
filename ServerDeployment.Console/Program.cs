@@ -1,7 +1,5 @@
-using System.Reflection;
 using ServerDeployment.Console.Forms.AppForms;
 using ServerDeployment.Domains.Utility;
-using ServerDeployment.Forms;
 
 namespace ServerDeployment.Console
 {
@@ -17,12 +15,12 @@ namespace ServerDeployment.Console
             ApplicationConfiguration.Initialize();
 
             Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false); 
+            Application.SetCompatibleTextRenderingDefault(false);
 
             Infragistics.Win.AppStyling.StyleManager.Load(Utilities.GetEmbeddedResourceStream("ServerDeployment.Console.StyleLibraries.FlatNature.isl"));
 
             Application.Run(new DeploymentForm());
-           // Application.Run(new MainForm());
+            // Application.Run(new MainForm());
         }
     }
 }
