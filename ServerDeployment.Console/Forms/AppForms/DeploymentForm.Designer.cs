@@ -69,7 +69,7 @@
             btnReloadSites.Location = new Point(26, 220);
             btnReloadSites.Name = "btnReloadSites";
             btnReloadSites.Size = new Size(171, 50);
-            btnReloadSites.TabIndex = 1;
+            btnReloadSites.TabIndex = 8;
             btnReloadSites.Text = "btnReloadSites";
             btnReloadSites.UseVisualStyleBackColor = true;
             btnReloadSites.Click += btnReloadSites_Click;
@@ -79,7 +79,7 @@
             btnBackup.Location = new Point(219, 220);
             btnBackup.Name = "btnBackup";
             btnBackup.Size = new Size(171, 50);
-            btnBackup.TabIndex = 2;
+            btnBackup.TabIndex = 9;
             btnBackup.Text = "btnBackup";
             btnBackup.UseVisualStyleBackColor = true;
             btnBackup.Click += btnBackup_Click;
@@ -89,7 +89,7 @@
             btnStopIIS.Location = new Point(415, 220);
             btnStopIIS.Name = "btnStopIIS";
             btnStopIIS.Size = new Size(171, 50);
-            btnStopIIS.TabIndex = 2;
+            btnStopIIS.TabIndex = 10;
             btnStopIIS.Text = "btnStopIIS";
             btnStopIIS.UseVisualStyleBackColor = true;
             btnStopIIS.Click += btnStopIIS_Click;
@@ -99,7 +99,7 @@
             btnStartIIS.Location = new Point(415, 276);
             btnStartIIS.Name = "btnStartIIS";
             btnStartIIS.Size = new Size(171, 50);
-            btnStartIIS.TabIndex = 2;
+            btnStartIIS.TabIndex = 14;
             btnStartIIS.Text = "btnStartIIS";
             btnStartIIS.UseVisualStyleBackColor = true;
             btnStartIIS.Click += btnStartIIS_Click;
@@ -109,7 +109,7 @@
             btnDeleteFiles.Location = new Point(604, 220);
             btnDeleteFiles.Name = "btnDeleteFiles";
             btnDeleteFiles.Size = new Size(171, 50);
-            btnDeleteFiles.TabIndex = 2;
+            btnDeleteFiles.TabIndex = 11;
             btnDeleteFiles.Text = "btnDeleteFiles";
             btnDeleteFiles.UseVisualStyleBackColor = true;
             btnDeleteFiles.Click += btnDeleteFiles_Click;
@@ -119,7 +119,7 @@
             btnCopyAppSettings.Location = new Point(219, 276);
             btnCopyAppSettings.Name = "btnCopyAppSettings";
             btnCopyAppSettings.Size = new Size(171, 50);
-            btnCopyAppSettings.TabIndex = 2;
+            btnCopyAppSettings.TabIndex = 13;
             btnCopyAppSettings.Text = "btnCopyAppSettings";
             btnCopyAppSettings.UseVisualStyleBackColor = true;
             btnCopyAppSettings.Click += btnCopyAppSettings_Click;
@@ -130,13 +130,14 @@
             txtBackend.Name = "txtBackend";
             txtBackend.Size = new Size(522, 31);
             txtBackend.TabIndex = 3;
+            txtBackend.KeyUp += txtBackend_KeyUp;
             // 
             // btnCopyContent
             // 
             btnCopyContent.Location = new Point(26, 276);
             btnCopyContent.Name = "btnCopyContent";
             btnCopyContent.Size = new Size(171, 50);
-            btnCopyContent.TabIndex = 2;
+            btnCopyContent.TabIndex = 12;
             btnCopyContent.Text = "btnCopyContent";
             btnCopyContent.UseVisualStyleBackColor = true;
             btnCopyContent.Click += btnCopyContent_Click;
@@ -147,7 +148,7 @@
             btnBackupPath.Location = new Point(9, 6);
             btnBackupPath.Name = "btnBackupPath";
             btnBackupPath.Size = new Size(171, 50);
-            btnBackupPath.TabIndex = 1;
+            btnBackupPath.TabIndex = 0;
             btnBackupPath.Text = "Backup";
             btnBackupPath.UseVisualStyleBackColor = true;
             btnBackupPath.Click += btnBackupPath_Click;
@@ -160,7 +161,7 @@
             ultraGrid.Location = new Point(3, 18);
             ultraGrid.Name = "ultraGrid";
             ultraGrid.Size = new Size(1022, 400);
-            ultraGrid.TabIndex = 4;
+            ultraGrid.TabIndex = 0;
             ultraGrid.Text = "Web Sites";
             // 
             // ultraPanel1
@@ -184,7 +185,7 @@
             ultraLabel1.Location = new Point(3, 7);
             ultraLabel1.Name = "ultraLabel1";
             ultraLabel1.Size = new Size(293, 34);
-            ultraLabel1.TabIndex = 5;
+            ultraLabel1.TabIndex = 0;
             ultraLabel1.Text = "MD HASIBUL ISLAM SHANTO";
             // 
             // panel2
@@ -273,7 +274,7 @@
             btnPublish.Location = new Point(781, 236);
             btnPublish.Name = "btnPublish";
             btnPublish.Size = new Size(208, 129);
-            btnPublish.TabIndex = 6;
+            btnPublish.TabIndex = 17;
             btnPublish.Text = "Publish";
             btnPublish.Click += btnPublish_Click;
             // 
@@ -282,21 +283,24 @@
             txtBackup.Location = new Point(186, 16);
             txtBackup.Name = "txtBackup";
             txtBackup.Size = new Size(522, 31);
-            txtBackup.TabIndex = 3;
+            txtBackup.TabIndex = 1;
+            txtBackup.KeyUp += txtBackup_KeyUp;
             // 
             // txtFrontend
             // 
             txtFrontend.Location = new Point(186, 128);
             txtFrontend.Name = "txtFrontend";
             txtFrontend.Size = new Size(522, 31);
-            txtFrontend.TabIndex = 3;
+            txtFrontend.TabIndex = 5;
+            txtFrontend.KeyUp += txtFrontend_KeyUp;
             // 
             // txtReport
             // 
             txtReport.Location = new Point(186, 183);
             txtReport.Name = "txtReport";
             txtReport.Size = new Size(522, 31);
-            txtReport.TabIndex = 3;
+            txtReport.TabIndex = 7;
+            txtReport.KeyUp += txtReport_KeyUp;
             // 
             // btnBackend
             // 
@@ -304,7 +308,7 @@
             btnBackend.Location = new Point(9, 60);
             btnBackend.Name = "btnBackend";
             btnBackend.Size = new Size(171, 50);
-            btnBackend.TabIndex = 1;
+            btnBackend.TabIndex = 2;
             btnBackend.Text = "Backend";
             btnBackend.UseVisualStyleBackColor = true;
             btnBackend.Click += btnBackend_Click;
@@ -315,7 +319,7 @@
             btnReport.Location = new Point(9, 171);
             btnReport.Name = "btnReport";
             btnReport.Size = new Size(171, 50);
-            btnReport.TabIndex = 1;
+            btnReport.TabIndex = 6;
             btnReport.Text = "Report";
             btnReport.UseVisualStyleBackColor = true;
             btnReport.Click += btnReport_Click;
@@ -326,7 +330,7 @@
             btnFrontend.Location = new Point(9, 116);
             btnFrontend.Name = "btnFrontend";
             btnFrontend.Size = new Size(171, 50);
-            btnFrontend.TabIndex = 1;
+            btnFrontend.TabIndex = 4;
             btnFrontend.Text = "Frontend";
             btnFrontend.UseVisualStyleBackColor = true;
             btnFrontend.Click += btnFrontend_Click;
@@ -337,7 +341,7 @@
             ultraLabel2.Location = new Point(481, -4);
             ultraLabel2.Name = "ultraLabel2";
             ultraLabel2.Size = new Size(341, 56);
-            ultraLabel2.TabIndex = 8;
+            ultraLabel2.TabIndex = 2;
             ultraLabel2.Text = "PETMATRIX";
             // 
             // DeploymentForm

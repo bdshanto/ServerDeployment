@@ -16,7 +16,7 @@ namespace ServerDeployment.Console.Forms.AppForms
 {
     public partial class DeploymentForm : Form
     {
-        private DataTable _sitesDataTable; 
+        private DataTable _sitesDataTable;
 
         private readonly Dictionary<string, string> _siteBackupDirectory = new();
 
@@ -85,7 +85,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             StatusUpdated += DeploymentForm_StatusUpdated;
 
 
-            ButtonsSwitch(true);
+            ButtonAppearance();
             InitializeUltraGrid();
             LoadSitesFromIis();
 
@@ -499,7 +499,7 @@ namespace ServerDeployment.Console.Forms.AppForms
         }
         private async Task BackupSelectedSitesAsync()
         {
-            ClearLables();
+            SetStatus("", Color.White);
 
             var selectedSites = GetSelectedSites();
             if (selectedSites.Count <= 0)
@@ -659,15 +659,14 @@ namespace ServerDeployment.Console.Forms.AppForms
             {
                 StatusUpdated?.Invoke("Please select at least one site.", Color.Red);
                 return;
+            } 
+            if (string.IsNullOrWhiteSpace(txtBackend.Text) || !Directory.Exists(txtBackend.Text))
+            {
+                StatusUpdated?.Invoke("Please select a valid Backend Deployment Folder.", Color.Red);
+                return;
             }
 
-            var confirm = MessageBox.Show(
-                "Are you sure you want to delete all files in selected site folders? This cannot be undone!",
-                "Confirm Delete",
-                MessageBoxButtons.YesNo);
 
-            if (confirm != DialogResult.Yes)
-                return;
 
             int totalSites = selectedSites.Count;
             int currentSite = 0;
@@ -704,7 +703,7 @@ namespace ServerDeployment.Console.Forms.AppForms
 
             btnDeleteFiles.Enabled = true;
 
-            StatusUpdated?.Invoke("Files deleted.", Color.Black);
+            StatusUpdated?.Invoke("Files deleted.", Color.Green);
         }
 
         private async void btnCopyAppSettings_Click(object sender, EventArgs e)
@@ -800,7 +799,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             {
                 btnCopyAppSettings.Enabled = true;
             }
-        } 
+        }
 
         private void btnReloadSites_Click(object sender, EventArgs e)
         {
@@ -852,7 +851,7 @@ namespace ServerDeployment.Console.Forms.AppForms
 
                     txtBackend.Text = folderDialog.SelectedPath;
 
-                    ButtonsSwitch(true);
+                    ButtonAppearance();
                 }
                 else
                 {
@@ -993,10 +992,22 @@ namespace ServerDeployment.Console.Forms.AppForms
         }
 
         // Helper method to set label status
+        //SystemColors.Control
         private void SetStatus(string message, Color color)
         {
-            lblMsg.Text = message;
-            // lblMsg.BackColor = color;
+            if (lblMsg.InvokeRequired)
+            {
+                lblMsg.Invoke(new Action(() =>
+                {
+                    lblMsg.Text = message;
+                    lblMsg.ForeColor = color;
+                }));
+            }
+            else
+            {
+                lblMsg.Text = message;
+                lblMsg.ForeColor = color;
+            }
         }
 
         private void btnBackupPath_Click(object sender, EventArgs e)
@@ -1008,50 +1019,52 @@ namespace ServerDeployment.Console.Forms.AppForms
         {
             using var fbd = new FolderBrowserDialog { Description = @"Select Backup Destination Folder" };
             if (fbd.ShowDialog() != DialogResult.OK) return;
-             
+
             txtBackup.Text = fbd.SelectedPath;
-            ButtonsSwitch(true);
+            ButtonAppearance();
         }
 
-        private void ButtonsSwitch(bool value)
-        { 
+        private void ButtonAppearance()
+        {
 
             if (AppUtility.HasAnyStr(txtBackup.Text))
             {
-                btnBackupPath.BackColor = Color.Green;
+                btnBackupPath.ForeColor = Color.Green;
             }
             else
             {
-                btnBackupPath.BackColor = Color.Red;
+                btnBackupPath.ForeColor = Color.Red;
             }
 
             if (AppUtility.HasAnyStr(txtBackend.Text))
             {
-                btnBackend.BackColor = Color.Green;
+                btnBackend.ForeColor = Color.Green;
             }
             else
             {
-                btnBackend.BackColor = Color.Red;
+                btnBackend.ForeColor = Color.Red;
             }
             if (AppUtility.HasAnyStr(txtFrontend.Text))
             {
-                btnFrontend.BackColor = Color.Green;
+                btnFrontend.ForeColor = Color.Green;
             }
             else
             {
-                btnFrontend.BackColor = Color.Red;
+                btnFrontend.ForeColor = Color.Red;
             }
             if (AppUtility.HasAnyStr(txtReport.Text))
 
             {
-                btnReport.BackColor = Color.Green;
+                btnReport.ForeColor = Color.Green;
             }
             else
             {
-                btnReport.BackColor = Color.Red;
+                btnReport.ForeColor = Color.Red;
             }
+        }
 
-
+        private void ButtonSwitch(bool value)
+        {
             btnReloadSites.Enabled = value;
             btnBackup.Enabled = value;
             btnStopIIS.Enabled = value;
@@ -1097,13 +1110,13 @@ namespace ServerDeployment.Console.Forms.AppForms
             // Set Header Font (size, style, color)
             band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.FontData.SizeInPoints = 13; // Font size
             band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.FontData.Bold = DefaultableBoolean.True; // Bold
-            band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.BackColor = Color.Black; // Text color (black to match white theme)
-            band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.BackColor = Color.LightGray; // Light gray background for header
+            band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.ForeColor = Color.Black; // Text color (black to match white theme)
+            band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.ForeColor = Color.LightGray; // Light gray background for header
 
             band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.FontData.SizeInPoints = 13; // Font size
             band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.FontData.Bold = DefaultableBoolean.True; // Bold
-            band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.BackColor = Color.Black; // Text color
-            band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.BackColor = Color.LightGray; // Light gray background for header
+            band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.ForeColor = Color.Black; // Text color
+            band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.ForeColor = Color.LightGray; // Light gray background for header
 
             // Optionally, align header text
             band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.TextHAlign = HAlign.Center; // Center alignment
@@ -1112,8 +1125,8 @@ namespace ServerDeployment.Console.Forms.AppForms
             // General header customizations for all columns
             ultraGrid.DisplayLayout.Override.HeaderAppearance.FontData.SizeInPoints = 13; // Set header font size for all columns
             ultraGrid.DisplayLayout.Override.HeaderAppearance.FontData.Bold = DefaultableBoolean.True; // Set all headers to bold
-            ultraGrid.DisplayLayout.Override.HeaderAppearance.BackColor = Color.Black; // Set header text color
-            ultraGrid.DisplayLayout.Override.HeaderAppearance.BackColor = Color.LightGray; // Set header background color for all columns
+            ultraGrid.DisplayLayout.Override.HeaderAppearance.ForeColor = Color.Black; // Set header text color
+            ultraGrid.DisplayLayout.Override.HeaderAppearance.ForeColor = Color.LightGray; // Set header background color for all columns
 
 
             // Selection settings
@@ -1137,7 +1150,8 @@ namespace ServerDeployment.Console.Forms.AppForms
         private async void btnPublish_Click(object sender, EventArgs e)
         {
             // Clear previous messages
-            ClearLables();
+
+            SetStatus("", Color.Red);
 
             // Validate paths and at least one path length should be > 0
             if (AppUtility.HasNoStr(txtBackend.Text)
@@ -1148,7 +1162,7 @@ namespace ServerDeployment.Console.Forms.AppForms
                 StatusUpdated?.Invoke("Please set at least one path to publish content.", Color.Red);
                 return;
             }
-            if (AppUtility.HasAnyStr(txtBackup.Text))
+            if (AppUtility.HasNoStr(txtBackup.Text))
             {
                 StatusUpdated?.Invoke("Please select the backup path", Color.Yellow);
                 return;
@@ -1161,9 +1175,22 @@ namespace ServerDeployment.Console.Forms.AppForms
                 StatusUpdated?.Invoke("No sites were backed up. Please select sites to backup.", Color.Red);
                 return;
             }
-            StatusUpdated?.Invoke("Backup completed successfully.", Color.Green);
 
             // 2. STOP IIS Sites
+            await StopIisAsync();
+
+            // 3. Delete files in selected sites
+            await DeleteFilesInSitesAsync();
+
+            // 4. Copy content to sites
+            await CopyContentAsync();
+
+            // 5. Copy appsettings and web.config files
+            await CopyAppSettingsAsync();
+
+
+            // 6. Start IIS Sites
+            await StartIisAsync();
 
 
 
@@ -1172,11 +1199,6 @@ namespace ServerDeployment.Console.Forms.AppForms
         }
 
 
-        private void ClearLables()
-        {
-            lblMsg.Text = string.Empty;
-            lblMsg.BackColor = SystemColors.Control;
-        }
 
 
         private void OnProgressUpdated(string message, int? percent = null, ProgressType progressFor = ProgressType.Backup)
@@ -1283,10 +1305,10 @@ namespace ServerDeployment.Console.Forms.AppForms
                 if (missingItems.Count == 0)
                 {
                     StatusUpdated?.Invoke(@"All required files and folders are present.", Color.Green);
-                     
+
                     txtFrontend.Text = folderDialog.SelectedPath;
 
-                    ButtonsSwitch(true);
+                    ButtonAppearance();
                 }
                 else
                 {
@@ -1319,7 +1341,7 @@ namespace ServerDeployment.Console.Forms.AppForms
                 }
 
                 if (missingItems.Count == 0)
-                { 
+                {
                     txtReport.Text = folderDialog.SelectedPath;
 
                     StatusUpdated?.Invoke(@"All required report files and folders are present.", Color.Green);
@@ -1329,8 +1351,29 @@ namespace ServerDeployment.Console.Forms.AppForms
                     StatusUpdated?.Invoke(@"Missing files or folders:\n" + string.Join("\n", missingItems), Color.Red);
                 }
 
-                ButtonsSwitch(true);
+                ButtonAppearance();
             }
+        }
+
+
+        private void txtBackup_KeyUp(object sender, KeyEventArgs e)
+        {
+            ButtonAppearance();
+        }
+
+        private void txtBackend_KeyUp(object sender, KeyEventArgs e)
+        {
+            ButtonAppearance();
+        }
+
+        private void txtFrontend_KeyUp(object sender, KeyEventArgs e)
+        {
+            ButtonAppearance();
+        }
+
+        private void txtReport_KeyUp(object sender, KeyEventArgs e)
+        {
+            ButtonAppearance();
         }
     }
 }
