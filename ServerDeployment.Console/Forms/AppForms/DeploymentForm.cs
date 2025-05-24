@@ -9,6 +9,7 @@ using Microsoft.Web.Administration;
 using ServerDeployment.Applications.Helpers;
 using ServerDeployment.Console.Helpers;
 using ServerDeployment.Domains.Utility;
+using Application = System.Windows.Forms.Application;
 
 namespace ServerDeployment.Console.Forms.AppForms
 {
@@ -285,25 +286,6 @@ namespace ServerDeployment.Console.Forms.AppForms
         }
 
 
-        /*
-        private void CopySiteContent(string sourceRoot, string destinationSiteFolder, DeployEnum copyTo)
-        {
-            if (copyTo == DeployEnum.PetMatrixBackendAPI)
-            {
-                destinationSiteFolder = Path.Combine(destinationSiteFolder, nameof(DeployEnum.PetMatrixBackendAPI));
-                CopyDirectory(sourceRoot, destinationSiteFolder);
-            }
-            else if (copyTo == DeployEnum.ReportsViewer)
-            {
-                destinationSiteFolder = Path.Combine(destinationSiteFolder, nameof(DeployEnum.ReportsViewer));
-                CopyDirectory(sourceRoot, destinationSiteFolder);
-            }
-            else
-            {
-                CopyDirectory(sourceRoot, destinationSiteFolder);
-            }
-        }
-        */
 
 
         private void CopyDirectory(string sourceDir, string destDir)
@@ -312,13 +294,17 @@ namespace ServerDeployment.Console.Forms.AppForms
             if (!dir.Exists)
             {
                 SLogger.WriteLog($"{nameof(CopyDirectory)}: Source directory does not exist: {sourceDir}");
+                StatusUpdated?.Invoke($"Source directory does not exist: {sourceDir}", Color.Red);
                 throw new DirectoryNotFoundException($"Source directory does not exist: {sourceDir}");
             }
             Directory.CreateDirectory(destDir);
 
             foreach (var file in dir.GetFiles())
             {
-                file.CopyTo(Path.Combine(destDir, file.Name), true);
+                string destFile = Path.Combine(destDir, file.Name);
+                file.CopyTo(destFile, true);
+                StatusUpdated?.Invoke($"Copied file: {file.Name}", Color.Black);
+                Application.DoEvents(); // To keep UI responsive and update status label
             }
 
             foreach (var subDir in dir.GetDirectories())
@@ -364,14 +350,14 @@ namespace ServerDeployment.Console.Forms.AppForms
                 string output = proc.StandardOutput.ReadToEnd();
                 string err = proc.StandardError.ReadToEnd();
                 if (!string.IsNullOrEmpty(err))
-                { 
+                {
 
 
                     StatusUpdated?.Invoke("Error running appcmd: @" + err, Color.Black);
                 }
             }
             catch (Exception ex)
-            {  
+            {
                 StatusUpdated?.Invoke("Error running appcmd: @" + ex.Message, Color.Red);
                 SLogger.WriteLog(ex);
             }
@@ -789,20 +775,17 @@ namespace ServerDeployment.Console.Forms.AppForms
 
             if (pathMap.All(p => AppUtility.HasNoStr(p.Path)))
             {
-                 StatusUpdated?.Invoke("Please set at least one path to copy content.", Color.Red);
+                StatusUpdated?.Invoke("Please set at least one path to copy content.", Color.Red);
                 return;
             }
 
             try
             {
                 var options = new ParallelOptions { MaxDegreeOfParallelism = 4 };
-                Parallel.ForEach(selectedSites, options, site =>
+
+                foreach (var site in selectedSites)
                 {
-                    if (!_siteBackupDirectory.TryGetValue(site.Name, out string siteBackupDir))
-                    {
-                        SetStatus($"Backup path not found for site {site.Name}", Color.Red);
-                        return;
-                    }
+                   
 
                     foreach (var (configuredPath, deployType) in pathMap)
                     {
@@ -813,6 +796,11 @@ namespace ServerDeployment.Console.Forms.AppForms
                         }
                         else
                         {
+                            if (!_siteBackupDirectory.TryGetValue(site.Name, out string siteBackupDir))
+                            {
+                                StatusUpdated?.Invoke($"Backup path not found for site {site.Name}", Color.Red);
+                                return;
+                            }
                             source = GetDefaultSourcePath(deployType, siteBackupDir);
                         }
 
@@ -832,18 +820,18 @@ namespace ServerDeployment.Console.Forms.AppForms
 
                         CopySiteContent(source, destinationFolder);
                     }
-                });
+                };
 
-                 StatusUpdated?.Invoke("Content copied successfully.", Color.Green);
+                StatusUpdated?.Invoke("Content copied successfully.", Color.Green);
             }
             catch (AggregateException aggEx)
             {
-                 StatusUpdated?.Invoke("Error copying content: " + aggEx.Flatten().Message, Color.Red);
+                StatusUpdated?.Invoke("Error copying content: " + aggEx.Flatten().Message, Color.Red);
                 SLogger.WriteLog(aggEx);
             }
             catch (Exception ex)
             {
-                 StatusUpdated?.Invoke("Error copying content: " + ex.Message, Color.Red);
+                StatusUpdated?.Invoke("Error copying content: " + ex.Message, Color.Red);
                 SLogger.WriteLog(ex);
             }
         }
@@ -851,7 +839,7 @@ namespace ServerDeployment.Console.Forms.AppForms
         {
             if (!Directory.Exists(sourceRoot))
             {
-                SetStatus($"Source path not found: {sourceRoot}", Color.Red);
+                StatusUpdated?.Invoke($"Source path not found: {sourceRoot}", Color.Red);
                 SLogger.WriteLog($"Source path not found: {sourceRoot}");
                 return;
             }
@@ -874,7 +862,7 @@ namespace ServerDeployment.Console.Forms.AppForms
         private void SetStatus(string message, Color color)
         {
             lblMsg.Text = message;
-           // lblMsg.BackColor = color;
+            // lblMsg.BackColor = color;
         }
 
         private void btnBackupPath_Click(object sender, EventArgs e)
