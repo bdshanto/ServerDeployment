@@ -265,7 +265,7 @@
             // btnPublish
             // 
             btnPublish.ButtonStyle = Infragistics.Win.UIElementButtonStyle.Button3D;
-            btnPublish.Font = new Font("Segoe UI", 25F, FontStyle.Bold);
+            btnPublish.Font = new Font("Segoe UI", 16F, FontStyle.Bold);
             appearance11.BackColor = Color.Lime;
             appearance11.BackGradientStyle = Infragistics.Win.GradientStyle.Vertical;
             appearance11.ForeColor = Color.FromArgb(0, 192, 0);

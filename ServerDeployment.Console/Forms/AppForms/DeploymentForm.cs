@@ -16,12 +16,7 @@ namespace ServerDeployment.Console.Forms.AppForms
 {
     public partial class DeploymentForm : Form
     {
-        private DataTable _sitesDataTable;
-
-        private string _backupPath = @"D:\Workspace\Office\ARAK\Resources\Publish";
-        private string _backendPath = @"D:\Workspace\Office\ARAK\Resources\Publish\ARAK-Backend";
-        private string _frontendPath = @"D:\Workspace\Office\ARAK\Resources\Publish\ARAK-Frontend";
-        private string _reportPath = @"";
+        private DataTable _sitesDataTable; 
 
         private readonly Dictionary<string, string> _siteBackupDirectory = new();
 
@@ -539,7 +534,7 @@ namespace ServerDeployment.Console.Forms.AppForms
                     try
                     {
                         string sourceDir = site.PhysicalPath;
-                        string backupDir = Path.Combine(_backupPath, $"{site.Name}_backup_{DateTime.Now:yyyyMMddHHmmss}");
+                        string backupDir = Path.Combine(txtBackup.Text, $"{site.Name}_backup_{DateTime.Now:yyyyMMddHHmmss}");
 
                         // Pass callback to increment copied files and update progress
                         CopyDirectory(sourceDir, backupDir, () =>
@@ -684,7 +679,7 @@ namespace ServerDeployment.Console.Forms.AppForms
                 foreach (var site in selectedSites)
                 {
                     currentSite++;
-                    string folder = Path.Combine(_backendPath, site.PhysicalPath);
+                    string folder = Path.Combine(txtBackend.Text, site.PhysicalPath);
 
                     this.Invoke(() =>
                     {
@@ -855,8 +850,7 @@ namespace ServerDeployment.Console.Forms.AppForms
                 {
                     StatusUpdated?.Invoke("✅ All backend deployment files are present.", Color.Green);
 
-                    _backendPath = folderDialog.SelectedPath;
-                    txtBackend.Text = _backendPath;
+                    txtBackend.Text = folderDialog.SelectedPath;
 
                     ButtonsSwitch(true);
                 }
@@ -882,9 +876,9 @@ namespace ServerDeployment.Console.Forms.AppForms
 
             var pathMap = new List<(string Path, DeployEnum Type)>
                             {
-                                (_backendPath, DeployEnum.PetMatrixBackendAPI),
-                                (_frontendPath, DeployEnum.Frontend),
-                                (_reportPath, DeployEnum.ReportsViewer)
+                                (txtBackend.Text, DeployEnum.PetMatrixBackendAPI),
+                                (txtFrontend.Text, DeployEnum.Frontend),
+                                (txtReport.Text, DeployEnum.ReportsViewer)
                             };
 
             if (pathMap.All(p => AppUtility.HasNoStr(p.Path)))
@@ -1014,17 +1008,13 @@ namespace ServerDeployment.Console.Forms.AppForms
         {
             using var fbd = new FolderBrowserDialog { Description = @"Select Backup Destination Folder" };
             if (fbd.ShowDialog() != DialogResult.OK) return;
-
-            _backupPath = fbd.SelectedPath;
+             
             txtBackup.Text = fbd.SelectedPath;
             ButtonsSwitch(true);
         }
 
         private void ButtonsSwitch(bool value)
-        {
-            txtBackup.Text = _backupPath;
-            txtFrontend.Text = _frontendPath;
-            txtBackend.Text = _backendPath;
+        { 
 
             if (AppUtility.HasAnyStr(txtBackup.Text))
             {
@@ -1150,15 +1140,15 @@ namespace ServerDeployment.Console.Forms.AppForms
             ClearLables();
 
             // Validate paths and at least one path length should be > 0
-            if (AppUtility.HasNoStr(_backendPath)
-                && AppUtility.HasNoStr(_frontendPath)
-                && AppUtility.HasNoStr(_reportPath)
+            if (AppUtility.HasNoStr(txtBackend.Text)
+                && AppUtility.HasNoStr(txtFrontend.Text)
+                && AppUtility.HasNoStr(txtReport.Text)
                 )
             {
                 StatusUpdated?.Invoke("Please set at least one path to publish content.", Color.Red);
                 return;
             }
-            if (AppUtility.HasAnyStr(_backupPath))
+            if (AppUtility.HasAnyStr(txtBackup.Text))
             {
                 StatusUpdated?.Invoke("Please select the backup path", Color.Yellow);
                 return;
@@ -1293,9 +1283,8 @@ namespace ServerDeployment.Console.Forms.AppForms
                 if (missingItems.Count == 0)
                 {
                     StatusUpdated?.Invoke(@"All required files and folders are present.", Color.Green);
-
-                    _frontendPath = folderDialog.SelectedPath;
-                    txtFrontend.Text = _frontendPath;
+                     
+                    txtFrontend.Text = folderDialog.SelectedPath;
 
                     ButtonsSwitch(true);
                 }
@@ -1330,9 +1319,8 @@ namespace ServerDeployment.Console.Forms.AppForms
                 }
 
                 if (missingItems.Count == 0)
-                {
-                    _reportPath = folderDialog.SelectedPath;
-                    txtReport.Text = _reportPath;
+                { 
+                    txtReport.Text = folderDialog.SelectedPath;
 
                     StatusUpdated?.Invoke(@"All required report files and folders are present.", Color.Green);
                 }
