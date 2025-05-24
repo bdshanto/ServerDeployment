@@ -16,10 +16,10 @@ namespace ServerDeployment.Console.Forms.AppForms
     {
         private DataTable _sitesDataTable;
 
-        private string _backendPath = @"D:\Workspace\Office\ARAK\Resources\Publish";
+        private string _backupPath = @"D:\Workspace\Office\ARAK\Resources\Publish";
+        private string _backendPath = @"D:\Workspace\Office\ARAK\Resources\Publish\ARAK-Backend";
         private string _frontendPath = @"D:\Workspace\Office\ARAK\Resources\Publish\ARAK-Frontend";
         private string _reportPath = @"";
-        private string _backupPath = @"D:\Workspace\Office\ARAK\Resources\Publish\ARAK-Backend";
 
         private readonly Dictionary<string, string> _siteBackupDirectory = new();
 
@@ -133,9 +133,9 @@ namespace ServerDeployment.Console.Forms.AppForms
                 }
 
                 var contentSize = string.Empty;
-               
-                    contentSize = AppUtility.GetDirectorySize(site.PhysicalPath);
-               
+
+                contentSize = AppUtility.GetDirectorySize(site.PhysicalPath);
+
                 dt.Rows.Add(isSelected, site.Name, site.PhysicalPath, contentSize, site.State);
             }
             // Bind the DataTable to ultraGrid
@@ -285,6 +285,7 @@ namespace ServerDeployment.Console.Forms.AppForms
         }
 
 
+        /*
         private void CopySiteContent(string sourceRoot, string destinationSiteFolder, DeployEnum copyTo)
         {
             if (copyTo == DeployEnum.PetMatrixBackendAPI)
@@ -302,12 +303,17 @@ namespace ServerDeployment.Console.Forms.AppForms
                 CopyDirectory(sourceRoot, destinationSiteFolder);
             }
         }
+        */
 
 
         private void CopyDirectory(string sourceDir, string destDir)
         {
             var dir = new DirectoryInfo(sourceDir);
-            if (!dir.Exists) throw new DirectoryNotFoundException($"Source directory does not exist: {sourceDir}");
+            if (!dir.Exists)
+            {
+                SLogger.WriteLog($"{nameof(CopyDirectory)}: Source directory does not exist: {sourceDir}");
+                throw new DirectoryNotFoundException($"Source directory does not exist: {sourceDir}");
+            }
             Directory.CreateDirectory(destDir);
 
             foreach (var file in dir.GetFiles())
@@ -358,13 +364,16 @@ namespace ServerDeployment.Console.Forms.AppForms
                 string output = proc.StandardOutput.ReadToEnd();
                 string err = proc.StandardError.ReadToEnd();
                 if (!string.IsNullOrEmpty(err))
-                {
-                    MessageBox.Show("Error running appcmd: @" + err);
+                { 
+
+
+                    StatusUpdated?.Invoke("Error running appcmd: @" + err, Color.Black);
                 }
             }
             catch (Exception ex)
-            {
-                MessageBox.Show("Failed to run appcmd: @" + ex.Message);
+            {  
+                StatusUpdated?.Invoke("Error running appcmd: @" + ex.Message, Color.Red);
+                SLogger.WriteLog(ex);
             }
         }
 
@@ -404,11 +413,22 @@ namespace ServerDeployment.Console.Forms.AppForms
                 try
                 {
                     File.SetAttributes(file, FileAttributes.Normal);
+
                     File.Delete(file);
+                    StatusUpdated?.Invoke($"Deleted file: {Path.GetFileName(file)}", Color.Black);
+                    System.Windows.Forms.Application.DoEvents(); // To refresh UI immediately
                 }
                 catch (Exception ex)
                 {
-                    SLogger.WriteLog(ex);
+                    if (TryDeleteFile(file))
+                    {
+                        StatusUpdated?.Invoke($"Deleted file forcefully: {Path.GetFileName(file)}", Color.Black);
+                    }
+                    else
+                    {
+                        StatusUpdated?.Invoke($"Failed to delete file (locked?): {Path.GetFileName(file)}", Color.Red);
+                    }
+
                 }
             }
 
@@ -426,12 +446,40 @@ namespace ServerDeployment.Console.Forms.AppForms
                 {
                     Directory.Delete(dir, true);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // Ignore folders that cannot be deleted
+                    SLogger.WriteLog(ex);
                 }
             }
         }
+
+        private bool TryDeleteFile(string filePath, int retries = 3, int delayMs = 200)
+        {
+            for (int i = 0; i < retries; i++)
+            {
+                try
+                {
+                    File.SetAttributes(filePath, FileAttributes.Normal);
+                    File.Delete(filePath);
+                    return true;
+                }
+                catch (IOException)
+                {
+                    System.Threading.Thread.Sleep(delayMs);
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    System.Threading.Thread.Sleep(delayMs);
+                }
+                catch (Exception ex)
+                {
+                    SLogger.WriteLog(ex);
+                    return false;
+                }
+            }
+            return false;
+        }
+
 
         // Ping the site folder as hostname or IP (simplified)
         private async Task PingSiteAsync(string siteName)
@@ -722,53 +770,111 @@ namespace ServerDeployment.Console.Forms.AppForms
         {
             CopyContent();
         }
+
         private void CopyContent()
         {
             var selectedSites = GetSelectedSites();
             if (selectedSites.Count == 0)
             {
-                SetStatus("Please set both Site Root and Backup Path before publishing.", Color.Red);
+                StatusUpdated?.Invoke("Please set both Site Root and Backup Path before publishing.", Color.Red);
                 return;
             }
 
             var pathMap = new List<(string Path, DeployEnum Type)>
-            {
-                (_backendPath, DeployEnum.PetMatrixBackendAPI),
-                (_frontendPath, DeployEnum.Frontend),
-                (_reportPath, DeployEnum.ReportsViewer)
-            };
+    {
+        (_backendPath, DeployEnum.PetMatrixBackendAPI),
+        (_frontendPath, DeployEnum.Frontend),
+        (_reportPath, DeployEnum.ReportsViewer)
+    };
 
             if (pathMap.All(p => AppUtility.HasNoStr(p.Path)))
             {
-                SetStatus("Please set at least one path to copy content.", Color.Red);
+                 StatusUpdated?.Invoke("Please set at least one path to copy content.", Color.Red);
                 return;
             }
 
             try
             {
-                foreach (var site in selectedSites)
+                var options = new ParallelOptions { MaxDegreeOfParallelism = 4 };
+                Parallel.ForEach(selectedSites, options, site =>
                 {
-                    foreach (var (sourcePath, deployType) in pathMap)
+                    if (!_siteBackupDirectory.TryGetValue(site.Name, out string siteBackupDir))
                     {
-                        string source = (AppUtility.HasAnyStr(sourcePath) && sourcePath.Length > 0) ? sourcePath : site.PhysicalPath;
-                        CopySiteContent(source, site.PhysicalPath, deployType);
+                        SetStatus($"Backup path not found for site {site.Name}", Color.Red);
+                        return;
                     }
-                }
 
-                SetStatus("Content copied successfully.", Color.Green);
+                    foreach (var (configuredPath, deployType) in pathMap)
+                    {
+                        string source;
+                        if (AppUtility.HasAnyStr(configuredPath))
+                        {
+                            source = configuredPath;
+                        }
+                        else
+                        {
+                            source = GetDefaultSourcePath(deployType, siteBackupDir);
+                        }
+
+                        string destinationFolder;
+                        if (deployType == DeployEnum.PetMatrixBackendAPI)
+                        {
+                            destinationFolder = Path.Combine(site.PhysicalPath, nameof(DeployEnum.PetMatrixBackendAPI));
+                        }
+                        else if (deployType == DeployEnum.ReportsViewer)
+                        {
+                            destinationFolder = Path.Combine(site.PhysicalPath, nameof(DeployEnum.ReportsViewer));
+                        }
+                        else
+                        {
+                            destinationFolder = site.PhysicalPath;
+                        }
+
+                        CopySiteContent(source, destinationFolder);
+                    }
+                });
+
+                 StatusUpdated?.Invoke("Content copied successfully.", Color.Green);
+            }
+            catch (AggregateException aggEx)
+            {
+                 StatusUpdated?.Invoke("Error copying content: " + aggEx.Flatten().Message, Color.Red);
+                SLogger.WriteLog(aggEx);
             }
             catch (Exception ex)
             {
-                SetStatus("Error copying content: " + ex.Message, Color.Red);
+                 StatusUpdated?.Invoke("Error copying content: " + ex.Message, Color.Red);
                 SLogger.WriteLog(ex);
             }
+        }
+        private void CopySiteContent(string sourceRoot, string destinationFolder)
+        {
+            if (!Directory.Exists(sourceRoot))
+            {
+                SetStatus($"Source path not found: {sourceRoot}", Color.Red);
+                SLogger.WriteLog($"Source path not found: {sourceRoot}");
+                return;
+            }
+
+            CopyDirectory(sourceRoot, destinationFolder);
+        }
+
+        private string GetDefaultSourcePath(DeployEnum deployType, string siteBackupDir)
+        {
+            return deployType switch
+            {
+                //DeployEnum.Frontend => Path.Combine(siteBackupDir, "ARAK-Frontend"),
+                DeployEnum.PetMatrixBackendAPI => Path.Combine(siteBackupDir, nameof(DeployEnum.PetMatrixBackendAPI)),
+                DeployEnum.ReportsViewer => Path.Combine(siteBackupDir, nameof(DeployEnum.ReportsViewer)),
+                _ => siteBackupDir
+            };
         }
 
         // Helper method to set label status
         private void SetStatus(string message, Color color)
         {
             lblMsg.Text = message;
-            lblMsg.BackColor = color;
+           // lblMsg.BackColor = color;
         }
 
         private void btnBackupPath_Click(object sender, EventArgs e)
@@ -836,6 +942,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             btnStartIIS.Enabled = value;
             btnDeleteFiles.Enabled = value;
             btnCopyAppSettings.Enabled = value;
+            btnPingSite.Enabled = value;
             btnPingSite.Enabled = value;
             btnCopyContent.Enabled = value;
         }

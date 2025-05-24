@@ -44,7 +44,7 @@ namespace ServerDeployment.Domains.Utility
 
         public static bool HasAnyStr(string strVal)
         {
-            return !HasNoStr(strVal);
+            return !HasNoStr(strVal) && strVal.Length > 0;
         }
 
         #endregion
