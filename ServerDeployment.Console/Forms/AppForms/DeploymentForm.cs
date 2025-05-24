@@ -371,6 +371,9 @@ namespace ServerDeployment.Console.Forms.AppForms
         {
             var siteName = siteFolderName;
             RunAppCmd($"start site \"{siteName}\"");
+
+            UpdateSiteStatus(siteFolderName, "Started");
+
         }
 
         // Run appcmd with arguments
@@ -636,17 +639,30 @@ namespace ServerDeployment.Console.Forms.AppForms
                 return;
             }
 
-            // Run IIS start on background thread to avoid blocking UI
+            int totalSites = selected.Count;
+            int currentSite = 0;
+
             await Task.Run(() =>
             {
                 foreach (var site in selected)
                 {
+                    currentSite++;
+
+                    // Start the site
                     StartSite(site.Name);
+
+                    // Update status on UI thread
+                    this.Invoke(new Action(() =>
+                    {
+                        SetStatus($"Started site '{site.Name}' ({currentSite} of {totalSites})", Color.Black);
+                    }));
                 }
             });
 
-            // Refresh sites on UI thread after start
-            await LoadSitesFromIisAsync();
+            // Optionally final status
+            // SetStatus("All selected sites started.", Color.Green);
+
+
         }
         private async void btnDeleteFiles_Click(object sender, EventArgs e)
         {
@@ -659,7 +675,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             {
                 StatusUpdated?.Invoke("Please select at least one site.", Color.Red);
                 return;
-            } 
+            }
             if (string.IsNullOrWhiteSpace(txtBackend.Text) || !Directory.Exists(txtBackend.Text))
             {
                 StatusUpdated?.Invoke("Please select a valid Backend Deployment Folder.", Color.Red);
@@ -806,59 +822,270 @@ namespace ServerDeployment.Console.Forms.AppForms
             LoadSitesFromIis();
         }
 
+        #region Backend
 
+        private bool CheckBackendFiles(string path, out List<string> missingItems)
+        {
+            missingItems = new List<string>();
+
+            var fileSystemEntries = Directory.Exists(path)
+                ? Directory.EnumerateFileSystemEntries(path).Select(Path.GetFileName).ToList()
+                : new List<string>();
+
+            foreach (var expected in expectedBackendFiles)
+            {
+                bool found = false;
+
+                if (expected is string s)
+                {
+                    string fullPath = Path.Combine(path, s);
+                    found = Directory.Exists(fullPath) || File.Exists(fullPath);
+                }
+                else if (expected is Regex regex)
+                {
+                    found = fileSystemEntries.Any(f => regex.IsMatch(f));
+                }
+
+                if (!found)
+                    missingItems.Add(expected is string str ? str : expected.ToString());
+            }
+
+            return missingItems.Count == 0;
+        }
+
+        private void txtBackend_Leave(object sender, EventArgs e)
+        {
+            if (txtBackend.Text.StartsWith("\"") && txtBackend.Text.EndsWith("\""))
+            {
+                txtBackend.Text = txtBackend.Text.Trim('"');
+            }
+
+            if (AppUtility.HasAnyStr(txtBackend.Text))
+            {
+                bool allPresent = CheckBackendFiles(txtBackend.Text, out var missingItems);
+
+                if (allPresent)
+                {
+                    StatusUpdated?.Invoke("✅ All backend deployment files are present.", Color.Green);
+                    ButtonAppearance();
+                }
+                else
+                {
+                    txtBackend.Text = "";
+                    StatusUpdated?.Invoke("❌ Missing files or folders:" + Environment.NewLine + string.Join(Environment.NewLine, missingItems), Color.Red);
+                }
+            }
+        }
 
         private void btnBackend_Click(object sender, EventArgs e)
         {
             using var folderDialog = new FolderBrowserDialog
             {
-                Description = @"Select Backend Deployment Folder"
+                Description = "Select Backend Deployment Folder"
             };
 
             if (folderDialog.ShowDialog() == DialogResult.OK)
             {
                 string selectedPath = folderDialog.SelectedPath;
-                var fileSystemEntries = Directory.EnumerateFileSystemEntries(selectedPath)
-                    .Select(Path.GetFileName)
-                    .ToList();
 
-                var missingItems = new List<string>();
+                bool allPresent = CheckBackendFiles(selectedPath, out var missingItems);
 
-                foreach (var expected in expectedBackendFiles)
-                {
-                    bool found = false;
-
-                    if (expected is string s)
-                    {
-                        string fullPath = Path.Combine(selectedPath, s);
-                        if (Directory.Exists(fullPath))
-                            found = true;
-                        else if (File.Exists(fullPath))
-                            found = true;
-                    }
-                    else if (expected is Regex regex)
-                    {
-                        found = fileSystemEntries.Any(f => regex.IsMatch(f));
-                    }
-
-                    if (!found)
-                        missingItems.Add(expected is string str ? str : expected.ToString());
-                }
-
-                if (missingItems.Count == 0)
+                if (allPresent)
                 {
                     StatusUpdated?.Invoke("✅ All backend deployment files are present.", Color.Green);
-
-                    txtBackend.Text = folderDialog.SelectedPath;
-
+                    txtBackend.Text = selectedPath;
                     ButtonAppearance();
                 }
                 else
                 {
-                    StatusUpdated?.Invoke(@"❌Missing files or folders:\n" + string.Join("\n", missingItems), Color.Red);
+                    StatusUpdated?.Invoke("❌ Missing files or folders:" + Environment.NewLine + string.Join(Environment.NewLine, missingItems), Color.Red);
                 }
             }
         }
+
+
+        #endregion
+
+        #region Frontend
+
+        private bool ValidateFrontendFolder(string selectedPath, out List<string> missingItems)
+        {
+            missingItems = new List<string>();
+
+            if (!Directory.Exists(selectedPath))
+            {
+                missingItems.Add("Folder does not exist.");
+                return false;
+            }
+
+            var fileSystemEntries = Directory.EnumerateFileSystemEntries(selectedPath)
+                .Select(Path.GetFileName)
+                .ToList();
+
+            foreach (var expected in _expectedFrontendFilesAndFolders)
+            {
+                bool found = false;
+
+                if (expected is string str)
+                {
+                    if (str.Equals("assets", StringComparison.OrdinalIgnoreCase))
+                    {
+                        string assetsPath = Path.Combine(selectedPath, "assets");
+                        found = Directory.Exists(assetsPath);
+                    }
+                    else
+                    {
+                        found = fileSystemEntries.Any(f => f.Equals(str, StringComparison.OrdinalIgnoreCase));
+                    }
+                }
+                else if (expected is Regex regex)
+                {
+                    found = fileSystemEntries.Any(f => regex.IsMatch(f));
+                }
+
+                if (!found)
+                {
+                    missingItems.Add(expected is string ? (string)expected : expected.ToString());
+                    break; // Stop on first missing item
+                }
+            }
+
+            return missingItems.Count == 0;
+        }
+
+        private void btnFrontend_Click(object sender, EventArgs e)
+        {
+            using var folderDialog = new FolderBrowserDialog
+            {
+                Description = @"Select Angular Build Folder"
+            };
+
+            if (folderDialog.ShowDialog() == DialogResult.OK)
+            {
+                string selectedPath = folderDialog.SelectedPath;
+
+                if (ValidateFrontendFolder(selectedPath, out var missingItems))
+                {
+                    StatusUpdated?.Invoke("All required files and folders are present.", Color.Green);
+                    txtFrontend.Text = selectedPath;
+                    ButtonAppearance();
+                }
+                else
+                {
+                    StatusUpdated?.Invoke("Missing files or folders:" + Environment.NewLine + string.Join(Environment.NewLine, missingItems), Color.Red);
+                }
+            }
+        }
+
+        // Consider using txtFrontend_Leave instead of KeyUp to avoid too frequent validations
+        private void txtFrontend_Leave(object sender, EventArgs e)
+        {
+            // Trim quotes if any
+            if (txtFrontend.Text.StartsWith("\"") && txtFrontend.Text.EndsWith("\""))
+            {
+                txtFrontend.Text = txtFrontend.Text.Trim('"');
+            }
+
+            if (AppUtility.HasAnyStr(txtFrontend.Text))
+            {
+                if (ValidateFrontendFolder(txtFrontend.Text, out var missingItems))
+                {
+                    StatusUpdated?.Invoke("All required files and folders are present.", Color.Green);
+                    ButtonAppearance();
+                }
+                else
+                {
+                    StatusUpdated?.Invoke("Missing files or folders:" + Environment.NewLine + string.Join(Environment.NewLine, missingItems), Color.Red);
+                }
+            }
+        }
+
+
+        #endregion
+
+
+        #region Report
+        private bool ValidateReportDirectory(string path, out List<string> missingItems)
+        {
+            missingItems = new List<string>();
+
+            if (!Directory.Exists(path))
+            {
+                missingItems.Add("Directory does not exist.");
+                return false;
+            }
+
+            foreach (var item in _expectedReportViewerFilesAndFolders)
+            {
+                string fullPath = Path.Combine(path, item);
+
+                if (item.Contains("."))
+                {
+                    if (!File.Exists(fullPath))
+                        missingItems.Add(item);
+                }
+                else
+                {
+                    if (!Directory.Exists(fullPath))
+                        missingItems.Add(item);
+                }
+            }
+
+            return missingItems.Count == 0;
+        }
+
+        private void btnReport_Click(object sender, EventArgs e)
+        {
+            using var folderDialog = new FolderBrowserDialog
+            {
+                Description = "Select Report Directory"
+            };
+
+            if (folderDialog.ShowDialog() == DialogResult.OK)
+            {
+                string selectedPath = folderDialog.SelectedPath;
+                if (ValidateReportDirectory(selectedPath, out var missingItems))
+                {
+                    txtReport.Text = selectedPath;
+                    StatusUpdated?.Invoke("All required report files and folders are present.", Color.Green);
+                    ButtonAppearance();
+                }
+                else
+                {
+                    StatusUpdated?.Invoke("Missing files or folders:" + Environment.NewLine + string.Join(Environment.NewLine, missingItems), Color.Red);
+                }
+            }
+        }
+
+        private void txtReport_Leave(object? sender, EventArgs e)
+        {
+            if (txtReport.Text.StartsWith("\"") && txtReport.Text.EndsWith("\""))
+            {
+                txtReport.Text = txtReport.Text.Trim('"');
+            }
+
+            if (AppUtility.HasAnyStr(txtReport.Text))
+            {
+                if (ValidateReportDirectory(txtReport.Text, out var missingItems))
+                {
+                    StatusUpdated?.Invoke("All required report files and folders are present.", Color.Green);
+                    ButtonAppearance();
+                }
+                else
+                {
+                    txtReport.Text = string.Empty;
+                    StatusUpdated?.Invoke("Missing files or folders:" + Environment.NewLine + string.Join(Environment.NewLine, missingItems), Color.Red);
+                }
+            }
+            else
+            {
+                txtReport.Text = string.Empty;
+                StatusUpdated?.Invoke("Please select a valid Report Directory.", Color.Red);
+            }
+        }
+
+
+        #endregion
 
         private async void btnCopyContent_Click(object sender, EventArgs e)
         {
@@ -1256,124 +1483,15 @@ namespace ServerDeployment.Console.Forms.AppForms
             }
         }
 
-        private void btnFrontend_Click(object sender, EventArgs e)
+
+
+        private void txtBackup_Leave(object? sender, EventArgs e)
         {
-            using var folderDialog = new FolderBrowserDialog();
-            folderDialog.Description = @"Select Angular Build Folder";
-
-            if (folderDialog.ShowDialog() == DialogResult.OK)
+            if (txtBackup.Text.StartsWith("\"") && txtBackup.Text.EndsWith("\""))
             {
-                string selectedPath = folderDialog.SelectedPath;
-
-                // Get all files and folders names in the root of selected path
-                var fileSystemEntries = Directory.EnumerateFileSystemEntries(selectedPath)
-                    .Select(Path.GetFileName)
-                    .ToList();
-
-                var missingItems = new List<string>();
-                foreach (var expected in _expectedFrontendFilesAndFolders)
-                {
-                    bool found = false;
-
-                    if (expected is string str)
-                    {
-                        if (str.Equals("assets", StringComparison.OrdinalIgnoreCase))
-                        {
-                            // Check folder existence
-                            string assetsPath = Path.Combine(selectedPath, "assets");
-                            found = Directory.Exists(assetsPath);
-                        }
-                        else
-                        {
-                            // Check exact file
-                            found = fileSystemEntries.Any(f => f.Equals(str, StringComparison.OrdinalIgnoreCase));
-                        }
-                    }
-                    else if (expected is Regex regex)
-                    {
-                        found = fileSystemEntries.Any(f => regex.IsMatch(f));
-                    }
-
-                    if (!found)
-                    {
-                        missingItems.Add(expected is string ? (string)expected : expected.ToString());
-                    }
-
-                    if (!found) break;
-                }
-
-                if (missingItems.Count == 0)
-                {
-                    StatusUpdated?.Invoke(@"All required files and folders are present.", Color.Green);
-
-                    txtFrontend.Text = folderDialog.SelectedPath;
-
-                    ButtonAppearance();
-                }
-                else
-                {
-                    StatusUpdated?.Invoke(@"Missing files or folders:\n" + string.Join("\n", missingItems), Color.Red);
-                }
+                txtBackup.Text = txtBackup.Text.Trim('"');
             }
         }
 
-        private void btnReport_Click(object sender, EventArgs e)
-        {
-            using var folderDialog = new FolderBrowserDialog
-            {
-                Description = @"Select Report Directory"
-            };
-
-            if (folderDialog.ShowDialog() == DialogResult.OK)
-            {
-                var missingItems = new List<string>();
-                foreach (var item in _expectedReportViewerFilesAndFolders)
-                {
-                    string fullPath = Path.Combine(folderDialog.SelectedPath, item);
-                    if (item.Contains(".") && !File.Exists(fullPath)) // file check
-                    {
-                        missingItems.Add(item);
-                    }
-                    else if (!item.Contains(".") && !Directory.Exists(fullPath)) // folder check
-                    {
-                        missingItems.Add(item);
-                    }
-                }
-
-                if (missingItems.Count == 0)
-                {
-                    txtReport.Text = folderDialog.SelectedPath;
-
-                    StatusUpdated?.Invoke(@"All required report files and folders are present.", Color.Green);
-                }
-                else
-                {
-                    StatusUpdated?.Invoke(@"Missing files or folders:\n" + string.Join("\n", missingItems), Color.Red);
-                }
-
-                ButtonAppearance();
-            }
-        }
-
-
-        private void txtBackup_KeyUp(object sender, KeyEventArgs e)
-        {
-            ButtonAppearance();
-        }
-
-        private void txtBackend_KeyUp(object sender, KeyEventArgs e)
-        {
-            ButtonAppearance();
-        }
-
-        private void txtFrontend_KeyUp(object sender, KeyEventArgs e)
-        {
-            ButtonAppearance();
-        }
-
-        private void txtReport_KeyUp(object sender, KeyEventArgs e)
-        {
-            ButtonAppearance();
-        }
     }
 }

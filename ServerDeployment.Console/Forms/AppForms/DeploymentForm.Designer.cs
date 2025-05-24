@@ -130,7 +130,7 @@
             txtBackend.Name = "txtBackend";
             txtBackend.Size = new Size(522, 31);
             txtBackend.TabIndex = 3;
-            txtBackend.KeyUp += txtBackend_KeyUp;
+            txtBackend.Leave += txtBackend_Leave;
             // 
             // btnCopyContent
             // 
@@ -284,7 +284,7 @@
             txtBackup.Name = "txtBackup";
             txtBackup.Size = new Size(522, 31);
             txtBackup.TabIndex = 1;
-            txtBackup.KeyUp += txtBackup_KeyUp;
+            txtBackup.Leave += txtBackup_Leave;
             // 
             // txtFrontend
             // 
@@ -292,7 +292,7 @@
             txtFrontend.Name = "txtFrontend";
             txtFrontend.Size = new Size(522, 31);
             txtFrontend.TabIndex = 5;
-            txtFrontend.KeyUp += txtFrontend_KeyUp;
+            txtFrontend.Leave += txtFrontend_Leave;
             // 
             // txtReport
             // 
@@ -300,7 +300,7 @@
             txtReport.Name = "txtReport";
             txtReport.Size = new Size(522, 31);
             txtReport.TabIndex = 7;
-            txtReport.KeyUp += txtReport_KeyUp;
+            txtReport.Leave += txtReport_Leave;
             // 
             // btnBackend
             // 
