@@ -312,49 +312,6 @@ namespace ServerDeployment.Console.Forms.AppForms
             return selected;
         }
 
-        private void BackupSelectedSites()
-        {
-            ClearLables();
-
-            var selectedSites = GetSelectedSites();
-            if (selectedSites.Count <= 0)
-            {
-                StatusUpdated?.Invoke("Please select at least one site to backup.", Color.Red);
-
-                return;
-            }
-
-            int totalSites = selectedSites.Count;
-            int currentSite = 0;
-
-            foreach (var site in selectedSites)
-            {
-                currentSite++;
-                try
-                {
-                    OnProgressUpdated($"Backing up site '{site.Name}' ({currentSite} of {totalSites})...", (currentSite * 100) / totalSites, ProgressType.Backup);
-
-                    string sourceDir = site.PhysicalPath;
-                    string backupDir = Path.Combine(_backupPath, $"{site.Name}_backup_{DateTime.Now:yyyyMMddHHmmss}");
-
-                    CopyDirectory(sourceDir, backupDir);
-
-                    if (_siteBackupDirectory.ContainsKey(site.Name))
-                    {
-                        _siteBackupDirectory.Remove(site.Name);
-                    }
-
-                    _siteBackupDirectory.Add(site.Name, backupDir);
-                }
-                catch (Exception ex)
-                {
-                    OnProgressUpdated($"Failed to backup site '{site.Name}': {ex.Message}");
-                }
-            }
-
-            OnProgressUpdated("Backup completed.", 100, ProgressType.Backup);
-        }
-
         private void CopyDirectory(string sourceDir, string destDir, Action onFileCopied)
         {
             var dir = new DirectoryInfo(sourceDir);
@@ -414,15 +371,6 @@ namespace ServerDeployment.Console.Forms.AppForms
             }
         }
 
-
-        private void StopSite(string siteFolderName)
-        {
-            // Find IIS site name from folder name - simplified as folder name is site name
-            var siteName = siteFolderName;
-
-            RunAppCmd($"stop site \"{siteName}\"");
-        }
-
         // Start IIS site by folder name using appcmd
         private void StartSite(string siteFolderName)
         {
@@ -460,41 +408,6 @@ namespace ServerDeployment.Console.Forms.AppForms
                 StatusUpdated?.Invoke("Error running appcmd: @" + ex.Message, Color.Red);
                 SLogger.WriteLog(ex);
             }
-        }
-
-        // Delete all files in selected site folders (with confirmation)
-        private void DeleteFilesInSites()
-        {
-            List<IISSiteInfo> selectedSites = GetSelectedSites();
-            if (selectedSites.Count == 0)
-            {
-                StatusUpdated?.Invoke("Please select at least one site.", Color.Red);
-                return;
-            }
-
-            var confirm = MessageBox.Show(@"Are you sure you want to delete all files in selected site folders? This cannot be undone!", @"Confirm Delete", MessageBoxButtons.YesNo);
-            if (confirm != DialogResult.Yes) return;
-
-            int totalSites = selectedSites.Count;
-            int currentSite = 0;
-
-            foreach (var site in selectedSites)
-            {
-                OnProgressUpdated($"Deleting up site '{site.Name}' ({currentSite} of {totalSites})...", (currentSite * 100) / totalSites, ProgressType.Delete);
-                var folder = Path.Combine(_backendPath, site.PhysicalPath);
-                try
-                {
-                    DeleteAllFiles(folder);
-                }
-                catch (Exception ex)
-                {
-                    StatusUpdated?.Invoke($@"Error deleting files in {site}: {ex.Message}", Color.Red);
-
-                    SLogger.WriteLog(ex);
-                }
-            }
-
-            StatusUpdated?.Invoke(@"Files deleted.", Color.Red);
         }
 
         private void DeleteAllFiles(string folder, bool isRoot = true)
@@ -571,64 +484,6 @@ namespace ServerDeployment.Console.Forms.AppForms
             return false;
         }
 
-
-        // Ping the site folder as hostname or IP (simplified)
-        private async Task PingSiteAsync(string siteName)
-        {
-            string hostHeader = @"";
-            string ip = @"";
-            int port = 0;
-
-            using (ServerManager iisManager = new ServerManager())
-            {
-                var site = iisManager.Sites[siteName];
-                if (site != null)
-                {
-                    foreach (var binding in site.Bindings)
-                    {
-                        ip = binding.EndPoint?.Address.ToString() ?? @"";
-                        port = binding.EndPoint?.Port ?? 0;
-                        hostHeader = binding.Host;
-
-                        // Use first valid binding
-                        break;
-                    }
-                }
-            }
-
-            string pingTarget = @"127.0.0.1";
-
-            // Determine ping target
-            if (!string.IsNullOrEmpty(hostHeader) && hostHeader != @"*" && hostHeader != @"0.0.0.0")
-            {
-                pingTarget = hostHeader;
-            }
-            else if (!string.IsNullOrEmpty(ip) && ip != @"0.0.0.0" && ip != @"::")
-            {
-                pingTarget = ip;
-            }
-
-            if (pingTarget != null)
-            {
-                var ping = new Ping();
-                try
-                {
-                    var reply = await ping.SendPingAsync($@"{pingTarget}:{port}", 2000);
-                    string status = reply.Status == IPStatus.Success ? @"Online" : @"Offline";
-                    UpdateSiteStatus(siteName, status);
-                }
-                catch (Exception ex)
-                {
-                    UpdateSiteStatus(siteName, @"Offline");
-                }
-            }
-            else
-            {
-                // Cannot ping unknown or invalid address
-                UpdateSiteStatus(siteName, @"Unknown");
-            }
-        }
-
         private void UpdateSiteStatus(string siteFolderName, string status)
         {
             foreach (UltraGridRow row in ultraGrid.Rows)
@@ -640,8 +495,6 @@ namespace ServerDeployment.Console.Forms.AppForms
                 }
             }
         }
-
-        // UI button click events
 
         private async void btnBackup_Click(object sender, EventArgs e)
         {
@@ -773,24 +626,6 @@ namespace ServerDeployment.Console.Forms.AppForms
             return totalFiles;
         }
 
-
-        private void StopIis()
-        {
-            var selected = GetSelectedSites();
-            if (selected.Count == 0)
-            {
-                lblMsg.Text = @"Please select at least one site.";
-                lblMsg.BackColor = Color.Red;
-                return;
-            }
-
-            foreach (var site in selected)
-            {
-                StopSite(site.Name);
-            }
-
-            LoadSitesFromIis();
-        }
 
         private async void btnStartIIS_Click(object sender, EventArgs e)
         {
@@ -970,74 +805,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             {
                 btnCopyAppSettings.Enabled = true;
             }
-        }
-        private void CopyAppSettings()
-        {
-            var sites = GetIISSites();
-            if (sites.Count <= 0)
-            {
-                lblMsg.Text = @"No sites found.";
-                lblMsg.BackColor = Color.Red;
-                return;
-            }
-
-            try
-            {
-                int totalSites = sites.Count;
-                int currentSite = 0;
-                foreach (var site in sites)
-                {
-                    OnProgressUpdated($"Updating '{site.Name}' configurations, ({currentSite} of {totalSites})...", (currentSite * 100) / totalSites, ProgressType.AppSettings);
-                    string sourceRoot = _siteBackupDirectory[site.Name];
-                    var destRoot = site.PhysicalPath;
-
-                    // Copy Frontend web.config from Existing source to root
-                    string frontendWebConfig = Path.Combine(sourceRoot, @"web.config");
-                    if (File.Exists(frontendWebConfig))
-                    {
-                        string destWebConfig = Path.Combine(destRoot, @"web.config");
-                        File.Copy(frontendWebConfig, destWebConfig, overwrite: true);
-                    }
-
-                    // Copy appsettings.json from Existing directory  PetMatrixBackendAPI
-                    string backendAppSettings = Path.Combine(sourceRoot, @"PetMatrixBackendAPI", @"appsettings.json");
-                    if (File.Exists(backendAppSettings))
-                    {
-                        string destApiFolder = Path.Combine(destRoot, @"PetMatrixBackendAPI");
-                        Directory.CreateDirectory(destApiFolder);
-                        string destAppSettings = Path.Combine(destApiFolder, @"appsettings.json");
-                        File.Copy(backendAppSettings, destAppSettings, overwrite: true);
-                    }
-
-                    // Copy web.config from Existing directory to PetMatrixBackendAPI
-                    string backendWebConfig = Path.Combine(sourceRoot, @"PetMatrixBackendAPI", @"web.config");
-                    if (File.Exists(backendWebConfig))
-                    {
-                        string destApiFolder = Path.Combine(destRoot, @"PetMatrixBackendAPI");
-                        Directory.CreateDirectory(destApiFolder);
-                        string destAppSettings = Path.Combine(destApiFolder, @"web.config");
-                        File.Copy(backendWebConfig, destAppSettings, overwrite: true);
-                    }
-
-                    // Copy ReportsViewer web.config
-                    string reportsViewerWebConfig = Path.Combine(sourceRoot, @"ReportsViewer", @"Web.config");
-                    if (File.Exists(reportsViewerWebConfig))
-                    {
-                        string destApiFolder = Path.Combine(destRoot, @"ReportsViewer");
-                        Directory.CreateDirectory(destApiFolder);
-                        string destAppSettings = Path.Combine(destApiFolder, @"Web.config");
-                        File.Copy(reportsViewerWebConfig, destAppSettings, overwrite: true);
-                    }
-                }
-
-                StatusUpdated?.Invoke(@"Copy completed successfully.", Color.Green);
-            }
-            catch (Exception ex)
-            {
-                StatusUpdated?.Invoke(@$"Error during copy: {ex.Message}", Color.Red);
-                SLogger.WriteLog(ex);
-            }
-        }
+        } 
 
         private void btnReloadSites_Click(object sender, EventArgs e)
         {
@@ -1216,98 +984,8 @@ namespace ServerDeployment.Console.Forms.AppForms
             StatusUpdated?.Invoke("Content copied successfully.", Color.Green);
             btnCopyContent.Enabled = true;
         }
-        private void CopyContent()
-        {
-            var selectedSites = GetSelectedSites();
-            if (selectedSites.Count == 0)
-            {
-                StatusUpdated?.Invoke("Please set both Site Root and Backup Path before publishing.", Color.Red);
-                return;
-            }
 
-            var pathMap = new List<(string Path, DeployEnum Type)>
-            {
-                (_backendPath, DeployEnum.PetMatrixBackendAPI),
-                (_frontendPath, DeployEnum.Frontend),
-                (_reportPath, DeployEnum.ReportsViewer)
-            };
 
-            if (pathMap.All(p => AppUtility.HasNoStr(p.Path)))
-            {
-                StatusUpdated?.Invoke("Please set at least one path to copy content.", Color.Red);
-                return;
-            }
-
-            try
-            {
-                var options = new ParallelOptions { MaxDegreeOfParallelism = 4 };
-
-                foreach (var site in selectedSites)
-                {
-
-                    foreach (var (configuredPath, deployType) in pathMap)
-                    {
-                        string source;
-                        if (AppUtility.HasAnyStr(configuredPath))
-                        {
-                            source = configuredPath;
-                        }
-                        else
-                        {
-                            if (!_siteBackupDirectory.TryGetValue(site.Name, out string siteBackupDir))
-                            {
-                                StatusUpdated?.Invoke($"Backup path not found for site {site.Name}", Color.Red);
-                                return;
-                            }
-
-                            source = GetDefaultSourcePath(deployType, siteBackupDir);
-                        }
-
-                        string destinationFolder;
-                        if (deployType == DeployEnum.PetMatrixBackendAPI)
-                        {
-                            destinationFolder = Path.Combine(site.PhysicalPath, nameof(DeployEnum.PetMatrixBackendAPI));
-                        }
-                        else if (deployType == DeployEnum.ReportsViewer)
-                        {
-                            destinationFolder = Path.Combine(site.PhysicalPath, nameof(DeployEnum.ReportsViewer));
-                        }
-                        else
-                        {
-                            destinationFolder = site.PhysicalPath;
-                        }
-
-                        CopySiteContent(source, destinationFolder);
-                    }
-                }
-
-                ;
-
-                StatusUpdated?.Invoke("Content copied successfully.", Color.Green);
-            }
-            catch (AggregateException aggEx)
-            {
-                StatusUpdated?.Invoke("Error copying content: " + aggEx.Flatten().Message, Color.Red);
-                SLogger.WriteLog(aggEx);
-            }
-            catch (Exception ex)
-            {
-                StatusUpdated?.Invoke("Error copying content: " + ex.Message, Color.Red);
-                SLogger.WriteLog(ex);
-            }
-        }
-
-        private void CopySiteContent(string sourceRoot, string destinationFolder)
-        {
-            if (!Directory.Exists(sourceRoot))
-            {
-                StatusUpdated?.Invoke($"Source path not found: {sourceRoot}", Color.Red);
-                SLogger.WriteLog($"Source path not found: {sourceRoot}");
-                return;
-            }
-
-            CopyDirectory(sourceRoot, destinationFolder);
-        }
 
         private string GetDefaultSourcePath(DeployEnum deployType, string siteBackupDir)
         {
@@ -1322,11 +1000,6 @@ namespace ServerDeployment.Console.Forms.AppForms
 
         // Helper method to set label status
         private void SetStatus(string message, Color color)
-        {
-            lblMsg.Text = message;
-            // lblMsg.BackColor = color;
-        }
-        private void SetTitleStatus(string message, Color color)
         {
             lblMsg.Text = message;
             // lblMsg.BackColor = color;
@@ -1353,7 +1026,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             txtFrontend.Text = _frontendPath;
             txtBackend.Text = _backendPath;
 
-            if (!HasNoStr(txtBackup.Text) && txtBackup.Text.Length > 0)
+            if (AppUtility.HasAnyStr(txtBackup.Text))
             {
                 btnBackupPath.BackColor = Color.Green;
             }
@@ -1362,7 +1035,7 @@ namespace ServerDeployment.Console.Forms.AppForms
                 btnBackupPath.BackColor = Color.Red;
             }
 
-            if (!HasNoStr(txtBackend.Text) && txtBackend.Text.Length > 0)
+            if (AppUtility.HasAnyStr(txtBackend.Text))
             {
                 btnBackend.BackColor = Color.Green;
             }
@@ -1370,8 +1043,7 @@ namespace ServerDeployment.Console.Forms.AppForms
             {
                 btnBackend.BackColor = Color.Red;
             }
-
-            if (!HasNoStr(txtFrontend.Text) && txtFrontend.Text.Length > 0)
+            if (AppUtility.HasAnyStr(txtFrontend.Text))
             {
                 btnFrontend.BackColor = Color.Green;
             }
@@ -1379,8 +1051,8 @@ namespace ServerDeployment.Console.Forms.AppForms
             {
                 btnFrontend.BackColor = Color.Red;
             }
+            if (AppUtility.HasAnyStr(txtReport.Text))
 
-            if (!HasNoStr(txtReport.Text) && txtReport.Text.Length > 0)
             {
                 btnReport.BackColor = Color.Green;
             }
@@ -1400,10 +1072,6 @@ namespace ServerDeployment.Console.Forms.AppForms
         }
 
 
-        private bool HasNoStr(string str)
-        {
-            return string.IsNullOrWhiteSpace(str) || string.IsNullOrEmpty(str);
-        }
 
         private DataTable CreateSitesDataTable()
         {
