@@ -85,7 +85,6 @@ This Windows Forms application streamlines deployment and management of IIS-host
 
 ## Author
 
-Miracle Advance Technologies  
 Md Hasibul Islam Shanto  
 LinkedIn: [bdshanto](https://www.linkedin.com/in/bdshanto)
 
