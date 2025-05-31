@@ -41,7 +41,6 @@
             btnBackupPath = new Button();
             ultraGrid = new Infragistics.Win.UltraWinGrid.UltraGrid();
             ultraPanel1 = new Infragistics.Win.Misc.UltraPanel();
-            ultraLabel1 = new Infragistics.Win.Misc.UltraLabel();
             panel2 = new Panel();
             panel1 = new Panel();
             lblMsg = new Label();
@@ -178,15 +177,6 @@
             ultraPanel1.Size = new Size(1054, 870);
             ultraPanel1.TabIndex = 5;
             // 
-            // ultraLabel1
-            // 
-            ultraLabel1.Font = new Font("Comic Sans MS", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            ultraLabel1.Location = new Point(3, 362);
-            ultraLabel1.Name = "ultraLabel1";
-            ultraLabel1.Size = new Size(293, 34);
-            ultraLabel1.TabIndex = 0;
-            ultraLabel1.Text = "MD HASIBUL ISLAM SHANTO";
-            // 
             // panel2
             // 
             panel2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
@@ -199,7 +189,6 @@
             // panel1
             // 
             panel1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            panel1.Controls.Add(ultraLabel1);
             panel1.Controls.Add(lblMsg);
             panel1.Controls.Add(progressBarReport);
             panel1.Controls.Add(progressBarFrontend);
@@ -273,7 +262,7 @@
             btnPublish.HotTrackAppearance = appearance11;
             btnPublish.Location = new Point(781, 236);
             btnPublish.Name = "btnPublish";
-            btnPublish.Size = new Size(208, 129);
+            btnPublish.Size = new Size(208, 90);
             btnPublish.TabIndex = 17;
             btnPublish.Text = "Publish";
             btnPublish.Click += btnPublish_Click;
@@ -353,7 +342,6 @@
             Controls.Add(ultraPanel1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "DeploymentForm";
-            StartPosition = FormStartPosition.Manual;
             Text = "Deployment Form";
             ((System.ComponentModel.ISupportInitialize)ultraGrid).EndInit();
             ultraPanel1.ClientArea.ResumeLayout(false);
@@ -376,7 +364,6 @@
         private Button btnBackupPath;
         private Infragistics.Win.UltraWinGrid.UltraGrid ultraGrid;
         private Infragistics.Win.Misc.UltraPanel ultraPanel1;
-        private Infragistics.Win.Misc.UltraLabel ultraLabel1;
         private TextBox txtBackup;
         private Infragistics.Win.Misc.UltraButton btnPublish;
         private Label lblMsg;
