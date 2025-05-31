@@ -170,7 +170,6 @@
             // 
             // ultraPanel1.ClientArea
             // 
-            ultraPanel1.ClientArea.Controls.Add(ultraLabel1);
             ultraPanel1.ClientArea.Controls.Add(panel2);
             ultraPanel1.ClientArea.Controls.Add(panel1);
             ultraPanel1.ClientArea.Controls.Add(ultraLabel2);
@@ -182,7 +181,7 @@
             // ultraLabel1
             // 
             ultraLabel1.Font = new Font("Comic Sans MS", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            ultraLabel1.Location = new Point(3, 7);
+            ultraLabel1.Location = new Point(3, 362);
             ultraLabel1.Name = "ultraLabel1";
             ultraLabel1.Size = new Size(293, 34);
             ultraLabel1.TabIndex = 0;
@@ -200,6 +199,7 @@
             // panel1
             // 
             panel1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            panel1.Controls.Add(ultraLabel1);
             panel1.Controls.Add(lblMsg);
             panel1.Controls.Add(progressBarReport);
             panel1.Controls.Add(progressBarFrontend);
@@ -338,11 +338,11 @@
             // ultraLabel2
             // 
             ultraLabel2.Font = new Font("Segoe UI Variable Text", 18F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            ultraLabel2.Location = new Point(481, -4);
+            ultraLabel2.Location = new Point(361, 3);
             ultraLabel2.Name = "ultraLabel2";
             ultraLabel2.Size = new Size(341, 56);
             ultraLabel2.TabIndex = 2;
-            ultraLabel2.Text = "PETMATRIX";
+            ultraLabel2.Text = "DEPLOYMENT";
             // 
             // DeploymentForm
             // 
