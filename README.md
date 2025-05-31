@@ -123,9 +123,14 @@ This Windows Forms application streamlines deployment and management of IIS-host
 
 ## Notes
 
-- The tool is designed to work with IIS sites structured similarly to PetMatrix deployments.
+- The tool is designed to work with IIS sites structured similarly to Demo deployments.
+- It is not intended for use with non-IIS web servers or applications.
+- The application is built using .NET 8 and requires the latest version of Visual Studio for development.
 - Administrative rights are required for IIS operations.
 - The UI leverages Infragistics UltraGrid for a rich user experience.
+- The application is designed to be user-friendly, with clear instructions and progress indicators.
+- The tool is suitable for developers and system administrators who manage IIS-hosted web applications.
+- The application is extensible and can be modified to include additional features or support for more complex deployment scenarios.
 
 ---
 
