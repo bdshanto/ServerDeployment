@@ -93,4 +93,7 @@ LinkedIn: [bdshanto](https://www.linkedin.com/in/bdshanto)
 
 ## License
 
-MIT License (see LICENSE file)
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
