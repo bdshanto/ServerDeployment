@@ -1298,7 +1298,7 @@ namespace ServerDeployment.Console.Forms.AppForms
         private DataTable CreateSitesDataTable()
         {
             DataTable dt = new DataTable();
-            dt.Columns.Add(nameof(IISSiteInfo.Select), typeof(bool)); // checkbox column
+            dt.Columns.Add(nameof(IISSiteInfo.Select), typeof(bool));  
             dt.Columns.Add(nameof(IISSiteInfo.Name), typeof(string));
             dt.Columns.Add(nameof(IISSiteInfo.PhysicalPath), typeof(string));
             dt.Columns.Add(nameof(IISSiteInfo.ContentSize), typeof(string));
@@ -1325,18 +1325,7 @@ namespace ServerDeployment.Console.Forms.AppForms
 
             band.Columns[nameof(IISSiteInfo.State)].Header.Caption = @"Status";
             band.Columns[nameof(IISSiteInfo.State)].CellActivation = Activation.NoEdit;
-
-            // Set Header Font (size, style, color)
-            band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.FontData.SizeInPoints = 13; // Font size
-            band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.FontData.Bold = DefaultableBoolean.True; // Bold
-            band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.ForeColor = Color.Black; // Text color (black to match white theme)
-            band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.ForeColor = Color.LightGray; // Light gray background for header
-
-            band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.FontData.SizeInPoints = 13; // Font size
-            band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.FontData.Bold = DefaultableBoolean.True; // Bold
-            band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.ForeColor = Color.Black; // Text color
-            band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.ForeColor = Color.LightGray; // Light gray background for header
-
+             
             // Optionally, align header text
             band.Columns[nameof(IISSiteInfo.Name)].Header.Appearance.TextHAlign = HAlign.Center; // Center alignment
             band.Columns[nameof(IISSiteInfo.State)].Header.Appearance.TextHAlign = HAlign.Center; // Center alignment
@@ -1416,9 +1405,7 @@ namespace ServerDeployment.Console.Forms.AppForms
 
 
         }
-
-
-
+         
 
         private void OnProgressUpdated(string message, int? percent = null, ProgressType progressFor = ProgressType.Backup)
         {
@@ -1473,9 +1460,7 @@ namespace ServerDeployment.Console.Forms.AppForms
                     break;
                     //toDO: ProgressType.AppSettings
             }
-        }
-
-
+        } 
 
         private void txtBackup_Leave(object? sender, EventArgs e)
         {
