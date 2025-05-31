@@ -25,7 +25,13 @@ This Windows Forms application streamlines deployment and management of IIS-host
 ## Deployment Form UI
 
 <p align="center">
-  <img src="resources/resource-01.png" alt="Resource Image" width="500"/>
+  <img src="resources/resource-01.png" alt="Resource Image" width="450"/>
+</p>
+<p align="center"><strong>Figure 1:</strong> Deployment Form UI</p>
+
+
+<p align="center">
+  <img src="resources/" alt="Resource Image" width="450"/>
 </p>
 <p align="center"><strong>Figure 1:</strong> Deployment Form UI</p>
 

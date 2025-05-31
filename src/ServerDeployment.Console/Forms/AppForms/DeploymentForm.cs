@@ -474,17 +474,27 @@ namespace ServerDeployment.Console.Forms.AppForms
             return false;
         }
 
-        private void UpdateSiteStatus(string siteFolderName, string status)
+        private void UpdateSiteStatus(string name, string status)
         {
-            foreach (UltraGridRow row in ultraGrid.Rows)
+            if (ultraGrid.InvokeRequired)
             {
-                if (row.Cells[nameof(IISSiteInfo.PhysicalPath)].Value?.ToString() == siteFolderName)
+                ultraGrid.Invoke(new Action(() => UpdateSiteStatus(name, status)));
+            }
+            else
+            {
+                foreach (UltraGridRow row in ultraGrid.Rows)
                 {
-                    row.Cells[nameof(IISSiteInfo.State)].Value = status;
-                    break; // Exit after updating first match
+                    if (row.Cells[nameof(IISSiteInfo.Name)].Value?.ToString() == name)
+                    {
+                        row.Cells[nameof(IISSiteInfo.State)].Value = status;
+                        // Optionally force grid refresh
+                        ultraGrid.Refresh();
+                        break; // Exit after updating first match
+                    }
                 }
             }
         }
+
 
         private async void btnBackup_Click(object sender, EventArgs e)
         {
@@ -647,7 +657,9 @@ namespace ServerDeployment.Console.Forms.AppForms
                     this.Invoke(new Action(() =>
                     {
                         SetStatus($"Started site '{site.Name}' ({currentSite} of {totalSites})", Color.Black);
+                       
                     }));
+                    UpdateSiteStatus(site.Name, "Started");
                 }
             });
 
