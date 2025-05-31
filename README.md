@@ -18,14 +18,18 @@ This Windows Forms application streamlines deployment and management of IIS-host
 - **Configuration Sync:** Copy/update configuration files (`web.config`, `appsettings.json`) after deployment.
 - **File/Folder Validation:** Validates backend, frontend, and report folders for expected files/folders before deployment.
 - **Progress Reporting:** UI progress bars and colored status messages update in real-time.
+- **Publish Button:** Executes the full deployment process (backup, stop site, delete files, deploy content, config sync, start site) as a single automated action.
 
 ---
-## Operation UI
+
+## Deployment Form UI
 
 <p align="center">
-  <img src="resources/resource-01.png" alt="Resource Image" width="500"/> 
+  <img src="resources/resource-01.png" alt="Resource Image" width="500"/>
 </p>
-<p align="center"><strong><em>Figure 1:</em></strong> Operation UI</p>
+<p align="center"><strong>Figure 1:</strong> Deployment Form UI</p>
+
+**Note:** The **Publish** button triggers the entire deployment workflow, automating backup, site stopping, file cleanup, content deployment, configuration synchronization, and site restarting in one seamless process.
 
 ## Technology Stack
 
