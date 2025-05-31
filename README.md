@@ -23,26 +23,27 @@ This Windows Forms application streamlines deployment and management of IIS-host
 ---
 
 ## Deployment Form UI
+ 
 
 <p align="center" >
-  <img src="resources/resource-01.png" alt="Deployment Form Initial View" width="350"/>
+  <img align="center" alt="resource-01.png" src="resources/resource-01.png" title="Initial Load with No Site Selected" width="500"/>
 </p>
-<p align="center"><strong>Figure 1:</strong> Deployment Form - Initial Load with No Site Selected</p>
+<p align="center"><strong>Figure 1:</strong>  Initial Load with No Site Selected</p>
 
 <p align="center">
-  <img src="resources/resource-02.png" alt="Deployment Form Site Selected with Valid Paths" width="350"/>
+  <img src="resources/resource-02.png" alt="Deployment Form Site Selected with Valid Paths" width="500"/>
 </p>
-<p align="center"><strong>Figure 2:</strong> Deployment Form - Site Selected with Backup, Backend, Frontend, and Report Paths Set</p>
+<p align="center"><strong>Figure 2:</strong> Site Selected with Backup, Backend, Frontend, and Report Paths Set</p>
 
 <p align="center">
   <img src="resources/resource-03.png" alt="Deployment Form Backup Progress" width="350"/>
 </p>
-<p align="center"><strong>Figure 3:</strong> Deployment Form - Backup and Copy Progress Indicated with Percentage and File Count</p>
+<p align="center"><strong>Figure 3:</strong> Backup and Copy Progress Indicated with Percentage and File Count</p>
 
 <p align="center">
   <img src="resources/resource-04.png" alt="Deployment Form Post Deployment Site Restarted" width="350"/>
 </p>
-<p align="center"><strong>Figure 4:</strong> Deployment Form - Deployment Complete, Site Restarted and Running</p>
+<p align="center"><strong>Figure 4:</strong> Deployment Complete, Site Restarted and Running</p>
 
 **Note:** The **Publish** button triggers the entire deployment workflow, automating backup, site stopping, file cleanup, content deployment, configuration synchronization, and site restarting in one seamless process.
 
