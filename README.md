@@ -1,5 +1,6 @@
 # Server Deployment Utility for IIS Web Applications
 
+
 ## Overview
 
 This Windows Forms application streamlines deployment and management of IIS-hosted web applications, including backend APIs, Angular frontends, and ReportViewer web apps. It helps automate tasks such as site backup, stopping/starting IIS sites, file cleanup, and content publishing.
@@ -19,6 +20,12 @@ This Windows Forms application streamlines deployment and management of IIS-host
 - **Progress Reporting:** UI progress bars and colored status messages update in real-time.
 
 ---
+## Deployment Form UI
+
+<p align="center">
+  <img src="resources/resource-01.png" alt="Resource Image" width="500"/> 
+</p>
+<p align="center"><strong><em>Figure 1:</em></strong> Operation UI</p>
 
 ## Technology Stack
 
