@@ -1,4 +1,1 @@
-use PETMATRIX_PSU
-
--- select * from dbo.GBL_PROVINCE
-SELECT * FROM PMR_REASON_TYPE WHERE ORG_ID = 1
+ 
