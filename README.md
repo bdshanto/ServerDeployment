@@ -36,12 +36,12 @@ This Windows Forms application streamlines deployment and management of IIS-host
 <p align="center"><strong>Figure 2:</strong> Site Selected with Backup, Backend, Frontend, and Report Paths Set</p>
 
 <p align="center">
-  <img src="resources/resource-03.png" alt="Backup and Copy Progress Indicated with Percentage and File Count" width="350" title="Figure 3"/>
+  <img src="resources/resource-03.png" alt="Backup and Copy Progress Indicated with Percentage and File Count" width="500" title="Figure 3"/>
 </p>
 <p align="center"><strong>Figure 3:</strong> Backup and Copy Progress Indicated with Percentage and File Count</p>
 
 <p align="center">
-  <img src="resources/resource-04.png" alt="Deployment Form Post Deployment Site Restarted" width="350"/>
+  <img src="resources/resource-04.png" alt="Deployment Form Post Deployment Site Restarted" width="500"/>
 </p>
 <p align="center"><strong>Figure 4:</strong> Deployment Complete, Site Restarted and Running</p>
 
