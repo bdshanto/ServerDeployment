@@ -47,6 +47,7 @@ This Windows Forms application streamlines deployment and management of IIS-host
 
 **Note:** The **Publish** button triggers the entire deployment workflow, automating backup, site stopping, file cleanup, content deployment, configuration synchronization, and site restarting in one seamless process.
 
+---
 ## Technology Stack
 
 - .NET 8 Windows Forms
