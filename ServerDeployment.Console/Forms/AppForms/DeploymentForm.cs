@@ -59,18 +59,12 @@ namespace ServerDeployment.Console.Forms.AppForms
             "Documents",
             "runtimes",
             "appsettings.json",
-            "efpt.config.json",
-            "EPPlus.dll",
+            "efpt.config.json", 
             "libman.json",
             "web.config",
-            "PetMatrix.API.dll",
-            "PetMatrix.API.exe",
-            "PetMatrix.API.runtimeconfig.json",
             new Regex(@"^Microsoft\..+\.dll$"),
             new Regex(@"^System\..+\.dll$"),
-            new Regex(@"^Newtonsoft\.Json\.dll$"),
-            new Regex(@"^PetMatrix\..+\.dll$"),
-            new Regex(@"^PetMatrix\..+\.pdb$")
+          
         };
 
         public event EventHandler<ProgressEventArgs>? ProgressUpdated;
