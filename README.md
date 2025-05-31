@@ -98,8 +98,26 @@ This Windows Forms application streamlines deployment and management of IIS-host
 
 - Clone or download the repository.
 - Open in Visual Studio 2022+ and build the solution.
+- Ensure you have the required `.NET SDK 8` and Infragistics(`InfragisticsUltimate2022.2`) controls installed.
+- Ensure IIS is installed and configured on your machine.
+- Ensure you have the necessary permissions to manage IIS sites.
+- Ensure the required backend, frontend, and report folders are structured as expected.
+- Ensure the `appsettings.json` and other config files are correctly set up in the backend folder.
+- Ensure the Angular frontend is built and the output folder is ready for deployment.
+- Ensure the ReportViewer web app files are in the correct structure.
+- Ensure the `bin`, `Content`, `fonts`, `Scripts`, and `SqlServerTypes` folders are present in the ReportViewer folder.
+- Ensure the `main.*.bundle.js` files are present in the Angular build folder.
+- Ensure the `About.aspx`, `Default.aspx`, `ReportViewer.aspx`, and `Site.Master` files are present in the ReportViewer folder.
+- Ensure the `appsettings.json`, `web.config`, and other config files are present in the backend deployment folder. 
 - Run the executable as Administrator (required for IIS control).
 - Configure the backup and deployment folders before publishing.
+- Click the **Publish** button to execute the deployment workflow.
+- Monitor the progress and status messages for feedback.
+- After deployment, verify the sites are running correctly in IIS.
+- Check the IIS Manager to confirm site status and content.
+- Review the logs for any errors or warnings during deployment.
+
+
 
 ---
 
