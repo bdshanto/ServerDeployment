@@ -69,7 +69,7 @@
             btnReloadSites.Name = "btnReloadSites";
             btnReloadSites.Size = new Size(171, 50);
             btnReloadSites.TabIndex = 8;
-            btnReloadSites.Text = "btnReloadSites";
+            btnReloadSites.Text = "Reload";
             btnReloadSites.UseVisualStyleBackColor = true;
             btnReloadSites.Click += btnReloadSites_Click;
             // 
@@ -79,7 +79,7 @@
             btnBackup.Name = "btnBackup";
             btnBackup.Size = new Size(171, 50);
             btnBackup.TabIndex = 9;
-            btnBackup.Text = "btnBackup";
+            btnBackup.Text = "Backup";
             btnBackup.UseVisualStyleBackColor = true;
             btnBackup.Click += btnBackup_Click;
             // 
@@ -89,7 +89,7 @@
             btnStopIIS.Name = "btnStopIIS";
             btnStopIIS.Size = new Size(171, 50);
             btnStopIIS.TabIndex = 10;
-            btnStopIIS.Text = "btnStopIIS";
+            btnStopIIS.Text = "Stop IIS";
             btnStopIIS.UseVisualStyleBackColor = true;
             btnStopIIS.Click += btnStopIIS_Click;
             // 
@@ -99,7 +99,7 @@
             btnStartIIS.Name = "btnStartIIS";
             btnStartIIS.Size = new Size(171, 50);
             btnStartIIS.TabIndex = 14;
-            btnStartIIS.Text = "btnStartIIS";
+            btnStartIIS.Text = "Start IIS";
             btnStartIIS.UseVisualStyleBackColor = true;
             btnStartIIS.Click += btnStartIIS_Click;
             // 
@@ -109,7 +109,7 @@
             btnDeleteFiles.Name = "btnDeleteFiles";
             btnDeleteFiles.Size = new Size(171, 50);
             btnDeleteFiles.TabIndex = 11;
-            btnDeleteFiles.Text = "btnDeleteFiles";
+            btnDeleteFiles.Text = "Delete Files";
             btnDeleteFiles.UseVisualStyleBackColor = true;
             btnDeleteFiles.Click += btnDeleteFiles_Click;
             // 
@@ -119,7 +119,7 @@
             btnCopyAppSettings.Name = "btnCopyAppSettings";
             btnCopyAppSettings.Size = new Size(171, 50);
             btnCopyAppSettings.TabIndex = 13;
-            btnCopyAppSettings.Text = "btnCopyAppSettings";
+            btnCopyAppSettings.Text = "Copy App Settings";
             btnCopyAppSettings.UseVisualStyleBackColor = true;
             btnCopyAppSettings.Click += btnCopyAppSettings_Click;
             // 
@@ -137,7 +137,7 @@
             btnCopyContent.Name = "btnCopyContent";
             btnCopyContent.Size = new Size(171, 50);
             btnCopyContent.TabIndex = 12;
-            btnCopyContent.Text = "btnCopyContent";
+            btnCopyContent.Text = "Copy Content";
             btnCopyContent.UseVisualStyleBackColor = true;
             btnCopyContent.Click += btnCopyContent_Click;
             // 
