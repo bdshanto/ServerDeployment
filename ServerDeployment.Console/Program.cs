@@ -7,11 +7,7 @@ namespace ServerDeployment.Console
     {
         [STAThread]
         static void Main()
-        {
-            var conString = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ToString();
-
-            AppUtility.ConnectionString = conString;
-
+        { 
             ApplicationConfiguration.Initialize();
 
             Application.EnableVisualStyles();
@@ -19,8 +15,7 @@ namespace ServerDeployment.Console
 
             Infragistics.Win.AppStyling.StyleManager.Load(Utilities.GetEmbeddedResourceStream("ServerDeployment.Console.StyleLibraries.FlatNature.isl"));
 
-            Application.Run(new DeploymentForm());
-            // Application.Run(new MainForm());
+            Application.Run(new DeploymentForm()); 
         }
     }
 }
