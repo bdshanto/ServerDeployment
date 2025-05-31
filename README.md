@@ -20,7 +20,7 @@ This Windows Forms application streamlines deployment and management of IIS-host
 - **Progress Reporting:** UI progress bars and colored status messages update in real-time.
 
 ---
-## Deployment Form UI
+## Operation UI
 
 <p align="center">
   <img src="resources/resource-01.png" alt="Resource Image" width="500"/> 
